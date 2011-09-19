@@ -33,7 +33,6 @@ from rime.core import targets
 from rime.core import taskgraph
 from rime.util import console as console_mod
 from rime.util import module_loader
-from rime.util import options
 
 
 def LoadRequiredModules():
