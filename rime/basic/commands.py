@@ -29,16 +29,19 @@ from rime.basic.targets import solution
 from rime.basic.targets import testset
 
 
+def IsBasicTarget(obj):
+  return isinstance(obj, (project.Project,
+                          problem.Problem,
+                          solution.Solution,
+                          testset.Testset))
+
 def Build(obj, args, ui):
   """Entry point for build command."""
   if args:
     ui.console.PrintError('Extra argument passed to build command!')
     return None
 
-  if isinstance(obj, (targets.Project,
-                      targets.Problem,
-                      targets.Solution,
-                      targets.Testset)):
+  if IsBasicTarget(obj):
     return obj.Build(ui)
 
   ui.console.PrintError('Build is not supported for the specified target.')
@@ -51,10 +54,7 @@ def Test(obj, args, ui):
     ui.console.PrintError('Extra argument passed to test command!')
     return None
 
-  if isinstance(obj, (targets.Project,
-                      targets.Problem,
-                      targets.Solution,
-                      targets.Testset)):
+  if IsBasicTarget(obj):
     return obj.Test(ui)
 
   ui.console.PrintError('Test is not supported for the specified target.')
@@ -67,10 +67,7 @@ def Clean(obj, args, ui):
     ui.console.PrintError('Extra argument passed to clean command!')
     return None
 
-  if isinstance(obj, (targets.Project,
-                      targets.Problem,
-                      targets.Solution,
-                      targets.Testset)):
+  if IsBasicTarget(obj):
     return obj.Clean(ui)
 
   ui.console.PrintError('Clean is not supported for the specified target.')

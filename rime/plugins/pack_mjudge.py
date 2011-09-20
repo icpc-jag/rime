@@ -131,9 +131,7 @@ def Pack(obj, args, ui):
     ui.console.PrintError('Extra argument passed to pack command!')
     return None
 
-  if isinstance(obj, (targets.Project,
-                      targets.Problem,
-                      targets.Testset)):
+  if isinstance(obj, (Project, Problem, Testset)):
     return obj.Pack(ui)
 
   ui.console.PrintError('Pack is not supported for the specified target.')
