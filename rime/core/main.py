@@ -79,7 +79,7 @@ def LoadProject(cwd, ui):
   try:
     project.Load(ui)
     return project
-  except:
+  except targets.ConfigurationError:
     ui.errors.Exception(project)
     return None
 
@@ -143,7 +143,7 @@ def InternalMain(argv):
   # Run the task.
   graph = CreateTaskGraph(ui)
   try:
-    task = cmd.Run(obj, args, ui)
+    task = cmd.Run(obj, tuple(args), ui)
     if task:
       graph.Run(task)
   except KeyboardInterrupt:
