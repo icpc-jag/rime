@@ -26,28 +26,27 @@ from rime.core import commands
 
 
 # Register the root command and global options.
-commands.RegisterCommand(None, None, consts.GLOBAL_HELP)
+class Default(commands.CommandBase):
+  def __init__(self, parent):
+    assert parent is None
+    super(Default, self).__init__(None, consts.GLOBAL_HELP, parent)
+    self.AddOptionEntry(commands.OptionEntry(
+        'h', 'help', 'help', bool, False, None,
+        'Show this help.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'j', 'jobs', 'parallelism', int, 0, 'n',
+        'Run multiple jobs in parallel.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'd', 'debug', 'debug', bool, False, None,
+        'Turn on debugging.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'C', 'cache_tests', 'cache_tests', bool, False, None,
+        'Cache test results.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'p', 'precise', 'precise', bool, False, None,
+        'Do not run timing tasks concurrently.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'k', 'keep_going', 'keep_going', bool, False, None,
+        'Do not skip tests on failures.'))
 
-commands.RegisterOption(
-  None, 'h', 'help', 'help', bool, False, None,
-  'Show this help.')
-
-commands.RegisterOption(
-  None, 'j', 'jobs', 'parallelism', int, 0, 'n',
-  'Run multiple jobs in parallel.')
-
-commands.RegisterOption(
-  None, 'd', 'debug', 'debug', bool, False, None,
-  'Turn on debugging.')
-
-commands.RegisterOption(
-  None, 'C', 'cache_tests', 'cache_tests', bool, False, None,
-  'Cache test results.')
-
-commands.RegisterOption(
-  None, 'p', 'precise', 'precise', bool, False, None,
-  'Do not run timing tasks concurrently.')
-
-commands.RegisterOption(
-  None, 'k', 'keep_going', 'keep_going', bool, False, None,
-  'Do not skip tests on failures.')
+commands.registry.Add(Default)

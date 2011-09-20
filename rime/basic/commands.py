@@ -35,53 +35,67 @@ def IsBasicTarget(obj):
                           solution.Solution,
                           testset.Testset))
 
-def Build(obj, args, ui):
-  """Entry point for build command."""
-  if args:
-    ui.console.PrintError('Extra argument passed to build command!')
+
+class Build(commands.CommandBase):
+  def __init__(self, parent):
+    super(Build, self).__init__(
+      'build',
+      'Build a target.',
+      parent)
+
+  def Run(self, obj, args, ui):
+    """Entry point for build command."""
+    if args:
+      ui.console.PrintError('Extra argument passed to build command!')
+      return None
+
+    if IsBasicTarget(obj):
+      return obj.Build(ui)
+
+    ui.console.PrintError('Build is not supported for the specified target.')
     return None
 
-  if IsBasicTarget(obj):
-    return obj.Build(ui)
 
-  ui.console.PrintError('Build is not supported for the specified target.')
-  return None
+class Test(commands.CommandBase):
+  def __init__(self, parent):
+    super(Test, self).__init__(
+      'test',
+      'Run tests.',
+      parent)
 
+  def Run(self, obj, args, ui):
+    """Entry point for test command."""
+    if args:
+      ui.console.PrintError('Extra argument passed to test command!')
+      return None
 
-def Test(obj, args, ui):
-  """Entry point for test command."""
-  if args:
-    ui.console.PrintError('Extra argument passed to test command!')
+    if IsBasicTarget(obj):
+      return obj.Test(ui)
+
+    ui.console.PrintError('Test is not supported for the specified target.')
     return None
 
-  if IsBasicTarget(obj):
-    return obj.Test(ui)
 
-  ui.console.PrintError('Test is not supported for the specified target.')
-  return None
+class Clean(commands.CommandBase):
+  def __init__(self, parent):
+    super(Clean, self).__init__(
+      'clean',
+      'Clean intermediate files.',
+      parent)
 
+  def Run(self, obj, args, ui):
+    """Entry point for clean command."""
+    if args:
+      ui.console.PrintError('Extra argument passed to clean command!')
+      return None
 
-def Clean(obj, args, ui):
-  """Entry point for clean command."""
-  if args:
-    ui.console.PrintError('Extra argument passed to clean command!')
+    if IsBasicTarget(obj):
+      return obj.Clean(ui)
+
+    ui.console.PrintError('Clean is not supported for the specified target.')
     return None
 
-  if IsBasicTarget(obj):
-    return obj.Clean(ui)
 
-  ui.console.PrintError('Clean is not supported for the specified target.')
-  return None
-
-
-commands.RegisterCommand('build', Build, """\
-Build a target.
-""")
-
-commands.RegisterCommand('test', Test, """\
-Run tests.
-""")
-
-commands.RegisterCommand('clean', Clean, """\
-Clean intermediate files.
-""")
+commands.registry.Add(Build)
+commands.registry.Add(Test)
+commands.registry.Add(Clean)

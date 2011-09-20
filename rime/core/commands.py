@@ -23,18 +23,18 @@
 
 import string
 
+from rime.util import class_registry
 from rime.util import struct
-
-
-_COMMANDS = {}
 
 
 class ParseError(Exception):
   pass
 
 
-class Option(object):
+class OptionEntry(object):
   def __init__(self, shortname, longname, varname, argtype, argdef, argname, description):
+    assert argtype in (bool, int, str)
+    assert isinstance(argdef, argtype)
     self.shortname = shortname
     self.longname = longname
     self.varname = varname
@@ -43,43 +43,68 @@ class Option(object):
     self.argname = argname
     self.description = description
 
-  def MatchOption(self, name):
+  def Match(self, name):
     return (name in (self.shortname, self.longname))
 
 
 class Command(object):
-  def __init__(self, name, handler, description):
+  name = None
+  description = None
+
+  def __init__(self, parent):
+    self.parent = parent
+
+  def FindOptionEntry(self, name):
+    raise NotImplementedError()
+
+  def GetDefaultOptionDict(self):
+    raise NotImplementedError()
+
+  def PrintHelp(self, arg0, ui):
+    raise NotImplementedError()
+
+  def Run(self, obj, args, ui):
+    raise NotImplementedError()
+
+
+class CommandBase(Command):
+  def __init__(self, name, description, parent):
+    super(CommandBase, self).__init__(parent)
     self.name = name
-    self.handler = handler
     self.description = description
     self.options = []
 
-  def AddOption(self, shortname, longname, varname, argtype, argdef, argname, description):
-    option = Option(shortname, longname, varname, argtype, argdef, argname, description)
+  def AddOptionEntry(self, option):
     self.options.append(option)
 
-  def FindOption(self, name):
+  def FindOptionEntry(self, name):
     for option in self.options:
-      if option.MatchOption(name):
+      if option.Match(name):
         return option
+    if self.parent:
+      return self.parent.FindOptionEntry(name)
     return None
 
-  def GetDefaultOptions(self):
-    options = struct.Struct()
+  def GetDefaultOptionDict(self):
+    if self.parent:
+      options = self.parent.GetDefaultOptionDict()
+    else:
+      options = {}
     for option in self.options:
-      setattr(options, option.varname, option.argdef)
+      assert option.varname not in options
+      options[option.varname] = option.argdef
     return options
 
   def PrintHelp(self, arg0, ui):
     ui.console.Print('Usage: %s %s [<options> ...] [<args> ...]' %
-                      (arg0, (self.name or '<command>')))
+                     (arg0, (self.name or '<command>')))
     ui.console.Print()
     self._PrintCommandDescription(ui)
     if self.name:
       ui.console.Print('Options for "%s":' % self.name)
       self._PrintOptionDescription(ui)
     ui.console.Print('Global options:')
-    _COMMANDS[None]._PrintOptionDescription(ui)
+    ui.commands[None]._PrintOptionDescription(ui)
 
   def _PrintCommandDescription(self, ui):
     description = self.description
@@ -91,7 +116,7 @@ class Command(object):
 
     if not self.name:
       rows = []
-      for cmd in sorted(_COMMANDS.values(), lambda a, b: cmp(a.name, b.name)):
+      for cmd in sorted(ui.commands.values(), lambda a, b: cmp(a.name, b.name)):
         if not cmd.name:
           continue
         rows.append(('  %s  ' % cmd.name, cmd.description.splitlines()[0]))
@@ -123,28 +148,26 @@ class Command(object):
     ui.console.Print()
 
 
-def RegisterCommand(name, handler, description):
-  assert name not in _COMMANDS
-  assert name is None or name.lower() == name
-  _COMMANDS[name] = Command(name, handler, description)
+registry = class_registry.ClassRegistry(Command)
 
 
-def RegisterOption(cmdname, shortname, longname, varname, argtype, argdef, argname, description):
-  assert cmdname in _COMMANDS
-  assert shortname is None or _COMMANDS[cmdname].FindOption(shortname) is None
-  assert shortname is None or _COMMANDS[None].FindOption(shortname) is None
-  assert _COMMANDS[cmdname].FindOption(longname) is None
-  assert _COMMANDS[None].FindOption(longname) is None
-  assert argtype in (bool, int, str)
-  assert type(argdef) is argtype
-  _COMMANDS[cmdname].AddOption(shortname, longname, varname, argtype, argdef, argname, description)
+def GetCommands():
+  commands = {}
+  default = registry.Default(None)
+  commands[None] = default
+  for name, clazz in registry.classes.items():
+    if name == 'Default':
+      continue
+    cmd = clazz(default)
+    commands[cmd.name] = cmd
+  return commands
 
 
 def GetCommand(cmdname):
-  return _COMMANDS[cmdname]
+  return GetCommands()[cmdname]
 
 
-def Parse(argv):
+def Parse(argv, commands):
   """Parses the command line arguments.
 
   Arguments:
@@ -160,10 +183,10 @@ def Parse(argv):
   Raises:
     ParseError: When failed to parse arguments.
   """
-  base = _COMMANDS[None]
+  default = commands[None]
   cmd = None
   extra_args = []
-  options = base.GetDefaultOptions()
+  options = default.GetDefaultOptionDict()
 
   assert len(argv) >= 1
   i = 1
@@ -178,13 +201,12 @@ def Parse(argv):
         arg = arg.lower()
 
         if arg == 'help':
-          options.help = True
+          options['help'] = True
         else:
-          if arg not in _COMMANDS:
+          if arg not in commands:
             raise ParseError('Unknown command: %s' % arg)
-          cmd = _COMMANDS[arg]
-          for option in cmd.options:
-            setattr(options, option.varname, option.argdef)
+          cmd = commands[arg]
+          options.update(cmd.GetDefaultOptionDict())
 
       else:
         extra_args.append(arg)
@@ -210,7 +232,8 @@ def Parse(argv):
       for optname in optnames:
         optfull = '%s%s' % (longopt and '--' or '-', optname)
 
-        option = (cmd and cmd.FindOption(optname) or base.FindOption(optname))
+        option = (cmd and cmd.FindOptionEntry(optname) or
+                  default.FindOptionEntry(optname))
         if option is None:
           raise ParseError('Unknown option: %s' % optfull)
 
@@ -227,10 +250,10 @@ def Parse(argv):
         except:
           raise ParseError('Invalid option parameter for %s' % optfull)
 
-        setattr(options, option.varname, optvalue)
+        options[option.varname] = optvalue
 
   if cmd is None:
-    cmd = _COMMANDS[None]
-    options.help = True
+    cmd = commands[None]
+    options['help'] = True
 
-  return (cmd, extra_args, options)
+  return (cmd, extra_args, struct.Struct(options))

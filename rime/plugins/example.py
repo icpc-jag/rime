@@ -24,23 +24,25 @@
 from rime.core import commands
 
 
-def Example(obj, args, ui):
-  ui.console.Print('Hello, world!')
-  ui.console.Print()
-  ui.console.Print('Object:')
-  ui.console.Print('  %s' % repr(obj))
-  ui.console.Print()
-  ui.console.Print('Parameters:')
-  for i, arg in enumerate(args):
-    ui.console.Print('  args[%s] = "%s"' % (i, arg))
-  ui.console.Print()
-  ui.console.Print('Options:')
-  for name in dir(ui.options):
-    if name.startswith('__'):
-      continue
-    ui.console.Print('  options.%s = %s' % (name, repr(getattr(ui.options, name))))
+class Example(commands.CommandBase):
+  def __init__(self, parent):
+    super(Example, self).__init__(
+      'example',
+      'Example command.',
+      parent)
 
-
-commands.RegisterCommand('example', Example, """\
-Example command.
-""")
+  def Run(self, obj, args, ui):
+    ui.console.Print('Hello, world!')
+    ui.console.Print()
+    ui.console.Print('Object:')
+    ui.console.Print('  %s' % repr(obj))
+    ui.console.Print()
+    ui.console.Print('Parameters:')
+    for i, arg in enumerate(args):
+      ui.console.Print('  args[%s] = "%s"' % (i, arg))
+    ui.console.Print()
+    ui.console.Print('Options:')
+    for name in dir(ui.options):
+      if name.startswith('__'):
+        continue
+      ui.console.Print('  options.%s = %s' % (name, repr(getattr(ui.options, name))))

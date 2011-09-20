@@ -22,9 +22,15 @@
 #
 
 
-class Struct(object):
-  """Utility dummy class for storing data."""
+class Struct(dict):
+  """Dictionary-like object allowing attribute access."""
 
-  def __init__(self, **kwargs):
-    for key, value in kwargs.items():
-      setattr(self, key, value)
+  def __getattribute__(self, name):
+    try:
+      return super(Struct, self).__getattribute__(name)
+    except AttributeError:
+      try:
+        return self[name]
+      except KeyError:
+        pass
+      raise

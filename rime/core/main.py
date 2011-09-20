@@ -27,20 +27,23 @@ import platform
 import sys
 import traceback
 
-from rime.core import commands
+from rime.core import commands as commands_mod
 from rime.core import ui as ui_mod
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import console as console_mod
 from rime.util import module_loader
+from rime.util import struct
 
 
 def LoadRequiredModules():
+  # TODO(nya): Fix this hacky implementation.
   module_loader.LoadPackage('rime.basic')
   while True:
-    default_options = commands.GetCommand(None).GetDefaultOptions()
+    commands = commands_mod.GetCommands()
+    default_options = struct.Struct(commands[None].GetDefaultOptionDict())
     null_console = console_mod.NullConsole()
-    fake_ui = ui_mod.UiContext(default_options, null_console)
+    fake_ui = ui_mod.UiContext(default_options, null_console, commands)
     try:
       LoadProject(os.getcwd(), fake_ui)
       break
@@ -98,14 +101,16 @@ def InternalMain(argv):
 
   console = console_mod.TtyConsole(sys.stdout)
 
+  commands = commands_mod.GetCommands()
+
   # Parse arguments.
   try:
-    cmd, args, opts = commands.Parse(argv)
-  except commands.ParseError, e:
+    cmd, args, opts = commands_mod.Parse(argv, commands)
+  except commands_mod.ParseError, e:
     console.PrintError(str(e))
     return 1
 
-  ui = ui_mod.UiContext(opts, console)
+  ui = ui_mod.UiContext(opts, console, commands)
 
   if opts.help:
     cmd.PrintHelp(argv[0], ui)
@@ -138,7 +143,7 @@ def InternalMain(argv):
   # Run the task.
   graph = CreateTaskGraph(ui)
   try:
-    task = cmd.handler(obj, args, ui)
+    task = cmd.Run(obj, args, ui)
     if task:
       graph.Run(task)
   except KeyboardInterrupt:

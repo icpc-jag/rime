@@ -125,19 +125,23 @@ targets.registry.Override('Problem', Problem)
 targets.registry.Override('Testset', Testset)
 
 
-def Pack(obj, args, ui):
-  """Entry point for pack command."""
-  if args:
-    ui.console.PrintError('Extra argument passed to pack command!')
+class Pack(commands.CommandBase):
+  def __init__(self, parent):
+    super(Pack, self).__init__(
+      'pack',
+      'Pack testsets to export to M-judge. (pack_mjudge plugin)',
+      parent)
+
+  def Run(self, obj, args, ui):
+    """Entry point for pack command."""
+    if args:
+      ui.console.PrintError('Extra argument passed to pack command!')
+      return None
+
+    if isinstance(obj, (Project, Problem, Testset)):
+      return obj.Pack(ui)
+
+    ui.console.PrintError('Pack is not supported for the specified target.')
     return None
 
-  if isinstance(obj, (Project, Problem, Testset)):
-    return obj.Pack(ui)
-
-  ui.console.PrintError('Pack is not supported for the specified target.')
-  return None
-
-
-commands.RegisterCommand('pack', Pack, """\
-Pack testsets to export to M-judge. (pack_mjudge plugin)
-""")
+commands.registry.Add(Pack)
