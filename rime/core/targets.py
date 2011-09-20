@@ -25,8 +25,9 @@ import os
 import os.path
 import sys
 
-from rime.util import module_loader
+from rime.util import class_registry
 from rime.util import files
+from rime.util import module_loader
 
 
 class TargetBase(object):
@@ -148,16 +149,5 @@ class Project(TargetBase):
     self.exports['use_plugin'] = use_plugin
 
 
-def NewTarget(name, target):
-  assert name not in globals()
-  globals()[name] = target
-
-
-def OverrideTarget(name, target):
-  assert name in globals()
-  assert issubclass(target, globals()[name])
-  globals()[name] = target
-
-
-# Target classes will be injected here by basic/plugin modules. Particularly,
-# rime.basic.targets module has definitions of very basic target classes.
+registry = class_registry.ClassRegistry(TargetBase)
+registry.Add(Project)

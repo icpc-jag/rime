@@ -65,8 +65,8 @@ class Problem(targets.TargetBase):
     self.solutions = []
     for name in sorted(files.ListDir(self.base_dir)):
       path = os.path.join(self.base_dir, name)
-      if targets.Solution.CanLoadFrom(path):
-        solution = targets.Solution(name, path, self)
+      if targets.registry.Solution.CanLoadFrom(path):
+        solution = targets.registry.Solution(name, path, self)
         try:
           solution.Load(ui)
           self.solutions.append(solution)
@@ -76,8 +76,8 @@ class Problem(targets.TargetBase):
     self.testsets = []
     for name in sorted(files.ListDir(self.base_dir)):
       path = os.path.join(self.base_dir, name)
-      if targets.Testset.CanLoadFrom(path):
-        testset = targets.Testset(name, path, self)
+      if targets.registry.Testset.CanLoadFrom(path):
+        testset = targets.registry.Testset(name, path, self)
         try:
           testset.Load(ui)
           self.testsets.append(testset)
@@ -200,4 +200,4 @@ class ProblemComponentMixin(object):
     return (src_mtime < stamp_mtime)
 
 
-targets.NewTarget('Problem', Problem)
+targets.registry.Add(Problem)

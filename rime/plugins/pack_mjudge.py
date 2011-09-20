@@ -35,7 +35,7 @@ from rime.util import files
 _PACKED_TARBALL_TEMPLATE = '%s.tar.gz'
 
 
-class Project(targets.Project):
+class Project(targets.registry.Project):
   @taskgraph.task_method
   def Pack(self, ui):
     results = yield taskgraph.TaskBranch(
@@ -43,7 +43,7 @@ class Project(targets.Project):
     yield all(results)
 
 
-class Problem(targets.Problem):
+class Problem(targets.registry.Problem):
   @taskgraph.task_method
   def Pack(self, ui):
     results = yield taskgraph.TaskBranch(
@@ -51,7 +51,7 @@ class Problem(targets.Problem):
     yield all(results)
 
 
-class Testset(targets.Testset):
+class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
     self.pack_dir = os.path.join(self.out_dir, 'pack')
@@ -120,9 +120,9 @@ class Testset(targets.Testset):
     yield True
 
 
-targets.OverrideTarget('Project', Project)
-targets.OverrideTarget('Problem', Problem)
-targets.OverrideTarget('Testset', Testset)
+targets.registry.Override('Project', Project)
+targets.registry.Override('Problem', Problem)
+targets.registry.Override('Testset', Testset)
 
 
 def Pack(obj, args, ui):

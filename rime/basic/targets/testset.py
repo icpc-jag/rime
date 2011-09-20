@@ -586,4 +586,4 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     yield True
 
 
-targets.NewTarget('Testset', Testset)
+targets.registry.Add(Testset)

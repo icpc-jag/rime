@@ -126,4 +126,4 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
     yield True
 
 
-targets.NewTarget('Solution', Solution)
+targets.registry.Add(Solution)

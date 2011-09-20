@@ -67,12 +67,12 @@ def LoadProject(cwd, ui):
   If PROJECT cannot be found, return None.
   """
   path = cwd
-  while not targets.Project.CanLoadFrom(path):
+  while not targets.registry.Project.CanLoadFrom(path):
     (head, tail) = os.path.split(path)
     if head == path:
       return None
     path = head
-  project = targets.Project('root', path, None)
+  project = targets.registry.Project('root', path, None)
   try:
     project.Load(ui)
     return project

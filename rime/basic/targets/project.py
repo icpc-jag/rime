@@ -29,7 +29,7 @@ from rime.core import taskgraph
 from rime.util import files
 
 
-class Project(targets.Project):
+class Project(targets.registry.Project):
   """Project target."""
 
   CONFIG_FILENAME = 'PROJECT'
@@ -48,8 +48,8 @@ class Project(targets.Project):
     self.problems = []
     for name in files.ListDir(self.base_dir):
       path = os.path.join(self.base_dir, name)
-      if targets.Problem.CanLoadFrom(path):
-        problem = targets.Problem(name, path, self)
+      if targets.registry.Problem.CanLoadFrom(path):
+        problem = targets.registry.Problem(name, path, self)
         try:
           problem.Load(ui)
           self.problems.append(problem)
@@ -88,4 +88,4 @@ class Project(targets.Project):
     yield all(results)
 
 
-targets.OverrideTarget('Project', Project)
+targets.registry.Override('Project', Project)

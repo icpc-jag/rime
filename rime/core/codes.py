@@ -23,6 +23,9 @@
 
 import os.path
 
+from rime.util import class_registry
+
+
 # Registered code types.  An entry is (prefix, extension, class).
 _CODE_TYPES = []
 
@@ -72,14 +75,6 @@ class RegistrationError(Exception):
   pass
 
 
-def CreateCodeByExtension(src_name, src_dir, out_dir, *args, **kwargs):
-  src_ext = os.path.splitext(src_name)[1][1:]
-  for _, code_extensions, code_class in _CODE_TYPES:
-    if src_ext in code_extensions:
-      return code_class(src_name, src_dir, out_dir, *args, **kwargs)
-  return None
-
-
 def Register(name, extensions, code_class):
   """Registers a code class."""
   for entry_name, entry_extensions, _ in _CODE_TYPES:
@@ -106,5 +101,9 @@ def ExportDictionary(name_fmt, codeset, src_dir, out_dir):
   return export
 
 
-# Code classes will be injected here by basic/plugin modules. Particularly,
-# rime.basic.codes module has definitions of common code classes.
+def CreateCodeByExtension(src_name, src_dir, out_dir, *args, **kwargs):
+  src_ext = os.path.splitext(src_name)[1][1:]
+  for _, code_extensions, code_class in _CODE_TYPES:
+    if src_ext in code_extensions:
+      return code_class(src_name, src_dir, out_dir, *args, **kwargs)
+  return None
