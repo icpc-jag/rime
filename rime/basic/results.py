@@ -70,10 +70,11 @@ class TestResult(object):
 
   def GetTimeStats(self):
     """Get time statistics."""
-    if (consts.CONCAT_INFILE in self.cases and
-        self.cases[consts.CONCAT_INFILE].time is not None):
-      return '(%.2f/%.2f/%.2f)' % (self.GetMaxTime(), self.GetTotalTime(),
-                                   self.cases[consts.CONCAT_INFILE].time)
+    # TODO(nya): Concat support
+    #if (consts.CONCAT_INFILE in self.cases and
+    #    self.cases[consts.CONCAT_INFILE].time is not None):
+    #  return '(%.2f/%.2f/%.2f)' % (self.GetMaxTime(), self.GetTotalTime(),
+    #                               self.cases[consts.CONCAT_INFILE].time)
     return '(%.2f/%.2f)' % (self.GetMaxTime(), self.GetTotalTime())
 
   def GetMaxTime(self):
