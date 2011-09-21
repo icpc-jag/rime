@@ -549,7 +549,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     timeout = self.problem.timeout
     if ignore_timeout:
       timeout = None
-    precise = (ui.options.precise or ui.options.parallelism == 1)
+    precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
       args=(), cwd=solution.out_dir,
       input=os.path.join(self.out_dir, infile),

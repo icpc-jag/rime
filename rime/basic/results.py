@@ -64,7 +64,7 @@ class TestResult(object):
 
   def IsTimeStatsAvailable(self, ui):
     """Checks if time statistics are available."""
-    return ((ui.options.precise or ui.options.parallelism == 1) and
+    return ((ui.options.precise or ui.options.parallelism <= 1) and
             self.files and
             all([c.verdict == TestResult.AC for c in self.cases.values()]))
 

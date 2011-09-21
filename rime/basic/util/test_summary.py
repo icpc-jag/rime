@@ -74,7 +74,7 @@ def PrintTestSummary(results, ui):
     if result.cached:
       status_row += [' ', '(cached)']
     ui.console.Print(*status_row)
-  if not (ui.options.precise or ui.options.parallelism == 1):
+  if not (ui.options.precise or ui.options.parallelism <= 1):
     ui.console.Print()
     ui.console.Print('Note: Timings are not displayed when '
                      'parallel testing is enabled.')
