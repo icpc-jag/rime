@@ -23,10 +23,12 @@
 
 from rime.core import commands
 from rime.core import targets
+from rime.core import taskgraph
 from rime.basic.targets import problem
 from rime.basic.targets import project
 from rime.basic.targets import solution
 from rime.basic.targets import testset
+from rime.basic.util import test_summary
 
 
 def IsBasicTarget(obj):
@@ -43,17 +45,18 @@ class Build(commands.CommandBase):
       'Build a target.',
       parent)
 
+  @taskgraph.task_method
   def Run(self, obj, args, ui):
     """Entry point for build command."""
     if args:
       ui.console.PrintError('Extra argument passed to build command!')
-      return None
+      yield None
 
     if IsBasicTarget(obj):
-      return obj.Build(ui)
+      yield (yield obj.Build(ui))
 
     ui.console.PrintError('Build is not supported for the specified target.')
-    return None
+    yield None
 
 
 class Test(commands.CommandBase):
@@ -63,17 +66,20 @@ class Test(commands.CommandBase):
       'Run tests.',
       parent)
 
+  @taskgraph.task_method
   def Run(self, obj, args, ui):
     """Entry point for test command."""
     if args:
       ui.console.PrintError('Extra argument passed to test command!')
-      return None
+      yield None
 
     if IsBasicTarget(obj):
-      return obj.Test(ui)
+      results = yield obj.Test(ui)
+      test_summary.PrintTestSummary(results, ui)
+      yield results
 
     ui.console.PrintError('Test is not supported for the specified target.')
-    return None
+    yield None
 
 
 class Clean(commands.CommandBase):
@@ -83,17 +89,18 @@ class Clean(commands.CommandBase):
       'Clean intermediate files.',
       parent)
 
+  @taskgraph.task_method
   def Run(self, obj, args, ui):
     """Entry point for clean command."""
     if args:
       ui.console.PrintError('Extra argument passed to clean command!')
-      return None
+      yield None
 
     if IsBasicTarget(obj):
-      return obj.Clean(ui)
+      yield (yield obj.Clean(ui))
 
     ui.console.PrintError('Clean is not supported for the specified target.')
-    return None
+    yield None
 
 
 commands.registry.Add(Build)

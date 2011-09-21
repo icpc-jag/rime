@@ -89,17 +89,3 @@ class TestResult(object):
     All case should be accepted.
     """
     return sum([c.time for k, c in self.cases.items() if not k.startswith('.')])
-
-  @classmethod
-  def CompareForListing(cls, a, b):
-    """Compare two TestResult for display-ordering."""
-    if a.problem.name != b.problem.name:
-      return cmp(a.problem.name, b.problem.name)
-    reference_solution = a.problem.reference_solution
-    if a.solution is reference_solution:
-      return -1
-    if b.solution is reference_solution:
-      return +1
-    if a.solution.IsCorrect() != b.solution.IsCorrect():
-      return -cmp(a.solution.IsCorrect(), b.solution.IsCorrect())
-    return cmp(a.solution.name, b.solution.name)
