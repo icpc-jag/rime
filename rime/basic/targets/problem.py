@@ -96,8 +96,18 @@ class Problem(targets.TargetBase):
       self.reference_solution = reference_solution
 
   def _ParseSettings(self, ui):
+    # Currently we only support one testset per problem.
+    self.testset = None
+    if len(self.testsets) >= 2:
+      ui.errors.Error(self, 'Multiple testsets found')
+    elif len(self.testsets) == 0:
+      self.testset = targets.registry.Testset.CreateEmpty(self, ui)
+    elif len(self.testsets) == 1:
+      self.testset = self.testsets[0]
+
     if self.timeout is None:
       ui.errors.Error(self, 'Time limit is not specified')
+
     # Select a reference solution.
     if self.reference_solution is None:
       # If not explicitly specified, select one which is
@@ -106,6 +116,7 @@ class Problem(targets.TargetBase):
         if solution.IsCorrect():
           self.reference_solution = solution
           break
+
     else:
       # If explicitly specified, just use it.
       reference_solution_name = self.reference_solution
@@ -138,7 +149,7 @@ class Problem(targets.TargetBase):
     """Build all solutions and the testset."""
     results = yield taskgraph.TaskBranch(
       [solution.Build(ui) for solution in self.solutions] +
-      [testset.Build(ui) for testset in self.testsets])
+      [self.testset.Build(ui)])
     yield all(results)
 
   @taskgraph.task_method
@@ -146,6 +157,13 @@ class Problem(targets.TargetBase):
     """Run tests in the problem."""
     results = yield taskgraph.TaskBranch(
       [testset.Test(ui) for testset in self.testsets])
+    yield list(itertools.chain(*results))
+
+  @taskgraph.task_method
+  def TestSolution(self, solution, ui):
+    """Run tests in the problem."""
+    results = yield taskgraph.TaskBranch(
+      [testset.TestSolution(solution, ui) for testset in self.testsets])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method

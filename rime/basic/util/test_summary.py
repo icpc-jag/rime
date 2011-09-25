@@ -38,8 +38,7 @@ def PrintTestSummary(results, ui):
         ui.console.NORMAL,
         ' ... %d solutions, %d tests' %
         (len(result.problem.solutions),
-         sum([len(testset.ListInputFiles())
-              for testset in result.problem.testsets]))]
+         len(result.problem.testset.ListInputFiles()))]
       ui.console.Print(*problem_row)
       last_problem = result.problem
     status_row = ['  ']

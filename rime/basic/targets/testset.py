@@ -47,6 +47,15 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     self.problem = parent
     problem.ProblemComponentMixin.__init__(self)
 
+  @classmethod
+  def CreateEmpty(cls, parent, ui):
+    # Workaround for no testset case.
+    # TODO(nya): support multiple testsets.
+    testset = cls('tests', '', parent)
+    testset.config_file = '/dev/null'
+    testset.Load(ui)
+    return testset
+
   def PreLoad(self, ui):
     super(Testset, self).PreLoad(ui)
     self.generators = []
@@ -107,6 +116,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   def Build(self, ui):
     """Build testset."""
     if self.IsBuildCached():
+      if not self.ListInputFiles():
+        ui.errors.Warning(self, 'No test case found')
       yield True
     if not self._InitOutputDir(ui):
       yield False
@@ -119,7 +130,9 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       yield False
     if not (yield self._RunValidators(ui)):
       yield False
-    if self.ListInputFiles():
+    if not self.ListInputFiles():
+      ui.errors.Warning(self, 'No test case found')
+    else:
       if not (yield self._CompileReferenceSolution(ui)):
         yield False
       if not (yield self._RunReferenceSolution(ui)):
@@ -215,8 +228,10 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     Run input validators.
     """
     if not self.validators:
-      #ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
-      ui.errors.Warning(self, 'Validator Unavailable')
+      # Ignore when this testset actually does not exist.
+      if self.base_dir:
+        #ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
+        ui.errors.Warning(self, 'Validator unavailable')
       yield True
     infiles = self.ListInputFiles()
     results = yield taskgraph.TaskBranch([
@@ -281,7 +296,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     """Compile the reference solution."""
     reference_solution = self.problem.reference_solution
     if reference_solution is None:
-      ui.errors.Error(self, 'Reference solution is not available')
+      ui.errors.Error(self, 'Reference solution unavailable')
       yield False
     yield (yield reference_solution.Build(ui))
 
@@ -292,7 +307,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     """
     reference_solution = self.problem.reference_solution
     if reference_solution is None:
-      ui.errors.Error(self, 'Reference solution is not available')
+      ui.errors.Error(self, 'Reference solution unavailable')
       yield False
     infiles = self.ListInputFiles()
     results = yield taskgraph.TaskBranch([
