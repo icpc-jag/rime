@@ -45,19 +45,23 @@ class Problem(targets.TargetBase):
 
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
-    self.reference_solution = None
-    self.timeout = None
-    def reference_solution(name):
-      self.reference_solution = name
-    def time_limit(limit):
-      self.timeout = limit
-    self.exports['reference_solution'] = reference_solution
-    self.exports['time_limit'] = time_limit
+    self.problem_defined = False
+    def _problem(time_limit, reference_solution=None,
+                 title=None, id=None, **kwargs):
+      assert not self.problem_defined, 'Multiple problem definitions found'
+      self.problem_defined = True
+      self.timeout = time_limit
+      self.reference_solution = reference_solution
+      self.title = title or self.name
+      self.id = id
+      for key in kwargs:
+        ui.errors.Warning(self, 'Unknown parameter for problem(): %s' % key)
+    self.exports['problem'] = _problem
 
   def PostLoad(self, ui):
     super(Problem, self).PostLoad(ui)
+    assert self.problem_defined, 'No problem definition found'
     self._ChainLoad(ui)
-    self._ReadCompatSettings(ui)
     self._ParseSettings(ui)
 
   def _ChainLoad(self, ui):
@@ -83,17 +87,6 @@ class Problem(targets.TargetBase):
           self.testsets.append(testset)
         except targets.ConfigurationError:
           ui.errors.Exception(testset)
-
-  def _ReadCompatSettings(self, ui):
-    id = self.configs.get('ID')
-    if id is not None:
-      self.id = id
-    timeout = self.configs.get('TIME_LIMIT')
-    if timeout is not None:
-      self.timeout = timeout
-    reference_solution = self.configs.get('REFERENCE_SOLUTION')
-    if reference_solution is not None:
-      self.reference_solution = reference_solution
 
   def _ParseSettings(self, ui):
     # Currently we only support one testset per problem.
