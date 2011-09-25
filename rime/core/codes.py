@@ -117,3 +117,6 @@ class AutoCode(Code):
     # Swap the class in runtime.
     self.__class__ = code_class
     self.__init__(src_name, src_dir, out_dir, *args, **kwargs)
+
+
+registry.Add(AutoCode)
