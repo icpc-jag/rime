@@ -24,11 +24,37 @@
 from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
+from rime.basic import consts
 from rime.basic.targets import problem
 from rime.basic.targets import project
 from rime.basic.targets import solution
 from rime.basic.targets import testset
 from rime.basic.util import test_summary
+
+
+# Register the root command and global options.
+class Default(commands.CommandBase):
+  def __init__(self, parent):
+    assert parent is None
+    super(Default, self).__init__(None, consts.GLOBAL_HELP, parent)
+    self.AddOptionEntry(commands.OptionEntry(
+        'h', 'help', 'help', bool, False, None,
+        'Show this help.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'j', 'jobs', 'parallelism', int, 0, 'n',
+        'Run multiple jobs in parallel.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'd', 'debug', 'debug', bool, False, None,
+        'Turn on debugging.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'C', 'cache_tests', 'cache_tests', bool, False, None,
+        'Cache test results.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'p', 'precise', 'precise', bool, False, None,
+        'Do not run timing tasks concurrently.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'k', 'keep_going', 'keep_going', bool, False, None,
+        'Do not skip tests on failures.'))
 
 
 def IsBasicTarget(obj):
@@ -103,6 +129,7 @@ class Clean(commands.CommandBase):
     yield None
 
 
+commands.registry.Add(Default)
 commands.registry.Add(Build)
 commands.registry.Add(Test)
 commands.registry.Add(Clean)
