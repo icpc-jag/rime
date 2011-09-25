@@ -38,7 +38,7 @@ from rime.util import files
 class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   """Testset target."""
 
-  CONFIG_FILENAME = 'TESTS'
+  CONFIG_FILENAME = 'TESTSET'
 
   def __init__(self, name, base_dir, parent):
     assert isinstance(parent, problem.Problem)
