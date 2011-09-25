@@ -76,20 +76,20 @@ class TargetBase(object):
     self._loaded = True
 
     # Evaluate config.
-    self.PreLoad(ui)
     try:
       script = files.ReadFile(self.config_file)
     except IOError:
       raise ConfigurationError('cannot read file: %s' % self.config_file)
     try:
       code = compile(script, self.config_file, 'exec')
+      self.PreLoad(ui)
       exec(code, self.exports, self.configs)
+      self.PostLoad(ui)
     except ReloadConfiguration:
       raise  # Passthru
     except Exception, e:
       # TODO(nya): print pretty file/lineno for debug
       raise ConfigurationError(e)
-    self.PostLoad(ui)
 
   def PreLoad(self, ui):
     """Called just before evaluation of configs.
