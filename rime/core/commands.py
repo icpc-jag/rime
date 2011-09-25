@@ -131,11 +131,13 @@ class CommandBase(Command):
   def _PrintOptionDescription(self, ui):
     rows = []
     for option in sorted(self.options, lambda a, b: cmp(a.longname, b.longname)):
-      shortopt = '-%s' % option.shortname
       longopt = '--%s' % option.longname
       if option.argname:
         longopt += ' <%s>' % option.argname
-      left_col_head = '  %s, %s  ' % (shortopt, longopt)
+      if option.shortname:
+        left_col_head = '  -%s, %s  ' % (option.shortname, longopt)
+      else:
+        left_col_head = '      %s  ' % longopt
       rows.append((left_col_head, option.description.splitlines()))
     if not rows:
       ui.console.Print('  No options.')
