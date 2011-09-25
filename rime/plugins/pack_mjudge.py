@@ -25,6 +25,9 @@ import itertools
 import os
 import os.path
 
+import rime.basic.targets.problem  # target dependency
+import rime.basic.targets.project  # target dependency
+import rime.basic.targets.testset  # target dependency
 from rime.basic import consts
 from rime.core import commands
 from rime.core import targets
