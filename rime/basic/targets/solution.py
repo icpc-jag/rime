@@ -45,12 +45,20 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
   def PreLoad(self, ui):
     super(Solution, self).PreLoad(ui)
     self._codes = []
-    self.correct = True
-    self.challenge_cases = None
     self.exports.update(
-      codes.CreateDictionary('%s_solution', self._codes,
+      codes.CreateDictionary('%s_solution',
+                             self._codes,
                              src_dir=self.src_dir,
-                             out_dir=self.out_dir))
+                             out_dir=self.out_dir,
+                             wrapper=self._WrapSolution))
+
+  def _WrapSolution(self, code_class):
+    def Wrapped(src_name, src_dir, out_dir, challenge_cases=None,
+                *args, **kwargs):
+      code = code_class(src_name, src_dir, out_dir, *args, **kwargs)
+      self.challenge_cases = challenge_cases
+      return code
+    return Wrapped
 
   def PostLoad(self, ui):
     super(Solution, self).PostLoad(ui)
@@ -61,26 +69,19 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
     if len(self._codes) == 0:
       raise targets.ConfigurationError('no solution definition found')
     self.code = self._codes[0]
-    self._ReadCompatSettings(ui)
 
   def _CompatGuessSolution(self, ui):
+    wrapped_auto_code = self._WrapSolution(codes.AutoCode)
     for filename in files.ListDir(self.src_dir):
       try:
-        code = codes.AutoCode(filename, self.src_dir, self.out_dir)
+        code = wrapped_auto_code(filename, self.src_dir, self.out_dir)
         self._codes.append(code)
       except codes.UnknownCodeExtensionException:
         continue
 
-  def _ReadCompatSettings(self, ui):
-    # Decide if this solution is correct or not.
-    challenge_cases = self.configs.get('CHALLENGE_CASES')
-    if challenge_cases is not None:
-      self.correct = False
-      self.challenge_cases = self.configs['CHALLENGE_CASES']
-
   def IsCorrect(self):
     """Returns whether this is correct solution."""
-    return self.correct
+    return self.challenge_cases is None
 
   @taskgraph.task_method
   def Build(self, ui):
