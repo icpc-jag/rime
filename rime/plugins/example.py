@@ -41,7 +41,7 @@ class Example(commands.CommandBase):
       ui.console.Print('  args[%s] = "%s"' % (i, arg))
     ui.console.Print()
     ui.console.Print('Options:')
-    for name in dir(ui.options):
-      if name.startswith('__'):
-        continue
-      ui.console.Print('  options.%s = %s' % (name, repr(getattr(ui.options, name))))
+    for key, value in ui.options.items():
+      ui.console.Print('  options.%s = %s' % (key, value))
+
+commands.registry.Add(Example)
