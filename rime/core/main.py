@@ -113,7 +113,7 @@ def InternalMain(argv):
   ui = ui_mod.UiContext(opts, console, commands)
 
   if opts.help:
-    cmd.PrintHelp(argv[0], ui)
+    cmd.PrintHelp(ui)
     return 0
 
   # Check system.

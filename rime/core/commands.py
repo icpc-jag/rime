@@ -60,7 +60,7 @@ class Command(object):
   def GetDefaultOptionDict(self):
     raise NotImplementedError()
 
-  def PrintHelp(self, arg0, ui):
+  def PrintHelp(self, ui):
     raise NotImplementedError()
 
   def Run(self, project, args, ui):
@@ -95,9 +95,9 @@ class CommandBase(Command):
       options[option.varname] = option.argdef
     return options
 
-  def PrintHelp(self, arg0, ui):
-    ui.console.Print('Usage: %s %s [<options> ...] [<args> ...]' %
-                     (arg0, (self.name or '<command>')))
+  def PrintHelp(self, ui):
+    ui.console.Print('Usage: rime.py %s [<options> ...] [<args> ...]' %
+                     (self.name or '<command>'))
     ui.console.Print()
     self._PrintCommandDescription(ui)
     if self.name:
@@ -202,13 +202,10 @@ def Parse(argv, commands):
       if cmd is None:
         arg = arg.lower()
 
-        if arg == 'help':
-          options['help'] = True
-        else:
-          if arg not in commands:
-            raise ParseError('Unknown command: %s' % arg)
-          cmd = commands[arg]
-          options.update(cmd.GetDefaultOptionDict())
+        if arg not in commands:
+          raise ParseError('Unknown command: %s' % arg)
+        cmd = commands[arg]
+        options.update(cmd.GetDefaultOptionDict())
 
       else:
         extra_args.append(arg)
@@ -259,3 +256,24 @@ def Parse(argv, commands):
     options['help'] = True
 
   return (cmd, extra_args, struct.Struct(options))
+
+
+class Help(CommandBase):
+  def __init__(self, parent):
+    super(Help, self).__init__(
+      'help',
+      'Show help.',
+      parent)
+
+  def Run(self, project, args, ui):
+    commands = GetCommands()
+    cmd = None
+    if len(args) > 0:
+      cmd = commands.get(args[0])
+    if not cmd:
+      cmd = commands[None]
+    cmd.PrintHelp(ui)
+    return None
+
+
+registry.Add(Help)
