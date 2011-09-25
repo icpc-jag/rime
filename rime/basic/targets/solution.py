@@ -48,7 +48,7 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
     self.correct = True
     self.challenge_cases = None
     self.exports.update(
-      codes.ExportDictionary('%s_solution', self._codes,
+      codes.CreateDictionary('%s_solution', self._codes,
                              src_dir=self.src_dir,
                              out_dir=self.out_dir))
 
@@ -65,9 +65,11 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
 
   def _CompatGuessSolution(self, ui):
     for filename in files.ListDir(self.src_dir):
-      code = codes.CreateCodeByExtension(filename, self.src_dir, self.out_dir)
-      if code is not None:
+      try:
+        code = codes.AutoCode(filename, self.src_dir, self.out_dir)
         self._codes.append(code)
+      except codes.UnknownCodeExtensionException:
+        continue
 
   def _ReadCompatSettings(self, ui):
     # Decide if this solution is correct or not.

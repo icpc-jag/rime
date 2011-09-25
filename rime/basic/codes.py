@@ -144,6 +144,9 @@ class CodeBase(codes.Code):
 
 
 class CCode(CodeBase):
+  PREFIX = 'c'
+  EXTENSIONS = ['c']
+
   def __init__(self, src_name, src_dir, out_dir, flags=['-lm']):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     super(CCode, self).__init__(
@@ -155,6 +158,9 @@ class CCode(CodeBase):
 
 
 class CXXCode(CodeBase):
+  PREFIX = 'cxx'
+  EXTENSIONS = ['cc', 'cxx']
+
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     super(CXXCode, self).__init__(
@@ -166,6 +172,9 @@ class CXXCode(CodeBase):
 
 
 class JavaCode(CodeBase):
+  PREFIX = 'java'
+  EXTENSIONS = ['java']
+
   def __init__(self, src_name, src_dir, out_dir,
                compile_flags=[], run_flags=[],
                encoding='UTF-8', mainclass='Main'):
@@ -181,6 +190,8 @@ class JavaCode(CodeBase):
 
 class ScriptCode(CodeBase):
   QUIET_COMPILE = True
+  PREFIX = 'script'
+  EXTENSIONS = ['sh', 'pl', 'py', 'rb']
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
     super(ScriptCode, self).__init__(
@@ -233,7 +244,7 @@ class InternalDiffCode(CodeBase):
     yield True
 
 
-codes.Register('c', ['c'], CCode)
-codes.Register('cxx', ['cc', 'cpp', 'cxx'], CXXCode)
-codes.Register('java', ['java'], JavaCode)
-codes.Register('script', ['sh', 'pl', 'py', 'rb'], ScriptCode)
+codes.registry.Add(CCode)
+codes.registry.Add(CXXCode)
+codes.registry.Add(JavaCode)
+codes.registry.Add(ScriptCode)

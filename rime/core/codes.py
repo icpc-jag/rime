@@ -26,10 +26,6 @@ import os.path
 from rime.util import class_registry
 
 
-# Registered code types.  An entry is (prefix, extension, class).
-_CODE_TYPES = []
-
-
 class RunResult(object):
   """Result of a single run.
 
@@ -56,6 +52,13 @@ class Code(object):
   # (e.g. script language).
   QUIET_COMPILE = False
 
+  # Prefix of exported directive.
+  # (e.g. prefix "foo" generates foo_solution, foo_generator, etc.)
+  PREFIX = None
+
+  # Extensions of this type of source codes. Used to autodetect code types.
+  EXTENSIONS = None
+
   def __init__(self, src_name, src_dir, out_dir):
     self.src_name = src_name
     self.src_dir = src_dir
@@ -71,39 +74,46 @@ class Code(object):
     raise NotImplementedError()
 
 
-class RegistrationError(Exception):
-  pass
+registry = class_registry.ClassRegistry(Code)
 
 
-def Register(name, extensions, code_class):
-  """Registers a code class."""
-  for entry_name, entry_extensions, _ in _CODE_TYPES:
-    if entry_name == name:
-      raise RegistrationError('Duplicate code class name: %s' % name)
-    dup_extensions = list(set(entry_extensions) & set(extensions))
-    if dup_extensions:
-      raise RegistrationError('Duplicate code class extension: %s' %
-                              dup_extensions)
-  _CODE_TYPES.append((name, extensions, code_class))
-
-
-def ExportDictionary(name_fmt, codeset, src_dir, out_dir):
-  """Exports a dictionary used for configs."""
-  export = {}
-  for name, _, code_class in _CODE_TYPES:
+def CreateDictionary(name_fmt, codeset, src_dir, out_dir, wrapper=None):
+  """Creates a dictionary used for configs."""
+  exports = {}
+  if wrapper is None:
+    wrapper = lambda c: c
+  for code_class in registry.classes.values():
     def Closure(code_class):
       def Registerer(src, *args, **kwargs):
         codeset.append(
-          code_class(src_name=src, src_dir=src_dir, out_dir=out_dir,
-                     *args, **kwargs))
-      export[name_fmt % name] = Registerer
+          wrapper(code_class)(src_name=src, src_dir=src_dir, out_dir=out_dir,
+                              *args, **kwargs))
+      exports[name_fmt % code_class.PREFIX] = Registerer
     Closure(code_class)
-  return export
+  return exports
 
 
-def CreateCodeByExtension(src_name, src_dir, out_dir, *args, **kwargs):
-  src_ext = os.path.splitext(src_name)[1][1:]
-  for _, code_extensions, code_class in _CODE_TYPES:
-    if src_ext in code_extensions:
-      return code_class(src_name, src_dir, out_dir, *args, **kwargs)
-  return None
+class UnknownCodeExtensionException(Exception):
+  pass
+
+
+class AutoCode(Code):
+  """Code class with automatic code type detection."""
+
+  PREFIX = 'auto'
+  EXTENSIONS = []
+
+  def __init__(self, src_name, src_dir, out_dir, *args, **kwargs):
+    matched_code_class = None
+    src_ext = os.path.splitext(src_name)[1][1:]
+    for code_class in registry.classes.values():
+      if src_ext in code_class.EXTENSIONS:
+        break
+    else:
+      code_class = None
+    if not code_class:
+      raise UnknownCodeExtensionException(
+        'Unknown code extension: %s' % src_ext)
+    # Swap the class in runtime.
+    self.__class__ = code_class
+    self.__init__(src_name, src_dir, out_dir, *args, **kwargs)

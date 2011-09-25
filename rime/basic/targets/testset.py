@@ -62,15 +62,15 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     self.validators = []
     self.judges = []
     self.exports.update(
-      core_codes.ExportDictionary('%s_generator', self.generators,
+      core_codes.CreateDictionary('%s_generator', self.generators,
                                   src_dir=self.src_dir,
                                   out_dir=self.out_dir))
     self.exports.update(
-      core_codes.ExportDictionary('%s_validator', self.validators,
+      core_codes.CreateDictionary('%s_validator', self.validators,
                                   src_dir=self.src_dir,
                                   out_dir=self.out_dir))
     self.exports.update(
-      core_codes.ExportDictionary('%s_judge', self.judges,
+      core_codes.CreateDictionary('%s_judge', self.judges,
                                   src_dir=self.src_dir,
                                   out_dir=self.out_dir))
 
