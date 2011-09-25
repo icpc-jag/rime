@@ -21,6 +21,9 @@
 # THE SOFTWARE.
 #
 
+import os
+import os.path
+
 from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
@@ -63,6 +66,31 @@ def IsBasicTarget(obj):
                           solution.Solution,
                           testset.Testset))
 
+def RunCommon(method_name, project, args, ui):
+  if args:
+    base_dir = os.path.abspath(args[0])
+    args = args[1:]
+  else:
+    base_dir = os.getcwd()
+
+  obj = project.FindByBaseDir(base_dir)
+  if not obj:
+    ui.errors.Error(None,
+                    'Target directory is missing or not managed by Rime.')
+    return None
+
+  if args:
+    ui.errors.Error(None,
+                    'Extra argument passed to %s command!' % self.name)
+    return None
+
+  if not IsBasicTarget(obj):
+    ui.errors.Error(None,
+                    '%s is not supported for the specified target.' % self.name)
+    return None
+
+  return getattr(obj, method_name)(ui)
+  
 
 class Build(commands.CommandBase):
   def __init__(self, parent):
@@ -71,18 +99,8 @@ class Build(commands.CommandBase):
       'Build a target.',
       parent)
 
-  @taskgraph.task_method
-  def Run(self, obj, args, ui):
-    """Entry point for build command."""
-    if args:
-      ui.console.PrintError('Extra argument passed to build command!')
-      yield None
-
-    if IsBasicTarget(obj):
-      yield (yield obj.Build(ui))
-
-    ui.console.PrintError('Build is not supported for the specified target.')
-    yield None
+  def Run(self, project, args, ui):
+    return RunCommon('Build', project, args, ui)
 
 
 class Test(commands.CommandBase):
@@ -92,20 +110,16 @@ class Test(commands.CommandBase):
       'Run tests.',
       parent)
 
-  @taskgraph.task_method
-  def Run(self, obj, args, ui):
-    """Entry point for test command."""
-    if args:
-      ui.console.PrintError('Extra argument passed to test command!')
-      yield None
-
-    if IsBasicTarget(obj):
-      results = yield obj.Test(ui)
+  def Run(self, project, args, ui):
+    task = RunCommon('Test', project, args, ui)
+    if not task:
+      return task
+    @taskgraph.task_method
+    def TestWrapper():
+      results = yield task
       test_summary.PrintTestSummary(results, ui)
       yield results
-
-    ui.console.PrintError('Test is not supported for the specified target.')
-    yield None
+    return TestWrapper()
 
 
 class Clean(commands.CommandBase):
@@ -115,18 +129,8 @@ class Clean(commands.CommandBase):
       'Clean intermediate files.',
       parent)
 
-  @taskgraph.task_method
-  def Run(self, obj, args, ui):
-    """Entry point for clean command."""
-    if args:
-      ui.console.PrintError('Extra argument passed to clean command!')
-      yield None
-
-    if IsBasicTarget(obj):
-      yield (yield obj.Clean(ui))
-
-    ui.console.PrintError('Clean is not supported for the specified target.')
-    yield None
+  def Run(self, project, args, ui):
+    return RunCommon('Clean', project, args, ui)
 
 
 commands.registry.Add(Default)

@@ -128,22 +128,11 @@ def InternalMain(argv):
     console.PrintError('PROJECT not found. Make sure you are in Rime subtree.')
     return 1
 
-  # Decide target object.
-  # Note: currently all commands recognizes first parameter as base_dir.
-  if args:
-    base_dir = os.path.abspath(args[0])
-    args = args[1:]
-  else:
-    base_dir = os.getcwd()
-  obj = project.FindByBaseDir(base_dir)
-  if not obj:
-    console.PrintError('Target directory is not managed by Rime.')
-    return 1
-
   # Run the task.
   graph = CreateTaskGraph(ui)
+  task = None
   try:
-    task = cmd.Run(obj, tuple(args), ui)
+    task = cmd.Run(project, tuple(args), ui)
     if task:
       graph.Run(task)
   except KeyboardInterrupt:
@@ -153,9 +142,10 @@ def InternalMain(argv):
   finally:
     graph.Close()
 
-  console.Print()
-  console.Print(console.BOLD, 'Error Summary:', console.NORMAL)
-  ui.errors.PrintSummary()
+  if task:
+    console.Print()
+    console.Print(console.BOLD, 'Error Summary:', console.NORMAL)
+    ui.errors.PrintSummary()
   return 0
 
 

@@ -63,7 +63,7 @@ class Command(object):
   def PrintHelp(self, arg0, ui):
     raise NotImplementedError()
 
-  def Run(self, obj, args, ui):
+  def Run(self, project, args, ui):
     raise NotImplementedError()
 
 
