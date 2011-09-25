@@ -23,7 +23,6 @@
 
 from rime.core import commands
 
-
 class Example(commands.CommandBase):
   def __init__(self, parent):
     super(Example, self).__init__(
@@ -31,11 +30,11 @@ class Example(commands.CommandBase):
       'Example command.',
       parent)
 
-  def Run(self, obj, args, ui):
+  def Run(self, project, args, ui):
     ui.console.Print('Hello, world!')
     ui.console.Print()
-    ui.console.Print('Object:')
-    ui.console.Print('  %s' % repr(obj))
+    ui.console.Print('Project:')
+    ui.console.Print('  %s' % repr(project))
     ui.console.Print()
     ui.console.Print('Parameters:')
     for i, arg in enumerate(args):
