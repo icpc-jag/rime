@@ -27,7 +27,7 @@ import re
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts
-from rime.basic import results
+from rime.basic import test
 from rime.basic.targets import problem
 from rime.core import codes as core_codes
 from rime.core import targets
@@ -88,35 +88,34 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       stamp = max(stamp, self.problem.reference_solution.GetLastModified())
     return stamp
 
-  def ListInputFiles(self):
-    """Enumerate input files."""
-    infiles = []
+  def ListTestCases(self):
+    """Enumerate test cases."""
+    testcases = []
     for infile in files.ListDir(self.out_dir, True):
+      infile = os.path.join(self.out_dir, infile)
       if not infile.endswith(consts.IN_EXT):
         continue
-      if not os.path.isfile(os.path.join(self.out_dir, infile)):
+      if not os.path.isfile(infile):
         continue
-      infiles.append(infile)
-    infiles = self._SortInputFiles(infiles)
-    return infiles
+      testcases.append(test.TestCase(self, infile))
+    self._SortTestCases(testcases)
+    return testcases
 
-  def _SortInputFiles(self, infiles):
-    """Compare input file names in a little bit smart way."""
-    infiles = infiles[:]
+  def _SortTestCases(self, testcases):
+    """Sorts test cases in a little bit smarter way."""
     def tokenize_cmp(a, b):
       def tokenize(s):
         def replace_digits(match):
           return '%08s' % match.group(0)
         return re.sub(r'\d+', replace_digits, s)
-      return cmp(tokenize(a), tokenize(b))
-    infiles.sort(tokenize_cmp)
-    return infiles
+      return cmp(tokenize(a.infile), tokenize(b.infile))
+    testcases.sort(tokenize_cmp)
 
   @taskgraph.task_method
   def Build(self, ui):
     """Build testset."""
     if self.IsBuildCached():
-      if not self.ListInputFiles():
+      if not self.ListTestCases():
         ui.errors.Warning(self, 'No test case found')
       yield True
     if not self._InitOutputDir(ui):
@@ -130,7 +129,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       yield False
     if not (yield self._RunValidators(ui)):
       yield False
-    if not self.ListInputFiles():
+    if not self.ListTestCases():
       ui.errors.Warning(self, 'No test case found')
     else:
       if not (yield self._CompileReferenceSolution(ui)):
@@ -233,42 +232,43 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
         #ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
         ui.errors.Warning(self, 'Validator unavailable')
       yield True
-    infiles = self.ListInputFiles()
+    testcases = self.ListTestCases()
     results = yield taskgraph.TaskBranch([
-        self._RunValidatorOne(validator, infile, ui)
+        self._RunValidatorOne(validator, testcase, ui)
         for validator in self.validators
-        for infile in infiles])
+        for testcase in testcases])
     if not all(results):
       yield False
     ui.console.PrintAction('VALIDATE', self, 'OK')
     yield True
 
   @taskgraph.task_method
-  def _RunValidatorOne(self, validator, infile, ui):
+  def _RunValidatorOne(self, validator, testcase, ui):
     """
     Run an input validator against a single input file.
     """
-    #ui.console.PrintAction('VALIDATE', self,
-    #                        infile, progress=True)
-    validationfile = os.path.splitext(infile)[0] + consts.VALIDATION_EXT
+    validationfile = (
+      os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
     res = yield validator.Run(
       args=(), cwd=self.out_dir,
-      input=os.path.join(self.out_dir, infile),
-      output=os.path.join(self.out_dir, validationfile),
+      input=testcase.infile,
+      output=validationfile,
       timeout=None, precise=False,
       redirect_error=True)
     if res.status == core_codes.RunResult.NG:
       ui.errors.Error(self,
-                      '%s: Validation Failed' % infile)
-      log = files.ReadFile(os.path.join(self.out_dir, validationfile))
+                      '%s: Validation Failed' % os.path.basename(testcase.infile))
+      log = files.ReadFile(validationfile)
       ui.console.PrintLog(log)
       raise taskgraph.Bailout([False])
     elif res.status != core_codes.RunResult.OK:
       ui.errors.Error(self,
-                      '%s: Validator Failed: %s' % (infile, res.status))
+                      '%s: Validator Failed: %s' %
+                      (os.path.basename(testcase.infile), res.status))
       raise taskgraph.Bailout([False])
     ui.console.PrintAction('VALIDATE', self,
-                            '%s: PASSED' % infile, progress=True)
+                           '%s: PASSED' % os.path.basename(testcase.infile),
+                           progress=True)
     yield True
 
   @taskgraph.task_method
@@ -309,35 +309,35 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     if reference_solution is None:
       ui.errors.Error(self, 'Reference solution unavailable')
       yield False
-    infiles = self.ListInputFiles()
+    testcases = self.ListTestCases()
     results = yield taskgraph.TaskBranch([
-        self._RunReferenceSolutionOne(reference_solution, infile, ui)
-        for infile in infiles])
+        self._RunReferenceSolutionOne(reference_solution, testcase, ui)
+        for testcase in testcases])
     if not all(results):
       yield False
     ui.console.PrintAction('REFRUN', reference_solution)
     yield True
 
   @taskgraph.task_method
-  def _RunReferenceSolutionOne(self, reference_solution, infile, ui):
+  def _RunReferenceSolutionOne(self, reference_solution, testcase, ui):
     """
     Run the reference solution against a single input file.
     """
-    difffile = os.path.splitext(infile)[0] + consts.DIFF_EXT
-    if os.path.isfile(os.path.join(self.out_dir, difffile)):
+    if os.path.isfile(testcase.difffile):
       yield True
     #ui.console.PrintAction('REFRUN', reference_solution,
-    #                        infile, progress=True)
+    #                       testcase.infile, progress=True)
     res = yield reference_solution.Run(
       args=(), cwd=self.out_dir,
-      input=os.path.join(self.out_dir, infile),
-      output=os.path.join(self.out_dir, difffile),
+      input=testcase.infile,
+      output=testcase.difffile,
       timeout=None, precise=False)
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(reference_solution, res.status)
       raise taskgraph.Bailout([False])
     ui.console.PrintAction('REFRUN', reference_solution,
-                            '%s: DONE' % infile, progress=True)
+                            '%s: DONE' % os.path.basename(testcase.infile),
+                           progress=True)
     yield True
 
   @taskgraph.task_method
@@ -351,112 +351,99 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   def TestSolution(self, solution, ui):
     """Test a single solution."""
     if not (yield self.Build(ui)):
-      result = results.TestResult(self.problem, solution, [])
-      result.good = False
-      result.passed = False
-      result.detail = 'Failed to build tests'
+      result = test.TestsetResult(self, solution, [])
+      result.Finalize(False, 'Failed to build tests')
       yield [result]
     if not (yield solution.Build(ui)):
-      result = results.TestResult(self.problem, solution, [])
-      result.good = False
-      result.passed = False
-      result.detail = 'Compile Error'
+      result = test.TestsetResult(self, solution, [])
+      result.Finalize(False, 'Compile Error')
       yield [result]
     ui.console.PrintAction('TEST', solution, progress=True)
     if not solution.IsCorrect() and solution.challenge_cases:
       result = yield self._TestSolutionWithChallengeCases(solution, ui)
     else:
       result = yield self._TestSolutionWithAllCases(solution, ui)
-    if result.good and result.passed:
-      assert not result.detail
-      if result.IsTimeStatsAvailable(ui):
-        result.detail = result.GetTimeStats()
-      else:
-        result.detail = '(*/*)'
-    else:
-      assert result.detail
-    status_row = []
-    status_row += [
-      result.good and ui.console.CYAN or ui.console.RED,
-      result.passed and 'PASSED' or 'FAILED',
-      ui.console.NORMAL,
-      ' ',
-      result.detail]
-    if result.cached:
+    status_row = [result.detail]
+    if result.IsCached():
       status_row += [' ', '(cached)']
     ui.console.PrintAction('TEST', solution, *status_row)
-    if solution.IsCorrect() and not result.good:
-      assert result.ruling_file
-      judgefile = os.path.splitext(result.ruling_file)[0] + consts.JUDGE_EXT
-      log = files.ReadFile(os.path.join(solution.out_dir, judgefile))
+    if solution.IsCorrect() and not result.expected:
+      assert result.notable_testcase
+      judgefile = (os.path.splitext(result.notable_testcase.infile)[0] +
+                   consts.JUDGE_EXT)
+      log = files.ReadFile(judgefile)
       ui.console.PrintLog(log)
     yield [result]
 
   @taskgraph.task_method
   def _TestSolutionWithChallengeCases(self, solution, ui):
     """Test a wrong solution which has explicitly-specified challenge cases."""
-    infiles = self.ListInputFiles()
-    challenge_cases = self._SortInputFiles(solution.challenge_cases)
-    result = results.TestResult(self.problem, solution, challenge_cases)
-    # Ensure all challenge cases exist.
-    all_exists = True
-    for infile in challenge_cases:
-      if infile not in infiles:
+    all_testcases = self.ListTestCases()
+    challenge_infiles = [os.path.join(self.out_dir, infile)
+                         for infile in set(solution.challenge_cases)]
+    testcases = []
+    for infile in challenge_infiles:
+      matched_testcases = [testcase for testcase in all_testcases
+                           if testcase.infile == infile]
+      if not matched_testcases:
         ui.errors.Error(solution,
                         'Challenge case not found: %s' % infile)
-        all_exists = False
-    if not all_exists:
-      result.good = False
-      result.passed = False
-      result.detail = 'Challenge case not found'
-      yield result
+        result = test.TestsetResult(self, solution, [])
+        result.Finalize(False,
+                        'Challenge case not found: %s' % infile)
+        yield result
+      elif len(matched_testcases) >= 2:
+        ui.errors.Error(solution,
+                        'Multiple challenge cases found: %s' % infile)
+        result = test.TestsetResult(self, solution, [])
+        result.Finalize(False,
+                        'Multiple challenge cases found: %s' % infile)
+        yield result
+      testcases.append(matched_testcases[0])
     # Try challenge cases.
+    result = test.TestsetResult(self, solution, testcases)
     yield taskgraph.TaskBranch([
-        self._TestSolutionWithChallengeCasesOne(solution, infile, result, ui)
-        for infile in challenge_cases],
+        self._TestSolutionWithChallengeCasesOne(solution, testcase, result, ui)
+        for testcase in testcases],
         unsafe_interrupt=True)
-    if result.good is None:
-      result.good = True
-      result.passed = False
-      result.detail = 'Expectedly Failed'
+    if not result.IsFinalized():
+      result.Finalize(True,
+                      'Expectedly failed all challenge cases')
     yield result
 
   @taskgraph.task_method
-  def _TestSolutionWithChallengeCasesOne(self, solution, infile, result, ui):
+  def _TestSolutionWithChallengeCasesOne(self, solution, testcase, result, ui):
     """Test a wrong solution which has explicitly-specified challenge cases."""
-    cookie = solution.GetCacheStamp()
     # TODO(nya): Concat support
     #ignore_timeout = (infile == consts.CONCAT_INFILE)
     ignore_timeout = False
-    (verdict, time, cached) = yield self._TestOneCase(
-      solution, infile, cookie, ignore_timeout, ui)
-    if cached:
-      result.cached = True
-    result.cases[infile].verdict = verdict
-    if verdict == results.TestResult.AC:
-      result.ruling_file = infile
-      result.good = False
-      result.passed = True
-      result.detail = '%s: Unexpectedly Accepted' % infile
+    case_result = yield self._TestOneCase(
+      solution, testcase, ignore_timeout, ui)
+    result.results[testcase] = case_result
+    if case_result.verdict == test.TestCaseResult.AC:
+      result.Finalize(False,
+                      '%s: Unexpectedly accepted' %
+                      os.path.basename(testcase.infile),
+                      notable_testcase=testcase)
       ui.errors.Error(solution, result.detail)
       if ui.options.keep_going:
         yield False
       else:
         raise taskgraph.Bailout([False])
-    elif verdict not in (results.TestResult.WA,
-                         results.TestResult.TLE,
-                         results.TestResult.RE):
-      result.ruling_file = infile
-      result.good = False
-      result.passed = False
-      result.detail = '%s: Judge Error' % infile
+    elif case_result.verdict not in (test.TestCaseResult.WA,
+                                     test.TestCaseResult.TLE,
+                                     test.TestCaseResult.RE):
+      result.Finalize(False,
+                      '%s: Judge Error' % os.path.basename(testcase.infile),
+                      notable_testcase=testcase)
       ui.errors.Error(solution, result.detail)
       if ui.options.keep_going:
         yield False
       else:
         raise taskgraph.Bailout([False])
     ui.console.PrintAction('TEST', solution,
-                            '%s: PASSED' % infile, progress=True)
+                           '%s: PASSED' % os.path.basename(testcase.infile),
+                           progress=True)
     yield True
 
   @taskgraph.task_method
@@ -465,130 +452,119 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
     The solution can be marked as wrong but without challenge cases.
     """
-    infiles = self.ListInputFiles()
-    result = results.TestResult(self.problem, solution, infiles)
+    testcases = self.ListTestCases()
+    result = test.TestsetResult(self, solution, testcases)
     # Try all cases.
     yield taskgraph.TaskBranch([
-        self._TestSolutionWithAllCasesOne(solution, infile, result, ui)
-        for infile in infiles],
+        self._TestSolutionWithAllCasesOne(solution, testcase, result, ui)
+        for testcase in testcases],
         unsafe_interrupt=True)
-    if result.good is None:
-      result.good = solution.IsCorrect()
-      result.passed = True
-      if not result.good:
-        result.detail = 'Unexpectedly Passed'
+    if not result.IsFinalized():
+      if solution.IsCorrect():
+        result.Finalize(True, result.GetTimeStats(ui))
+      else:
+        result.Finalize(False, 'Unexpectedly accepted all test cases')
     yield result
 
   @taskgraph.task_method
-  def _TestSolutionWithAllCasesOne(self, solution, infile, result, ui):
+  def _TestSolutionWithAllCasesOne(self, solution, testcase, result, ui):
     """Test a solution without challenge cases.
 
     The solution can be marked as wrong but without challenge cases.
     """
-    cookie = solution.GetCacheStamp()
     # TODO(nya): Concat support
     #ignore_timeout = (infile == consts.CONCAT_INFILE)
     ignore_timeout = False
-    (verdict, time, cached) = yield self._TestOneCase(
-      solution, infile, cookie, ignore_timeout, ui)
-    if cached:
-      result.cached = True
-    result.cases[infile].verdict = verdict
-    if verdict not in (results.TestResult.AC,
-                       results.TestResult.WA,
-                       results.TestResult.TLE,
-                       results.TestResult.RE):
-      result.ruling_file = infile
-      result.good = False
-      result.passed = False
-      result.detail = '%s: Judge Error' % infile
+    case_result = yield self._TestOneCase(
+      solution, testcase, ignore_timeout, ui)
+    result.results[testcase] = case_result
+    if case_result.verdict not in (test.TestCaseResult.AC,
+                                   test.TestCaseResult.WA,
+                                   test.TestCaseResult.TLE,
+                                   test.TestCaseResult.RE):
+      result.Finalize(False,
+                      '%s: Judge Error' %
+                      os.path.basename(testcase.infile),
+                      notable_testcase=testcase)
       ui.errors.Error(solution, result.detail)
       if ui.options.keep_going:
         yield False
       else:
         raise taskgraph.Bailout([False])
-    elif verdict != results.TestResult.AC:
-      result.ruling_file = infile
-      result.passed = False
-      result.detail = '%s: %s' % (infile, verdict)
+    elif case_result.verdict != test.TestCaseResult.AC:
+      expected = not solution.IsCorrect()
+      result.Finalize(expected,
+                      '%s: %s' % (os.path.basename(testcase.infile),
+                                  case_result.verdict),
+                      notable_testcase=testcase)
       if solution.IsCorrect():
-        result.good = False
         ui.errors.Error(solution, result.detail)
-      else:
-        result.good = True
       if ui.options.keep_going:
         yield False
       else:
         raise taskgraph.Bailout([False])
-    result.cases[infile].time = time
     ui.console.PrintAction('TEST', solution,
-                            '%s: PASSED' % infile, progress=True)
+                           '%s: PASSED' % os.path.basename(testcase.infile),
+                           progress=True)
     yield True
 
   @taskgraph.task_method
-  def _TestOneCase(self, solution, infile, cookie, ignore_timeout, ui):
+  def _TestOneCase(self, solution, testcase, ignore_timeout, ui):
     """Test a solution with one case.
 
     Cache results if option is set.
-    Return (verdict, time, cached).
+    Returns TestCaseResult.
     """
-    cachefile = os.path.join(
-      solution.out_dir,
-      os.path.splitext(infile)[0] + consts.CACHE_EXT)
-    if ui.options.cache_tests:
-      if cookie is not None and os.path.isfile(cachefile):
-        try:
-          (cached_cookie, result) = files.PickleLoad(cachefile)
-        except:
-          ui.errors.Exception(solution)
-          cached_cookie = None
-        if cached_cookie == cookie:
-          yield tuple(list(result)+[True])
-    result = yield self._TestOneCaseNoCache(solution, infile, ignore_timeout, ui)
-    try:
-      files.PickleSave((cookie, result), cachefile)
-    except:
-      ui.errors.Exception(solution)
-    yield tuple(list(result)+[False])
+    # TODO(nya): enable result cache.
+    case_result = yield self._TestOneCaseNoCache(
+      solution, testcase, ignore_timeout, ui)
+    yield case_result
 
   @taskgraph.task_method
-  def _TestOneCaseNoCache(self, solution, infile, ignore_timeout, ui):
+  def _TestOneCaseNoCache(self, solution, testcase, ignore_timeout, ui):
     """Test a solution with one case.
 
     Never cache results.
-    Return (verdict, time).
+    Returns TestCaseResult.
     """
-    outfile = os.path.splitext(infile)[0] + consts.OUT_EXT
-    difffile = os.path.splitext(infile)[0] + consts.DIFF_EXT
-    judgefile = os.path.splitext(infile)[0] + consts.JUDGE_EXT
+    outfile, judgefile = [
+      os.path.join(solution.out_dir,
+                   os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+      for ext in consts.OUT_EXT, consts.JUDGE_EXT]
     timeout = self.problem.timeout
     if ignore_timeout:
       timeout = None
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
       args=(), cwd=solution.out_dir,
-      input=os.path.join(self.out_dir, infile),
-      output=os.path.join(solution.out_dir, outfile),
+      input=testcase.infile,
+      output=outfile,
       timeout=timeout, precise=precise)
     if res.status == core_codes.RunResult.TLE:
-      yield (results.TestResult.TLE, None)
+      yield test.TestCaseResult(solution, testcase, test.TestCaseResult.TLE,
+                                time=None, cached=False)
     if res.status != core_codes.RunResult.OK:
-      yield (results.TestResult.RE, None)
+      yield test.TestCaseResult(solution, testcase, test.TestCaseResult.RE,
+                                time=None, cached=False)
     time = res.time
     for judge in self.judges:
       res = yield judge.Run(
-        args=('--infile', os.path.join(self.out_dir, infile),
-              '--difffile', os.path.join(self.out_dir, difffile),
-              '--outfile', os.path.join(solution.out_dir, outfile)),
+        args=('--infile', testcase.infile,
+              '--difffile', testcase.difffile,
+              '--outfile', outfile),
         cwd=self.out_dir,
         input=os.devnull,
-        output=os.path.join(solution.out_dir, judgefile),
+        output=judgefile,
         timeout=None, precise=False)
       if res.status == core_codes.RunResult.NG:
-        yield (results.TestResult.WA, None)
+        yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
+                                  time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
-        yield ('Validator ' + res.status, None)
-    yield (results.TestResult.AC, time)
+        yield test.TestCaseResult(solution, testcase,
+                                  test.TestVerdict('Validator %s' % res.status),
+                                  time=None, cached=False)
+    yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
+                              time=time, cached=False)
 
   @taskgraph.task_method
   def Clean(self, ui):

@@ -38,7 +38,7 @@ def PrintTestSummary(results, ui):
         ui.console.NORMAL,
         ' ... %d solutions, %d tests' %
         (len(result.problem.solutions),
-         len(result.problem.testset.ListInputFiles()))]
+         len(result.problem.testset.ListTestCases()))]
       ui.console.Print(*problem_row)
       last_problem = result.problem
     status_row = ['  ']
@@ -47,30 +47,12 @@ def PrintTestSummary(results, ui):
       result.solution.name.ljust(solution_name_width),
       ui.console.NORMAL,
       ' ']
-    status_row += [
-      result.good and ui.console.CYAN or ui.console.RED,
-      result.passed and 'PASSED' or 'FAILED',
-      ui.console.NORMAL,
-      ' ']
-    if result.good:
-      if result.passed:
-        if result.IsTimeStatsAvailable(ui):
-          status_row += [result.GetTimeStats()]
-        else:
-          status_row += ['(*/*)']
-      else:
-        status_row += ['Expectedly Failed']
+    if result.expected:
+      status_row += [ui.console.GREEN, ' OK ', ui.console.NORMAL]
     else:
-      if result.passed:
-        status_row += ['Unexpectedly Passed']
-      else:
-        if result.ruling_file:
-          status_row += [result.cases[result.ruling_file].verdict,
-                         ': ',
-                         result.ruling_file]
-        else:
-          status_row += [result.detail]
-    if result.cached:
+      status_row += [ui.console.RED, 'FAIL', ui.console.NORMAL]
+    status_row += [' ', result.detail]
+    if result.IsCached():
       status_row += [' ', '(cached)']
     ui.console.Print(*status_row)
   if not (ui.options.precise or ui.options.parallelism <= 1):
