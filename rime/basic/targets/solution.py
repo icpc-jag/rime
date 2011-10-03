@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 #
 
+import itertools
 import os.path
 
 from rime.basic.targets import problem
@@ -115,7 +116,7 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
   def Test(self, ui):
     """Run tests for the solution."""
     results = yield taskgraph.TaskBranch(
-      [testset.TestSolution(self, ui) for testset in self.testsets])
+      [testset.TestSolution(self, ui) for testset in self.problem.testsets])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method
