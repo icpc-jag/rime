@@ -113,13 +113,13 @@ class Project(targets.registry.Project):
     results = yield problem.Test(ui)
     # Get various information about the problem.
     num_solutions = len(results)
-    num_tests = len(problem.testset.ListInputFiles())
+    num_tests = len(problem.testset.ListTestCases())
     correct_solution_results = [result for result in results
                                 if result.solution.IsCorrect()]
     num_corrects = len(correct_solution_results)
     num_incorrects = num_solutions - num_corrects
     num_agreed = len([result for result in correct_solution_results
-                      if result.good])
+                      if result.expected])
     need_custom_judge = problem.need_custom_judge
     # Solutions:
     if num_corrects >= 2:
