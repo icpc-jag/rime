@@ -88,7 +88,7 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
   def Build(self, ui):
     """Build this solution."""
     if self.IsBuildCached():
-      ui.console.PrintAction('COMPILE', self, 'up-to-date')
+      ui.console.PrintAction('COMPILE', self, 'up-to-date', progress=True)
       yield True
     if not self.code.QUIET_COMPILE:
       ui.console.PrintAction('COMPILE', self)
