@@ -136,6 +136,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
         yield False
       if not (yield self._RunReferenceSolution(ui)):
         yield False
+    if not (yield self._PostBuildHook(ui)):
+      yield False
     if not self.SetCacheStamp(ui):
       yield False
     yield True
@@ -339,6 +341,10 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     ui.console.PrintAction('REFRUN', reference_solution,
                             '%s: DONE' % os.path.basename(testcase.infile),
                            progress=True)
+    yield True
+
+  @taskgraph.task_method
+  def _PostBuildHook(self, ui):
     yield True
 
   @taskgraph.task_method
