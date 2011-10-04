@@ -75,6 +75,7 @@ class TestsetResult(object):
     self.testset = testset
     self.problem = testset.problem
     self.solution = solution
+    self.testcases = testcases
     self.results = dict(
       [(testcase,
         TestCaseResult(solution, testcase, TestCaseResult.NA,
@@ -86,13 +87,13 @@ class TestsetResult(object):
   def IsFinalized(self):
     return self.finalized
 
-  def Finalize(self, expected, detail, notable_testcase=None):
-    if self.finalized:
+  def Finalize(self, expected, detail, notable_testcase=None,
+               allow_override=False):
+    if self.finalized and not allow_override:
       return
     self.expected = expected
     self.detail = detail
     self.notable_testcase = notable_testcase
-    assert notable_testcase is None or notable_testcase in self.results
     self.finalized = True
 
   def IsCached(self):
