@@ -91,7 +91,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   def ListTestCases(self):
     """Enumerate test cases."""
     testcases = []
-    for infile in files.ListDir(self.out_dir, True):
+    for infile in files.ListDir(self.out_dir, False):
       infile = os.path.join(self.out_dir, infile)
       if not infile.endswith(consts.IN_EXT):
         continue
