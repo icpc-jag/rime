@@ -113,8 +113,8 @@ class TestsetResult(object):
     """Get time statistics."""
     # TODO(nya): Concat support
     if not self.IsTimingValid(ui):
-      return '(*/*)'
-    return '(%.2f/%.2f)' % (self.GetMaxTime(), self.GetTotalTime())
+      return 'min *s, acc *s'
+    return 'min %.2fs, acc %.2fs' % (self.GetMaxTime(), self.GetTotalTime())
 
   def GetMaxTime(self):
     """Get maximum time.
