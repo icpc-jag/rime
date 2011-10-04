@@ -118,7 +118,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       if not self.ListTestCases():
         ui.errors.Warning(self, 'No test case found')
       yield True
-    if not self._InitOutputDir(ui):
+    if not (yield self._InitOutputDir(ui)):
       yield False
     if not all((yield taskgraph.TaskBranch([
             self._CompileGenerators(ui),
@@ -140,15 +140,16 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       yield False
     yield True
 
+  @taskgraph.task_method
   def _InitOutputDir(self, ui):
     """Initialize output directory."""
     try:
       files.RemoveTree(self.out_dir)
       files.CopyTree(self.src_dir, self.out_dir)
-      return True
     except:
       ui.errors.Exception(self)
-      return False
+      yield False
+    yield True
 
   @taskgraph.task_method
   def _CompileGenerators(self, ui):
