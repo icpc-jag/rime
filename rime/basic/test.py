@@ -37,10 +37,13 @@ class TestVerdict(object):
 
 class TestCase(object):
 
-  def __init__(self, testset, infile):
+  def __init__(self, testset, infile, difffile=None):
     self.testset = testset
     self.infile = infile
-    self.difffile = os.path.splitext(infile)[0] + consts.DIFF_EXT
+    if difffile is None:
+      self.difffile = os.path.splitext(infile)[0] + consts.DIFF_EXT
+    else:
+      self.difffile = difffile
 
 
 class TestCaseResult(object):
