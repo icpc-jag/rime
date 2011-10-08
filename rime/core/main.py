@@ -43,7 +43,8 @@ def LoadRequiredModules():
     commands = commands_mod.GetCommands()
     default_options = struct.Struct(commands[None].GetDefaultOptionDict())
     null_console = console_mod.NullConsole()
-    fake_ui = ui_mod.UiContext(default_options, null_console, commands)
+    graph = taskgraph.SerialTaskGraph()
+    fake_ui = ui_mod.UiContext(default_options, null_console, commands, graph)
     try:
       LoadProject(os.getcwd(), fake_ui)
       break
@@ -84,14 +85,14 @@ def LoadProject(cwd, ui):
     return None
 
 
-def CreateTaskGraph(ui):
+def CreateTaskGraph(options):
   """Creates the instance of TaskGraph to use for this session."""
-  if ui.options.parallelism == 0:
+  if options.parallelism == 0:
     graph = taskgraph.SerialTaskGraph()
   else:
     graph = taskgraph.FiberTaskGraph(
-      parallelism=ui.options.parallelism,
-      debug=ui.options.debug)
+      parallelism=options.parallelism,
+      debug=options.debug)
   return graph
 
 
@@ -105,14 +106,16 @@ def InternalMain(argv):
 
   # Parse arguments.
   try:
-    cmd, args, opts = commands_mod.Parse(argv, commands)
+    cmd, args, options = commands_mod.Parse(argv, commands)
   except commands_mod.ParseError, e:
     console.PrintError(str(e))
     return 1
 
-  ui = ui_mod.UiContext(opts, console, commands)
+  graph = CreateTaskGraph(options)
 
-  if opts.help:
+  ui = ui_mod.UiContext(options, console, commands, graph)
+
+  if options.help:
     cmd.PrintHelp(ui)
     return 0
 
@@ -129,7 +132,6 @@ def InternalMain(argv):
     return 1
 
   # Run the task.
-  graph = CreateTaskGraph(ui)
   task = None
   try:
     task = cmd.Run(project, tuple(args), ui)

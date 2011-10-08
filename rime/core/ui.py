@@ -28,10 +28,11 @@ import traceback
 class UiContext(object):
   """UI object of Rime."""
 
-  def __init__(self, options, console, commands):
+  def __init__(self, options, console, commands, graph):
     self.options = options
     self.console = console
     self.commands = commands
+    self.graph = graph
     self.errors = ErrorRecorder(self)
 
 
