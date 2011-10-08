@@ -141,8 +141,6 @@ def InternalMain(argv):
     if ui.options.debug >= 1:
       traceback.print_exc()
     raise
-  finally:
-    graph.Close()
 
   if task:
     console.Print()

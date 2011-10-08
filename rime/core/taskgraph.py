@@ -316,11 +316,21 @@ class SerialTaskGraph(object):
 
   def __init__(self):
     self.cache = dict()
+    self.blocked_task = None
+    self.running = False
 
-  def Close(self):
-    pass
+  def IsRunning(self):
+    return self.running
 
   def Run(self, task):
+    assert not self.running
+    self.running = True
+    try:
+      return self._Run(task)
+    finally:
+      self.running = False
+
+  def _Run(self, task):
     if task not in self.cache:
       self.cache[task] = None
       value = (True, None)
@@ -338,17 +348,21 @@ class SerialTaskGraph(object):
           result = _TaskRaise(*sys.exc_info())
         if isinstance(result, TaskBranch):
           try:
-            value = (True, [self.Run(subtask) for subtask in result.tasks])
+            value = (True, [self._Run(subtask) for subtask in result.tasks])
           except:
             value = (False, sys.exc_info())
         elif isinstance(result, Task):
           try:
-            value = (True, self.Run(result))
+            value = (True, self._Run(result))
           except:
             value = (False, sys.exc_info())
         elif isinstance(result, TaskBlock):
           value = (True, None)
-          task.Wait()
+          try:
+            self.blocked_task = task
+            task.Wait()
+          finally:
+            self.blocked_task = None
         elif isinstance(result, _TaskRaise):
           self.cache[task] = (False, result.exc_info)
           break
@@ -370,6 +384,11 @@ class SerialTaskGraph(object):
     else:
       raise value[0], value[1], value[2]
 
+  def GetBlockedTasks(self):
+    if self.blocked_task is not None:
+      return [self.blocked_task]
+    return []
+
 
 class FiberTaskGraph(object):
   """TaskGraph which executes tasks with fibers (microthreads).
@@ -390,19 +409,23 @@ class FiberTaskGraph(object):
     self.ready_tasks = []
     self.blocked_tasks = []
     self.pending_stack = []
+    self.running = False
 
-  def Close(self):
-    for task in self.task_state:
-      if self.task_state[task] not in (FINISHED, ABORTED):
-        self._InterruptTask(task)
+  def IsRunning(self):
+    return self.running
 
   def Run(self, init_task):
+    assert not self.running
+    self.running = True
     self.first_tick = time.clock()
     self.last_tick = self.first_tick
     self.cumulative_parallelism = 0.0
     self._BranchTask(None, [init_task])
     while self._RunNextTask():
       pass
+    for task in self.task_state:
+      if self.task_state[task] not in (FINISHED, ABORTED):
+        self._InterruptTask(task)
     self._UpdateCumulativeParallelism()
     if self.last_tick > self.first_tick:
       parallelism_efficiency = (
@@ -416,6 +439,7 @@ class FiberTaskGraph(object):
     assert self.task_state[None] == READY
     del self.task_state[None]
     del self.task_graph[None]
+    self.running = False
     success, value = self.cache[init_task]
     if success:
       return value
@@ -799,3 +823,6 @@ class FiberTaskGraph(object):
 
   def _LogDebug(self, msg):
     self._Log(msg, level=3)
+
+  def GetBlockedTasks(self):
+    return self.blocked_tasks[:]
