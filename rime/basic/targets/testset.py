@@ -421,11 +421,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   @taskgraph.task_method
   def _TestSolutionWithChallengeCasesOne(self, solution, testcase, result, ui):
     """Test a wrong solution which has explicitly-specified challenge cases."""
-    # TODO(nya): Concat support
-    #ignore_timeout = (infile == consts.CONCAT_INFILE)
-    ignore_timeout = False
-    case_result = yield self._TestOneCase(
-      solution, testcase, ignore_timeout, ui)
+    case_result = yield self._TestOneCase(solution, testcase, ui)
     result.results[testcase] = case_result
     if case_result.verdict == test.TestCaseResult.AC:
       result.Finalize(False,
@@ -479,11 +475,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
     The solution can be marked as wrong but without challenge cases.
     """
-    # TODO(nya): Concat support
-    #ignore_timeout = (infile == consts.CONCAT_INFILE)
-    ignore_timeout = False
-    case_result = yield self._TestOneCase(
-      solution, testcase, ignore_timeout, ui)
+    case_result = yield self._TestOneCase(solution, testcase, ui)
     result.results[testcase] = case_result
     if case_result.verdict not in (test.TestCaseResult.AC,
                                    test.TestCaseResult.WA,
@@ -516,19 +508,18 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     yield True
 
   @taskgraph.task_method
-  def _TestOneCase(self, solution, testcase, ignore_timeout, ui):
+  def _TestOneCase(self, solution, testcase, ui):
     """Test a solution with one case.
 
     Cache results if option is set.
     Returns TestCaseResult.
     """
     # TODO(nya): enable result cache.
-    case_result = yield self._TestOneCaseNoCache(
-      solution, testcase, ignore_timeout, ui)
+    case_result = yield self._TestOneCaseNoCache(solution, testcase, ui)
     yield case_result
 
   @taskgraph.task_method
-  def _TestOneCaseNoCache(self, solution, testcase, ignore_timeout, ui):
+  def _TestOneCaseNoCache(self, solution, testcase, ui):
     """Test a solution with one case.
 
     Never cache results.
@@ -538,15 +529,12 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       os.path.join(solution.out_dir,
                    os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
       for ext in consts.OUT_EXT, consts.JUDGE_EXT]
-    timeout = self.problem.timeout
-    if ignore_timeout:
-      timeout = None
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
       args=(), cwd=solution.out_dir,
       input=testcase.infile,
       output=outfile,
-      timeout=timeout, precise=precise)
+      timeout=testcase.timeout, precise=precise)
     if res.status == core_codes.RunResult.TLE:
       yield test.TestCaseResult(solution, testcase, test.TestCaseResult.TLE,
                                 time=None, cached=False)

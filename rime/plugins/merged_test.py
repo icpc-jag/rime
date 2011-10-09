@@ -81,6 +81,10 @@ class MergedTestCase(test.TestCase):
       os.path.join(testset.out_dir, '%s%s' % (merger.name, consts.IN_EXT)))
     self.merger = merger
 
+  @property
+  def timeout(self):
+    return None
+
 
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):

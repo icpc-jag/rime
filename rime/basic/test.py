@@ -45,6 +45,10 @@ class TestCase(object):
     else:
       self.difffile = difffile
 
+  @property
+  def timeout(self):
+    return self.testset.problem.timeout
+
 
 class TestCaseResult(object):
   """Testcase result."""
