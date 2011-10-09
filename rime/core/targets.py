@@ -45,6 +45,7 @@ class TargetBase(object):
     # Set full name.
     # Full name is normally path-like string separated with "/".
     if name is None:
+      self.name = '<root>'
       self.fullname = None
     elif parent is None or parent.fullname is None:
       self.fullname = name

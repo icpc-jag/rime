@@ -77,7 +77,7 @@ def LoadProject(cwd, ui):
     if head == path:
       return None
     path = head
-  project = targets.registry.Project('root', path, None)
+  project = targets.registry.Project(None, path, None)
   try:
     project.Load(ui)
     return project
