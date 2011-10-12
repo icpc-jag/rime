@@ -146,7 +146,7 @@ class Testset(targets.registry.Testset):
         else:
           detail = ('%s, %s' %
                     (original_result.detail,
-                     ', '.join(['%s *s' %
+                     ', '.join(['%s *.**s' %
                                 os.path.basename(t.infile)
                                 for t in merged_result.testcases])))
         original_result.Finalize(True, detail=detail, allow_override=True)
