@@ -497,7 +497,15 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
                                   case_result.verdict),
                       notable_testcase=testcase)
       if solution.IsCorrect():
-        ui.errors.Error(solution, result.detail)
+        if case_result.verdict == test.TestCaseResult.WA:
+          judgefile = os.path.join(
+            solution.out_dir,
+            os.path.splitext(os.path.basename(testcase.infile))[0] +
+            consts.JUDGE_EXT)
+          ui.errors.Error(solution,
+                          '%s\n  judge log: %s' % (result.detail, judgefile))
+        else:
+          ui.errors.Error(solution, result.detail)
       if ui.options.keep_going:
         yield False
       else:
