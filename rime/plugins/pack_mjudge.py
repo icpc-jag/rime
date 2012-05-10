@@ -63,7 +63,7 @@ class Testset(targets.registry.Testset):
   def Pack(self, ui):
     if not (yield self.Build(ui)):
       yield False
-    infiles = self.ListInputFiles()
+    testcases = self.ListTestCases()
     ui.console.PrintAction('PACK', self, progress=True)
     try:
       files.RemoveTree(self.pack_dir)
@@ -71,8 +71,8 @@ class Testset(targets.registry.Testset):
     except:
       ui.errors.Exception(self)
       yield False
-    for (i, infile) in enumerate(infiles):
-      basename = os.path.splitext(infile)[0]
+    for (i, testcase) in enumerate(testcases):
+      basename = os.path.splitext(testcase.infile)[0]
       difffile = basename + consts.DIFF_EXT
       packed_infile = str(i+1) + consts.IN_EXT
       packed_difffile = str(i+1) + consts.DIFF_EXT
@@ -80,9 +80,9 @@ class Testset(targets.registry.Testset):
         ui.console.PrintAction(
           'PACK',
           self,
-          '%s -> %s' % (infile, packed_infile),
+          '%s -> %s' % (testcase.infile, packed_infile),
           progress=True)
-        files.CopyFile(os.path.join(self.out_dir, infile),
+        files.CopyFile(os.path.join(self.out_dir, testcase.infile),
                        os.path.join(self.pack_dir, packed_infile))
         ui.console.PrintAction(
           'PACK',
