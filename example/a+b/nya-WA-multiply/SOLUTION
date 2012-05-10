@@ -1,0 +1,8 @@
+# -*- coding: utf-8; mode: python -*-
+
+## Solution definition.
+## Choose and modify one of definitions below.
+## Adding a parameter challenge_cases marks this solution as a wrong solution.
+#c_solution(src='main.c')
+cxx_solution(src='main.cc', challenge_cases=['00-sample1.in'])
+#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main')

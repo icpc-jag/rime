@@ -1,0 +1,11 @@
+# -*- coding: utf-8; mode: python -*-
+
+## Problem definition.
+## Required fields are:
+##   title: The problem title shown in test summary.
+##   id: The problem ID (typically starts from A) used to order problems.
+##   time_limit: The time limit of this problem in seconds.
+problem(title = "A+B Problem",
+        id = "A",
+        time_limit = 1.0,
+        )

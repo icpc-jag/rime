@@ -1,0 +1,19 @@
+# -*- coding: utf-8; mode: python -*-
+
+## Input generators.
+#c_generator(src='generator.c')
+#cxx_generator(src='generator.cc')
+#java_generator(src='Generator.java', encoding='UTF-8', mainclass='Generator')
+script_generator(src='generator.py')
+
+## Input validators.
+#c_validator(src='validator.c')
+#cxx_validator(src='validator.cc')
+#java_validator(src='Validator.java', encoding='UTF-8', mainclass='Validator')
+script_validator(src='validator.py')
+
+## Output judges.
+#c_judge(src='judge.c')
+#cxx_judge(src='judge.cc')
+#java_judge(src='Judge.java', encoding='UTF-8', mainclass='Judge')
+#script_judge(src='judge.py')
