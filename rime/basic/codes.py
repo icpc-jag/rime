@@ -48,11 +48,12 @@ class CodeBase(codes.Code):
   @taskgraph.task_method
   def Compile(self):
     """Compile the code and return RunResult."""
-    if not self.compile_args:
-      yield codes.RunResult(codes.RunResult.OK, None)
     try:
       self.MakeOutDir()
-      result = yield self._ExecForCompile(args=self.compile_args)
+      if not self.compile_args:
+        result = codes.RunResult(codes.RunResult.OK, None)
+      else:
+        result = yield self._ExecForCompile(args=self.compile_args)
     except Exception, e:
       result = codes.RunResult('On compiling: %s' % e, None)
     yield result
