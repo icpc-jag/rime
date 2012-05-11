@@ -43,7 +43,8 @@ class CodeBase(codes.Code):
 
   def MakeOutDir(self):
     """Create output directory."""
-    files.MakeDir(self.out_dir)
+    if self.out_dir:
+      files.MakeDir(self.out_dir)
 
   @taskgraph.task_method
   def Compile(self):
