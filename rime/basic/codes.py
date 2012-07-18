@@ -194,12 +194,14 @@ class ScriptCode(CodeBase):
   QUIET_COMPILE = True
   PREFIX = 'script'
   EXTENSIONS = ['sh', 'pl', 'py', 'rb']
+  EXT_COMMAND = {'sh': 'sh', 'pl': 'perl', 'py': 'python', 'rb': 'ruby'}
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
+    ext = src_name.split('.')[-1]
     super(ScriptCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
       compile_args=[],
-      run_args=['perl', '--', os.path.join(src_dir, src_name)] + run_flags)
+      run_args=[self.EXT_COMMAND[ext], '--', os.path.join(src_dir, src_name)] + run_flags)
 
 
 class InternalDiffCode(CodeBase):
