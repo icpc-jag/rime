@@ -190,10 +190,24 @@ class ScriptCode(CodeBase):
   EXTENSIONS = ['sh', 'pl', 'py', 'rb']
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
+    # Perl interpreter executes another interpreter by looking at a
+    # shebang line.
     super(ScriptCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
       compile_args=[],
       run_args=['perl', '--', os.path.join(src_dir, src_name)] + run_flags)
+
+  @taskgraph.task_method
+  def Compile(self, *args, **kwargs):
+    """Fail if the script is missing a shebang line."""
+    try:
+      with open(os.path.join(self.src_dir, self.src_name)) as f:
+        header = f.read(2)
+    except IOError:
+      yield codes.RunResult('File not found', None)
+    if header != '#!':
+      yield codes.RunResult('Script missing a shebang line', None)
+    yield (yield super(ScriptCode, self).Compile(*args, **kwargs))
 
 
 class InternalDiffCode(CodeBase):
