@@ -90,6 +90,7 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
     if self.IsBuildCached():
       ui.console.PrintAction('COMPILE', self, 'up-to-date', progress=True)
       yield True
+    files.MakeDir(self.out_dir)
     if not self.code.QUIET_COMPILE:
       ui.console.PrintAction('COMPILE', self)
     res = yield self.code.Compile()

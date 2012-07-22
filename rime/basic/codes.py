@@ -41,16 +41,10 @@ class CodeBase(codes.Code):
     self.compile_args = tuple(compile_args)
     self.run_args = tuple(run_args)
 
-  def MakeOutDir(self):
-    """Create output directory."""
-    if self.out_dir:
-      files.MakeDir(self.out_dir)
-
   @taskgraph.task_method
   def Compile(self):
     """Compile the code and return RunResult."""
     try:
-      self.MakeOutDir()
       if not self.compile_args:
         result = codes.RunResult(codes.RunResult.OK, None)
       else:
