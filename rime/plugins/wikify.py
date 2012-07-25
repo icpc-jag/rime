@@ -220,7 +220,9 @@ class Wikify(rime_commands.CommandBase):
   def __init__(self, parent):
     super(Wikify, self).__init__(
       'wikify',
+      '',
       'Upload test results to Pukiwiki. (wikify plugin)',
+      '',
       parent)
 
   def Run(self, obj, args, ui):

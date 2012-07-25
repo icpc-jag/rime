@@ -68,9 +68,11 @@ class Command(object):
 
 
 class CommandBase(Command):
-  def __init__(self, name, description, parent):
+  def __init__(self, name, args, oneline_summary, description, parent):
     super(CommandBase, self).__init__(parent)
     self.name = name
+    self.args = args
+    self.oneline_summary = oneline_summary
     self.description = description
     self.options = []
 
@@ -96,34 +98,38 @@ class CommandBase(Command):
     return options
 
   def PrintHelp(self, ui):
-    ui.console.Print('Usage: rime.py %s [<options> ...] [<args> ...]' %
-                     (self.name or '<command>'))
+    ui.console.Print('rime.py %s [<options>...] %s' %
+                     (self.name or '<command>', self.args or '[<args>...]'))
     ui.console.Print()
     self._PrintCommandDescription(ui)
     if self.name:
       ui.console.Print('Options for "%s":' % self.name)
+      ui.console.Print()
       self._PrintOptionDescription(ui)
     ui.console.Print('Global options:')
+    ui.console.Print()
     ui.commands[None]._PrintOptionDescription(ui)
 
   def _PrintCommandDescription(self, ui):
-    description = self.description
-    if self.name:
-      description = '%s - %s' % (self.name, description)
-    for line in description.splitlines():
-      ui.console.Print(line)
-    ui.console.Print()
+    if self.oneline_summary:
+      ui.console.Print(self.oneline_summary)
+      ui.console.Print()
+    if self.description:
+      for line in self.description.splitlines():
+        ui.console.Print('    ' + line)
+      ui.console.Print()
 
     if not self.name:
       rows = []
       for cmd in sorted(ui.commands.values(), lambda a, b: cmp(a.name, b.name)):
         if not cmd.name:
           continue
-        rows.append(('  %s  ' % cmd.name, cmd.description.splitlines()[0]))
+        rows.append((' %s    ' % cmd.name, cmd.oneline_summary))
 
       offset = max([len(left_col) for left_col, _ in rows])
 
-      ui.console.Print('Available commands:')
+      ui.console.Print('Commands:')
+      ui.console.Print()
       for left_col, right_col in rows:
         ui.console.Print(string.ljust(left_col, offset) + right_col)
       ui.console.Print()
@@ -135,12 +141,12 @@ class CommandBase(Command):
       if option.argname:
         longopt += ' <%s>' % option.argname
       if option.shortname:
-        left_col_head = '  -%s, %s  ' % (option.shortname, longopt)
+        left_col_head = ' -%s, %s  ' % (option.shortname, longopt)
       else:
-        left_col_head = '      %s  ' % longopt
+        left_col_head = '     %s  ' % longopt
       rows.append((left_col_head, option.description.splitlines()))
     if not rows:
-      ui.console.Print('  No options.')
+      ui.console.Print(' No options.')
     else:
       offset = max([len(left_col_head) for left_col_head, _ in rows])
       for left_col_head, right_col_lines in rows:
@@ -262,7 +268,11 @@ class Help(CommandBase):
   def __init__(self, parent):
     super(Help, self).__init__(
       'help',
+      '<command>',
       'Show help.',
+      'To see a brief description and available options of a command, try:\n'
+      '\n'
+      'rime.py help <command>',
       parent)
 
   def Run(self, project, args, ui):
@@ -271,7 +281,7 @@ class Help(CommandBase):
     if len(args) > 0:
       cmd = commands.get(args[0])
     if not cmd:
-      cmd = commands[None]
+      cmd = self
     cmd.PrintHelp(ui)
     return None
 

@@ -27,7 +27,9 @@ class Example(commands.CommandBase):
   def __init__(self, parent):
     super(Example, self).__init__(
       'example',
+      '',
       'Example command.',
+      'Example help.',
       parent)
 
   def Run(self, project, args, ui):

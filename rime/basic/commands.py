@@ -39,7 +39,7 @@ from rime.basic.util import test_summary
 class Default(commands.CommandBase):
   def __init__(self, parent):
     assert parent is None
-    super(Default, self).__init__(None, consts.GLOBAL_HELP, parent)
+    super(Default, self).__init__(None, None, '', consts.GLOBAL_HELP, parent)
     self.AddOptionEntry(commands.OptionEntry(
         'h', 'help', 'help', bool, False, None,
         'Show this help.'))
@@ -96,7 +96,9 @@ class Build(commands.CommandBase):
   def __init__(self, parent):
     super(Build, self).__init__(
       'build',
-      'Build a target.',
+      '[<target>]',
+      'Build a target and its dependencies.',
+      consts.BUILD_HELP,
       parent)
 
   def Run(self, project, args, ui):
@@ -107,7 +109,9 @@ class Test(commands.CommandBase):
   def __init__(self, parent):
     super(Test, self).__init__(
       'test',
-      'Run tests.',
+      '[<target>]',
+      'Run tests in a target.',
+      consts.TEST_HELP,
       parent)
 
   def Run(self, project, args, ui):
@@ -126,7 +130,9 @@ class Clean(commands.CommandBase):
   def __init__(self, parent):
     super(Clean, self).__init__(
       'clean',
+      '[<target>]',
       'Clean intermediate files.',
+      consts.CLEAN_HELP,
       parent)
 
   def Run(self, project, args, ui):

@@ -132,7 +132,9 @@ class Pack(commands.CommandBase):
   def __init__(self, parent):
     super(Pack, self).__init__(
       'pack',
+      '',
       'Pack testsets to export to M-judge. (pack_mjudge plugin)',
+      '',
       parent)
 
   def Run(self, obj, args, ui):
