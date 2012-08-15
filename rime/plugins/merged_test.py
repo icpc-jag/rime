@@ -131,6 +131,7 @@ class Testset(targets.registry.Testset):
       yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
     if original_result.expected and solution.IsCorrect() and self.mergers:
       merged_result = (yield self._TestSolutionWithMergedTests(solution, ui))
+      original_result.results.update(merged_result.results)
       if not merged_result.expected:
         original_result.Finalize(
           False, detail=merged_result.detail,
