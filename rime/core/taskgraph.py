@@ -34,7 +34,8 @@ import time
 
 
 # State of tasks.
-RUNNING, WAITING, BLOCKED, READY, FINISHED, ABORTED = range(6)
+NUM_STATES = 6
+RUNNING, WAITING, BLOCKED, READY, FINISHED, ABORTED = range(NUM_STATES)
 
 
 class TaskBranch(object):
@@ -407,6 +408,7 @@ class FiberTaskGraph(object):
     self.task_counters = dict()
     self.task_waits = dict()
     self.task_state = dict()
+    self.state_stats = [0] * NUM_STATES
     self.ready_tasks = []
     self.blocked_tasks = []
     self.pending_stack = []
@@ -806,16 +808,17 @@ class FiberTaskGraph(object):
         assert task not in self.task_waits
       else:
         raise AssertionError('Unknown state: ' + str(state))
+    if task in self.task_state:
+      self.state_stats[self.task_state[task]] -= 1
+    self.state_stats[state] += 1
     self.task_state[task] = state
 
   def _LogTaskStats(self):
     if self.debug == 0:
       return
-    stats = [0] * 6
-    for state in self.task_state.values():
-      stats[state] += 1
     self._LogDebug(('RUNNING %d, WAITING %d, BLOCKED %d, '
-                    'READY %d, FINISHED %d, ABORTED %d') % tuple(stats))
+                    'READY %d, FINISHED %d, ABORTED %d') %
+                   tuple(self.state_stats))
 
   def _Log(self, msg, level):
     if self.debug >= level:
