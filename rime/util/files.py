@@ -28,10 +28,11 @@ import shutil
 import os
 import os.path
 import pickle
+import platform
 import subprocess
 
 
-_devnull = open('/dev/null', 'r+')
+_devnull = open(os.devnull, 'r+')
 
 
 def CopyFile(src, dst):
@@ -94,7 +95,7 @@ def PickleLoad(file):
     return obj
 
 def ConvPath(path):
-  if not os.uname()[0].lower().startswith('cygwin'):
+  if not platform.uname()[0].lower().startswith('cygwin'):
     return path
   try:
     p = subprocess.Popen(['cygpath', '-wp', path], stdout=subprocess.PIPE)
