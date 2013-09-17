@@ -190,24 +190,35 @@ class ScriptCode(CodeBase):
   EXTENSIONS = ['sh', 'pl', 'py', 'rb']
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
-    # Perl interpreter executes another interpreter by looking at a
-    # shebang line.
     super(ScriptCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
       compile_args=[],
-      run_args=['perl', '--', os.path.join(src_dir, src_name)] + run_flags)
+      run_args=['false', os.path.join(src_dir, src_name)] + run_flags)
+    # Replace the executable with the shebang line
+    run_args = list(self.run_args)
+    try:
+      run_args[0] = self._ReadAndParseShebangLine()
+    except IOError:
+      pass
+    self.run_args = tuple(run_args)
 
   @taskgraph.task_method
   def Compile(self, *args, **kwargs):
     """Fail if the script is missing a shebang line."""
     try:
-      with open(os.path.join(self.src_dir, self.src_name)) as f:
-        header = f.read(2)
+      interpreter = self._ReadAndParseShebangLine()
     except IOError:
       yield codes.RunResult('File not found', None)
-    if header != '#!':
+    if not interpreter:
       yield codes.RunResult('Script missing a shebang line', None)
     yield (yield super(ScriptCode, self).Compile(*args, **kwargs))
+
+  def _ReadAndParseShebangLine(self):
+    with open(os.path.join(self.src_dir, self.src_name)) as f:
+      shebang_line = f.readline()
+    if not shebang_line.startswith('#!'):
+      return None
+    return shebang_line[2:].strip()
 
 
 class InternalDiffCode(CodeBase):
