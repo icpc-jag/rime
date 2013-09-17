@@ -211,6 +211,8 @@ class ScriptCode(CodeBase):
       yield codes.RunResult('File not found', None)
     if not interpreter:
       yield codes.RunResult('Script missing a shebang line', None)
+    if not os.path.exists(interpreter):
+      yield codes.RunResult('Interpreter not found: %s' % interpreter, None)
     yield (yield super(ScriptCode, self).Compile(*args, **kwargs))
 
   def _ReadAndParseShebangLine(self):
