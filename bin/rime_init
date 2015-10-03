@@ -1,0 +1,120 @@
+#!/usr/bin/python
+#
+# Copyright (c) 2015 Rime Project.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
+
+"""
+Initialize a rime project.
+"""
+
+import sys
+import os
+import os.path
+import urllib
+
+from rime.plugins.plus import rime_plus_version
+
+def make_file(path, content):
+  with open(path, 'w') as f:
+    f.write(content)
+
+if __name__ == '__main__':
+  if os.path.exists('PROJECT'):
+    print('This directory is already a rime project root.')
+    sys.exit(1)
+
+  if len(sys.argv) < 2:
+    print('Usage: rime_init.py --git / rime_init.py --mercurial')
+    sys.exit(1)
+
+  if sys.argv[1] == '--git':
+    isgit = True
+  elif sys.argv[1] == '--mercurial':
+    isgit = False
+  else:
+    print('Usage: rime_init.py --git / rime_init.py --mercurial')
+    sys.exit(1)
+
+  content = '''\
+rime-out
+*.pyc
+Icon*
+*.swp
+.DS_Store
+Thumbs.db
+*~
+*.out
+target
+'''
+  if isgit:
+    make_file('.gitignore', content)
+  else:
+    make_file('.hgignore', 'syntax: glob\n' + content)
+
+  if not os.path.exists('common'):
+    os.makedirs('common')
+  try:
+    urllib.urlretrieve(
+      'https://raw.githubusercontent.com/MikeMirzayanov/testlib/master/testlib.h',
+      'common/testlib.h')
+  except Exception:
+    os.remove('PROJECT')
+    print('Some error while downloading testlib.h.')
+    sys.exit(1)
+
+  content = '''\
+# -*- coding: utf-8; mode: python -*-
+
+## You can load plugins here.
+use_plugin('rime_plus')
+use_plugin('judge_system.atcoder')
+#use_plugin('judge_system.aoj')
+#use_plugin('wikify')
+#use_plugin('wikify_full')
+
+project(library_dir='common', required_rime_plus_version='{0}')
+
+#wikify_config(
+#  url="http://example.com/pukiwiki/",
+#  page="***",
+#  encoding="utf-8",
+#  auth_realm="***",
+#  auth_username="***",
+#  auth_password="***")
+
+atcoder_config(
+  upload_script='***',
+  contest_url='https://***.contest.atcoder.jp/',
+  username='***', password='***',
+  lang_ids={'c': 13, 'cxx': 10, 'java': 3}
+)
+'''.format(rime_plus_version)
+  make_file('PROJECT', content)
+
+  if(isgit):
+    os.system('git init')
+    os.system('git add PROJECT .gitignore common/testlib.h')
+    os.system('git commit -m "Initial commit"')
+  else:
+    os.system('hg init')
+    os.system('hg add PROJECT .hgignore common/testlib.h')
+    os.system('hg commit -m "Initial commit"')
