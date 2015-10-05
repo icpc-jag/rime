@@ -73,7 +73,7 @@ class KUPCReactiveRunner(ReactiveRunner):
   PREFIX = 'kupc'
   def Run(self, reactive, args, cwd, input, output, timeout, precise):
     return reactive.Run(
-        args=('', "'%s'" % ' '.join(args)),
+        args=("'%s'" % ' '.join(args),),
         cwd=cwd,
         input=input,
         output=output,
@@ -126,6 +126,7 @@ class Testset(targets.registry.Testset):
       if not reactive.variant:
         reactive.variant = KUPCJudgeRunner()
       res = yield reactive.variant.Run(
+        reactive=reactive,
         args=solution.code.run_args, cwd=solution.out_dir,
         input=testcase.infile,
         output=outfile,
@@ -163,6 +164,41 @@ class Testset(targets.registry.Testset):
                                   time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
+
+  @taskgraph.task_method
+  def _RunReferenceSolutionOne(self, reference_solution, testcase, ui):
+    """
+    Run the reference solution against a single input file.
+    """
+    if os.path.isfile(testcase.difffile):
+      yield True
+    # reactive
+    if self.reactives:
+      if len(self.reactives) > 1:
+        ui.errors.Error(testset, "Multiple reactive checkers registered.")
+        yield None
+      reactive = self.reactives[0]
+      if not reactive.variant:
+        reactive.variant = KUPCJudgeRunner()
+      res = yield reactive.variant.Run(
+        reactive=reactive,
+        args=reference_solution.code.run_args, cwd=reference_solution.out_dir,
+        input=testcase.infile,
+        output=testcase.difffile,
+        timeout=None, precise=False)
+    else:
+      res = yield reference_solution.Run(
+        args=(), cwd=reference_solution.out_dir,
+        input=testcase.infile,
+        output=testcase.difffile,
+        timeout=None, precise=False)
+    if res.status != core_codes.RunResult.OK:
+      ui.errors.Error(reference_solution, res.status)
+      raise taskgraph.Bailout([False])
+    ui.console.PrintAction('REFRUN', reference_solution,
+                            '%s: DONE' % os.path.basename(testcase.infile),
+                           progress=True)
+    yield True
 
   @taskgraph.task_method
   def _CompileJudges(self, ui):

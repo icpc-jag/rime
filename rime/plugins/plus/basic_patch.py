@@ -433,6 +433,7 @@ def GetLastModified(self):
 
 basic_codes.CodeBase._ExecForCompile = _ExecForCompile
 basic_codes.CodeBase.dependency = []
+basic_codes.CodeBase.variant = None
 rime.basic.targets.problem.ProblemComponentMixin.GetLastModified = GetLastModified
 
 # -O2
