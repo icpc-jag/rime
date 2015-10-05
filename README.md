@@ -28,15 +28,15 @@ Rime-plus
 * Add a testset
 ```$ rime add <parent_problem_dir_name> testset <testset_dir_name>```
 * Build a target (project/problem/solution/testset)
-```$ rime build <target_path>```
+```$ rime build <target_path> -j <#workers>```
 * Test a target (project/problem/solution/testset)
-```$ rime test <target_path>```
+```$ rime test <target_path> -C -j <#workers>```
 * Pack a target for an online judge (project/problem/testset)
 ```$ rime pack <target_path>```
 * Upload a target to an online judge (project/problem/testset)
 ```$ rime upload <target_path>```
 * Submit a target to an online judge (project/problem/solution)
-```$ rime upload <target_path>```
+```$ rime submit <target_path>```
 * Edit a configuration file (project/problem/solution/testset)
 ```vi/emacs/nano <target_path>/<PROJECT/PROBLEM/SOLUTION/TESTSET>```
 
