@@ -160,7 +160,15 @@ class Problem(targets.registry.Problem):
 #c_solution(src='main.c') # -lm -O2 as default
 #cxx_solution(src='main.cc', flags=[]) # -std=c++11 -O2 as default
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main')
+#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=[])
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=['10_corner*.in'])
+#script_solution(src='main.sh') # shebang line is required
+#script_solution(src='main.pl') # shebang line is required 
+#script_solution(src='main.py') # shebang line is required
+#script_solution(src='main.rb') # shebang line is required
+#js_solution(src='main.js') # javascript (nodejs) 
+#hs_solution(src='main.hs') # haskell (stack + ghc)
+#cs_solution(src='main.cs') # C# (mono)
 
 ## Score
 #expected_score(100)
