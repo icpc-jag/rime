@@ -22,6 +22,7 @@
 # THE SOFTWARE.
 #
 
+import codecs
 import commands as builtin_commands
 import getpass
 import hashlib
@@ -44,19 +45,17 @@ from rime.core import codes as core_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
-import rime.plugins.wikify  # target dependency
 from rime.util import files
 
-BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
-BGCOLOR_GOOD = 'BGCOLOR(#ccffcc):'
-BGCOLOR_NOTBAD = 'BGCOLOR(#ffffcc):'
-BGCOLOR_BAD = 'BGCOLOR(#ffcccc):'
-BGCOLOR_NA = 'BGCOLOR(#cccccc):'
+HTMLIFY_BGCOLOR_GOOD = ' class="success">'
+HTMLIFY_BGCOLOR_NOTBAD = ' class="warning">'
+HTMLIFY_BGCOLOR_BAD = ' class="danger">'
+HTMLIFY_BGCOLOR_NA = ' class="info">'
 
-CELL_GOOD = BGCOLOR_GOOD + '&#x25cb;'
-CELL_NOTBAD = BGCOLOR_NOTBAD + '&#x25b3;'
-CELL_BAD = BGCOLOR_BAD + '&#xd7;'
-CELL_NA = BGCOLOR_NA + '-'
+HTMLIFY_CELL_GOOD = HTMLIFY_BGCOLOR_GOOD + '&#x25cb;'
+HTMLIFY_CELL_NOTBAD = HTMLIFY_BGCOLOR_NOTBAD + '&#x25b3;'
+HTMLIFY_CELL_BAD = HTMLIFY_BGCOLOR_BAD + '&#xd7;'
+HTMLIFY_CELL_NA = HTMLIFY_BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):
@@ -82,90 +81,95 @@ def GetFileHash(dir, filename):
   else:
     return ''
 
-def GetFileComment(dir, filename):
+def GetHtmlifyFileComment(dir, filename):
   filepath = os.path.join(dir, filename)
   if os.path.exists(filepath):
     f = open(filepath)
-    r = f.read()
+    r = f.read().strip()
     f.close()
-    return SafeUnicode(r).replace('\n', '&br;').replace('|', '&#x7c;')
+    return SafeUnicode(r).replace('\n', '<br>')
   else:
     return ''
 
 class Project(targets.registry.Project):
   @taskgraph.task_method
-  def WikifyFull(self, ui):
-    if not self.wikify_config_defined:
-      ui.errors.Error(self, 'wikify_config() is not defined.')
-      yield None
-    wikiFull = yield self._GenerateWikiFull(ui)
-    self._UploadWiki(wikiFull, ui)
+  def HtmlifyFull(self, ui):
+    htmlFull = yield self._GenerateHtmlFull(ui)
+    codecs.open("summary.html", 'w', 'utf8').write(htmlFull)
     yield None
 
   @taskgraph.task_method
-  def _GenerateWikiFull(self, ui):
-    yield self.Clean(ui) # 重すぎるときはコメントアウト
+  def _GenerateHtmlFull(self, ui):
+    #yield self.Clean(ui) # 重すぎるときはコメントアウト
+
     # Get system information.
     rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
-    # Generate content.
-    wiki =  u'** Summary\n'
-    wiki += u'|||CENTER:|CENTER:|CENTER:|CENTER:|CENTER:|c\n'
-    wiki += u'|~問題|~担当|~解答|~入力|~出力|~入検|~出検|\n'
+    header  = u'<!DOCTYPE html>\n<html lang="ja"><head>'
+    header += u'<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>'
+    info    = u'このセクションは htmlfy_full plugin により自動生成されています '
+    info   += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' % {'rev': rev, 'username': username, 'hostname': hostname})
+    footer  = u'</body></html>'
 
-    wikiFull =  u'** Detail\n'
+    # Generate content.
+    html =  u'<h2>Summary</h2>\n<table class="table">\n'
+    html += u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th><th>出力</th><th>入検</th><th>出検</th></tr></thead>\n'
+
+    htmlFull =  u'<h2>Detail<h2>\n'
 
     results = yield taskgraph.TaskBranch([
-        self._GenerateWikiFullOne(problem, ui)
+        self._GenerateHtmlFullOne(problem, ui)
         for problem in self.problems])
-    (wikiResults, wikiFullResults) = zip(*results)
-    wiki += ''.join(wikiResults)
-    wikiFull += ''.join(wikiFullResults)
+    (htmlResults, htmlFullResults) = zip(*results)
+    html += '<tbody>' + ''.join(htmlResults) + '</tbody></table>\n'
+    htmlFull += ''.join(htmlFullResults)
 
-    environments =  '** Environments\n'
-    environments += ':gcc:|'   + builtin_commands.getoutput('gcc --version')  + '\n'
-    environments += ':g++:|'   + builtin_commands.getoutput('g++ --version')  + '\n'
-    environments += ':javac:|' + builtin_commands.getoutput('javac -version') + '\n'
-    environments += ':java:|'  + builtin_commands.getoutput('java -version')  + '\n'
+    environments =  '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
+    environments += '<dt>gcc:</dt><dd>'   + builtin_commands.getoutput('gcc --version')  + '</dd>\n'
+    environments += '<dt>g++:</dt><dd>'   + builtin_commands.getoutput('g++ --version')  + '</dd>\n'
+    environments += '<dt>javac:</dt><dd>' + builtin_commands.getoutput('javac -version') + '</dd>\n'
+    environments += '<dt>java:</dt><dd>'  + builtin_commands.getoutput('java -version')  + '</dd>\n'
+    environments += '</dl>\n'
 
-    errors = '** Error Messages\n'
-    if ui.errors.HasError():
-      errors += ':COLOR(red):ERROR:|\n'
-      for e in ui.errors.errors:
-        errors += '--' + e + '\n'
-    if ui.errors.HasWarning():
-      errors += ':COLOR(yellow):WARNING:|\n'
-      for e in ui.errors.warnings:
-        errors += '--' + e + '\n'
-    errors = SafeUnicode(errors)
+    errors = ''
+    if ui.errors.HasError() or ui.errors.HasWarning():
+      errors = '<h2>Error Messages</h2>\n<dl class="dl-horizontal">\n'
+      if ui.errors.HasError():
+        errors += '<dt class="danger">ERROR:</dt><dd><ul>\n'
+        for e in ui.errors.errors:
+          errors += '<li>' + e + '</li>\n'
+        errors += '</ul></dt>\n'
+      if ui.errors.HasWarning():
+        errors += '<dt class="warning">WARNING:</dt><dd><ul>\n'
+        for e in ui.errors.warnings:
+          errors += '<li>' + e + '</li>\n'
+        errors += '</ul></dd>\n'
+      errors += '</dl>\n'
 
-    yield u'#contents\n' + (u'このセクションは wikify_full plugin により自動生成されています '
-            u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
-            {'rev': rev, 'username': username, 'hostname': hostname}
-            ) + wiki + environments + errors + wikiFull
+    yield header + info + html + environments + errors + htmlFull + footer
 
   @taskgraph.task_method
-  def _GenerateWikiFullOne(self, problem, ui):
+  def _GenerateHtmlFullOne(self, problem, ui):
     yield problem.Build(ui)
 
     # Get status.
     title = SafeUnicode(problem.title) or 'No Title'
-    wiki_name = SafeUnicode(problem.wiki_name) or 'No Wiki Name'
     assignees = problem.assignees
     if isinstance(assignees, list):
       assignees = ','.join(assignees)
     assignees = SafeUnicode(assignees)
 
     # Get various information about the problem.
-    wikiFull = '***' + title + '\n'
+    htmlFull = '<h3>' + title + '</h3>\n'
     solutions = sorted(problem.solutions, key=lambda x: x.name)
     solutionnames = [solution.name for solution in solutions]
+
     captions = [name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-    wikiFull += '|CENTER:~' + '|CENTER:~'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '|h\n'
-    formats = ['RIGHT:' for solution in solutions]
-    wikiFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
+    htmlFull += '<table class="table">\n<thead><tr><th>' + '</th><th>'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '</th></tr></thead>\n<tbody>\n'
+    #formats = ['RIGHT:' for solution in solutions]
+    #htmlFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -190,19 +194,20 @@ class Project(targets.registry.Project):
     dir = problem.testset.out_dir
     for casename, cols in lists:
       rows.append(
-          '|' +
-          '|'.join(
+          '<tr><td' +
+          '</td><td'.join(
             [
-              casename.replace('_', ' ').replace('-', ' '),
-              GetFileSize(dir, casename + consts.IN_EXT),
-              GetFileSize(dir, casename + consts.DIFF_EXT),
-              GetFileHash(dir, casename + consts.IN_EXT)
+              '>' + casename.replace('_', ' ').replace('-', ' '),
+              '>' + GetFileSize(dir, casename + consts.IN_EXT),
+              '>' + GetFileSize(dir, casename + consts.DIFF_EXT),
+              '>' + GetFileHash(dir, casename + consts.IN_EXT)
             ]
-            + [self._GetMessage(*t) for t in cols]
-            + [GetFileComment(dir, casename + '.comment')]
+            + [self._GetHtmlifyMessage(*t) for t in cols]
+            + ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
             ) +
-          '|\n')
-    wikiFull += ''.join(rows)
+          '</td></tr>\n')
+    htmlFull += ''.join(rows)
+    htmlFull += '</tbody></table>'
 
     # Fetch test results.
     #results = yield problem.Test(ui)
@@ -220,83 +225,83 @@ class Project(targets.registry.Project):
 
     # Solutions:
     if num_corrects >= 2:
-      cell_solutions = BGCOLOR_GOOD
+      cell_solutions = HTMLIFY_BGCOLOR_GOOD
     elif num_corrects >= 1:
-      cell_solutions = BGCOLOR_NOTBAD
+      cell_solutions = HTMLIFY_BGCOLOR_NOTBAD
     else:
-      cell_solutions = BGCOLOR_BAD
+      cell_solutions = HTMLIFY_BGCOLOR_BAD
     cell_solutions += '%d+%d' % (num_corrects, num_incorrects)
 
     # Input:
     if num_tests >= 20:
-      cell_input = BGCOLOR_GOOD + str(num_tests)
+      cell_input = HTMLIFY_BGCOLOR_GOOD + str(num_tests)
     else:
-      cell_input = BGCOLOR_BAD + str(num_tests)
+      cell_input = HTMLIFY_BGCOLOR_BAD + str(num_tests)
 
     # Output:
     if num_corrects >= 2 and num_agreed == num_corrects:
-      cell_output = BGCOLOR_GOOD
+      cell_output = HTMLIFY_BGCOLOR_GOOD
     elif num_agreed >= 2:
-      cell_output = BGCOLOR_NOTBAD
+      cell_output = HTMLIFY_BGCOLOR_NOTBAD
     else:
-      cell_output = BGCOLOR_BAD
+      cell_output = HTMLIFY_BGCOLOR_BAD
     cell_output += '%d/%d' % (num_agreed, num_corrects)
 
     # Validator:
     if problem.testset.validators:
-      cell_validator = CELL_GOOD
+      cell_validator = HTMLIFY_CELL_GOOD
     else:
-      cell_validator = CELL_BAD
+      cell_validator = HTMLIFY_CELL_BAD
 
     # Judge:
     if need_custom_judge:
       custom_judges = [judge for judge in problem.testset.judges
                        if judge.__class__ != basic_codes.InternalDiffCode]
       if custom_judges:
-        cell_judge = CELL_GOOD
+        cell_judge = HTMLIFY_CELL_GOOD
       else:
-        cell_judge = CELL_BAD
+        cell_judge = HTMLIFY_CELL_BAD
     else:
-      cell_judge = CELL_NA
+      cell_judge = HTMLIFY_CELL_NA
 
     # Done.
-    wiki = (('|[[%(title)s>%(wiki_name)s]]|%(assignees)s|'
-            '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
-            '%(cell_validator)s|%(cell_judge)s|\n') % locals())
+    html = (('<tr><td>%(title)s</td><td>%(assignees)s</td><td'
+            '%(cell_solutions)s</td><td%(cell_input)s</td><td%(cell_output)s</td><td'
+            '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
 
-    yield (wiki, wikiFull)
+    yield (html, htmlFull)
 
-  def _GetMessage(self, verdict, time):
+  def _GetHtmlifyMessage(self, verdict, time):
     if verdict is test.TestCaseResult.NA:
-      return BGCOLOR_NA + str(verdict)
+      return HTMLIFY_BGCOLOR_NA + str(verdict)
     elif time is None:
-      return BGCOLOR_BAD + str(verdict)
+      return HTMLIFY_BGCOLOR_BAD + str(verdict)
     else:
-      return BGCOLOR_GOOD + '%.2fs' % (time)
+      return HTMLIFY_BGCOLOR_GOOD + '%.2fs' % (time)
 
 
-class WikifyFull(rime_commands.CommandBase):
+class HtmlifyFull(rime_commands.CommandBase):
   def __init__(self, parent):
-    super(WikifyFull, self).__init__(
-        'wikify_full',
+    super(HtmlifyFull, self).__init__(
+        'htmlify_full',
         '',
-        'Upload all test results to Pukiwiki. (wikify_full plugin)',
+        'Local version of htmlfy_full. (htmlify_full plugin)',
         '',
         parent)
 
   def Run(self, obj, args, ui):
     if args:
-      ui.console.PrintError('Extra argument passed to wikify_full command!')
+      ui.console.PrintError('Extra argument passed to htmlify_full command!')
       return None
 
     if isinstance(obj, Project):
-      return obj.WikifyFull(ui)
+      return obj.HtmlifyFull(ui)
 
-    ui.console.PrintError('Wikify_full is not supported for the specified target.')
+    ui.console.PrintError('Htmlify_full is not supported for the specified target.')
     return None
 
 
 targets.registry.Override('Project', Project)
 
-rime_commands.registry.Add(WikifyFull)
+rime_commands.registry.Add(HtmlifyFull)
 
