@@ -552,9 +552,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     time = res.time
     for judge in self.judges:
       res = yield judge.Run(
-        args=('--infile', testcase.infile,
-              '--difffile', testcase.difffile,
-              '--outfile', outfile),
+        args=(testcase.infile, outfile, testcase.difffile),
         cwd=self.out_dir,
         input=os.devnull,
         output=judgefile,

@@ -236,12 +236,9 @@ class InternalDiffCode(CodeBase):
 
   @taskgraph.task_method
   def Run(self, args, cwd, input, output, timeout, precise, redirect_error=False):
-    parser = optparse.OptionParser()
-    parser.add_option('-i', '--infile', dest='infile')
-    parser.add_option('-d', '--difffile', dest='difffile')
-    parser.add_option('-o', '--outfile', dest='outfile')
-    (options, pos_args) = parser.parse_args([''] + list(args))
-    run_args = ('diff', '-u', options.difffile, options.outfile)
+    # files are specified in same way as testlib.h.
+    # "./judge.exe <in_file> <out_file> <diff_file>"
+    run_args = ('diff', '-u', args[2], args[1])
     with open(input, 'r') as infile:
       with open(output, 'w') as outfile:
         if redirect_error:
