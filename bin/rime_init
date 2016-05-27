@@ -105,7 +105,7 @@ atcoder_config(
   upload_script='***',
   contest_url='https://***.contest.atcoder.jp/',
   username='***', password='***',
-  lang_ids={'c': 13, 'cxx': 10, 'java': 3}
+  lang_ids={{'c': 13, 'cxx': 10, 'java': 3}}
 )
 '''.format(rime_plus_version)
   make_file('PROJECT', content)
