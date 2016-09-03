@@ -160,7 +160,14 @@ class AtCoderPacker(plus_commands.PackerBase):
     # TODO: reactive
 
     # score.txt
-    files.WriteFile('All(100): *', os.path.join(testset.atcoder_pack_dir, 'etc', 'score.txt'))
+    subtasks = testset.subtask_testcases
+    if len(subtasks) > 0:
+      score = '\n'.join([
+        s.name + '(' + str(s.score) + ')' + ': ' + ' '.join(s.input_patterns)
+        for s in subtasks])
+    else:
+      score = 'All(100): *'
+    files.WriteFile(score, os.path.join(testset.atcoder_pack_dir, 'etc', 'score.txt'))
 
     yield True
 
