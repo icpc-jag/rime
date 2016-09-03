@@ -40,6 +40,7 @@ class SubtaskTestCase(test.TestCase):
     super(SubtaskTestCase, self).__init__(
       testset,
       name, name)
+    self.name = name
     self.score = score
     self.input_patterns = input_patterns
 
