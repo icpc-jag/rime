@@ -24,4 +24,4 @@
 """Submodules for bootstrap plugin.
 """
 
-rime_plus_version = '0.9.0.1'
+rime_plus_version = '0.9.0.2'
