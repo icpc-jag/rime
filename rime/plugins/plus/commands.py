@@ -133,7 +133,7 @@ class Problem(targets.registry.Problem):
       yield False
     if len(uploader_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
-        [uploader().Upload(ui, None, not ui.options.upload) for uploader 
+        [uploader().Upload(ui, self, not ui.options.upload) for uploader 
           in uploader_registry.classes.values()])
       yield all(results)
     else:
