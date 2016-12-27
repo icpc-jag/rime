@@ -26,9 +26,9 @@ Rime は、この 4 つの項目のうち、問題文を除いた残りのすべ
 ダウンロード
 ============
 
-Github のプロジェクトページ https://github.com/nya3jp/rime から ZIP をダウンロードするか、git を使って次のように clone してください::
+Github のプロジェクトページ https://github.com/icpc-jag/rime から ZIP をダウンロードするか、git を使って次のように clone してください::
 
-    $ git clone https://github.com/nya3jp/rime.git
+    $ git clone https://github.com/icpc-jag/rime.git
 
 リポジトリのトップディレクトリにある rime.py および rime ディレクトリが Rime の本体です。
 自分のプロジェクトで Rime を使用するときは、この 2 つを問題データを管理しているリポジトリなどにコピーして下さい。
@@ -73,7 +73,7 @@ example ディレクトリには設定例が用意されていますので、そ
 早速 Rime を実行してみましょう。
 ::
 
-    $ ./rime.py test 
+    $ ./rime.py test
     [ GENERATE ] a+b/tests: generator.py
     [ VALIDATE ] a+b/tests: OK
     [ COMPILE  ] a+b/cpp-correct
@@ -84,14 +84,14 @@ example ディレクトリには設定例が用意されていますので、そ
     [   TEST   ] a+b/cpp-WA-multiply: Expectedly failed all challenge cases
     [   TEST   ] a+b/cpp-correct: max 0.00s, acc 0.09s
     [   TEST   ] a+b/python-correct: max 0.04s, acc 0.72s
-    
+
     Test Summary:
     a+b ... 4 solutions, 24 tests
       cpp-correct      OK  max 0.00s, acc 0.09s
       python-correct   OK  max 0.04s, acc 0.72s
       cpp-TLE          OK  11-maximum.in: Time Limit Exceeded
       cpp-WA-multiply  OK  Expectedly failed all challenge cases
-    
+
     Error Summary:
     Total 0 errors, 0 warnings
 
@@ -110,13 +110,13 @@ Rime が正しく動いていることを確認するため、試しに解答プ
 
     $ cat a+b/python-correct/main.py
     #!/usr/bin/python
-    
+
     import sys
-    
+
     def main():
       a, b = map(int, sys.stdin.read().strip().split())
       print a + b
-    
+
     if __name__ == '__main__':
       main()
 
@@ -127,13 +127,13 @@ Rime が正しく動いていることを確認するため、試しに解答プ
     ...
     $ cat a+b/python-correct/main.py
     #!/usr/bin/python
-    
+
     import sys
-    
+
     def main():
       a, b = map(int, sys.stdin.read().strip().split())
       print a * b  # i can haz moar?
-    
+
     if __name__ == '__main__':
       main()
 
@@ -147,14 +147,14 @@ Rime が正しく動いていることを確認するため、試しに解答プ
     ERROR: a+b/python-correct: 00-sample1.in: Wrong Answer
       judge log: /home/nya/src/rime/example/a+b/rime-out/python-correct/00-sample1.judge
     [   TEST   ] a+b/python-correct: 00-sample1.in: Wrong Answer
-    
+
     Test Summary:
     a+b ... 4 solutions, 24 tests
       cpp-correct      OK  max 0.01s, acc 0.09s
       python-correct  FAIL 00-sample1.in: Wrong Answer
       cpp-TLE          OK  11-maximum.in: Time Limit Exceeded
       cpp-WA-multiply  OK  Expectedly failed all challenge cases
-    
+
     Error Summary:
     ERROR: a+b/python-correct: 00-sample1.in: Wrong Answer
       judge log: /home/nya/src/rime/example/a+b/rime-out/python-correct/00-sample1.judge
