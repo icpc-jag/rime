@@ -14,3 +14,4 @@ else:
   print("rime-plus support only python2.")
   print("please use:")
   print("    python2 -m pip install git+https://github.com/icpc-jag/rime-plus")
+  sys.exit(1)
