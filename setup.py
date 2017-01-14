@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 import sys
 
+
 if sys.version_info[0] == 2:
   setup(
     name = "rime_plus",
@@ -12,4 +13,4 @@ if sys.version_info[0] == 2:
 else:
   print("rime-plus support only python2.")
   print("please use:")
-  print("    python2 -m pip install rime-plus")
+  print("    python2 -m pip install git+https://github.com/icpc-jag/rime-plus")
