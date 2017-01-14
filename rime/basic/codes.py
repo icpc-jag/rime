@@ -49,7 +49,7 @@ class CodeBase(codes.Code):
         result = codes.RunResult(codes.RunResult.OK, None)
       else:
         result = yield self._ExecForCompile(args=self.compile_args)
-    except Exception, e:
+    except Exception as e:
       result = codes.RunResult('On compiling: %s' % e, None)
     yield result
 
@@ -61,7 +61,7 @@ class CodeBase(codes.Code):
         args=tuple(list(self.run_args)+list(args)), cwd=cwd,
         input=input, output=output, timeout=timeout, precise=precise,
         redirect_error=redirect_error)
-    except Exception, e:
+    except Exception as e:
       result = codes.RunResult('On execution: %s' % e, None)
     yield result
 
@@ -73,7 +73,7 @@ class CodeBase(codes.Code):
     """
     try:
       files.RemoveTree(self.out_dir)
-    except Exception, e:
+    except Exception as e:
       yield e
     else:
       yield None
