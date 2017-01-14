@@ -50,7 +50,7 @@ class TestlibCode(codes.registry.CXXCode):
         result = codes.RunResult(codes.RunResult.OK, None)
       else:
         result = yield self._ExecForCompile(args=self.compile_args)
-    except Exception, e:
+    except Exception as e:
       result = codes.RunResult('On compiling: %s' % e, None)
     yield result
 
@@ -69,7 +69,7 @@ class TestlibCode(codes.registry.CXXCode):
         args=tuple(list(self.run_args)+[args[1], args[5], args[3]]), cwd=cwd, # reorder
         input=input, output=output, timeout=timeout, precise=precise,
         redirect_error=redirect_error)
-    except Exception, e:
+    except Exception as e:
       result = codes.RunResult('On execution: %s' % e, None)
     yield result
 

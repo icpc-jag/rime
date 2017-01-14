@@ -88,7 +88,7 @@ class TargetBase(object):
       self.PostLoad(ui)
     except ReloadConfiguration:
       raise  # Passthru
-    except Exception, e:
+    except Exception as e:
       # TODO(nya): print pretty file/lineno for debug
       raise ConfigurationError(e)
 
