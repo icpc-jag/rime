@@ -148,7 +148,7 @@ class AtCoderPacker(plus_commands.PackerBase):
     # checker
     checker = testset.judges[0]
     if len(testset.judges) == 1 and not isinstance(checker, basic_codes.InternalDiffCode):
-      ui.console.PrintAction('PACK', testset, 'checker files', progress=True)
+      ui.console.PrintAction('PACK', testset, 'output checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
                        os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
       for f in checker.dependency:
@@ -157,7 +157,21 @@ class AtCoderPacker(plus_commands.PackerBase):
     elif len(testset.judges) > 1:
       ui.errors.Error(testset, "Multiple output checker is not supported!")
       yield False
-    # TODO: reactive
+
+    # reactive
+    reactive = testset.reactives[0]
+    if len(testset.reactives) == 1:
+      ui.console.PrintAction('PACK', testset, 'reactive checker files', progress=True)
+      files.CopyFile(os.path.join(testset.src_dir, reactive.src_name),
+                       os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
+      for f in reactive.dependency:
+        files.CopyFile(os.path.join(testset.project.library_dir, f),
+                       os.path.join(testset.atcoder_pack_dir, 'etc', f))
+      # outは使わない
+      files.RemoveTree(os.path.join(testset.atcoder_pack_dir, 'out'))
+    elif len(testset.judges) > 1:
+      ui.errors.Error(testset, "Multiple reactive checker is not supported!")
+      yield False
 
     # score.txt
     subtasks = testset.subtask_testcases
