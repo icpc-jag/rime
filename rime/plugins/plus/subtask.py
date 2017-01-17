@@ -89,9 +89,9 @@ class Testset(targets.registry.Testset):
           max_score += subtask.score
 
       if min_score == max_score:
-        detail = ('%s, score %d' % (original_result.detail, min_score))
+        detail = ('%s, score %s' % (original_result.detail, min_score))
       else:
-        detail = ('%s, score %d <= x <= %d' % (original_result.detail, min_score, max_score))
+        detail = ('%s, score %s <= x <= %s' % (original_result.detail, min_score, max_score))
         ui.errors.Warning(self, "If you want more precise score, set keep_going option.")
 
       if solution.expected_score is not None:
@@ -103,10 +103,10 @@ class Testset(targets.registry.Testset):
             notable_testcase=test.TestCase(self, 'unexpected_score.in'),
             detail=detail, allow_override=True)
           if min_score == max_score:
-            ui.errors.Error(self, 'expected score %d does not equal to %d' % 
+            ui.errors.Error(self, 'expected score %s does not equal to %s' % 
               (solution.expected_score, min_score))
           else:
-            ui.errors.Error(self, 'expected score x = %d does not satisfy %d <= x <= %d' % 
+            ui.errors.Error(self, 'expected score x = %s does not satisfy %s <= x <= %s' % 
               (solution.expected_score, min_score, max_score))
       else:
         original_result.Finalize(True, detail=detail, allow_override=True)
@@ -137,8 +137,8 @@ class Testset(targets.registry.Testset):
               notable_testcase=test.TestCase(self, 'judge_error.in'),
               detail=original_result.detail, allow_override=True)
           yield original_result
-      score /= len(original_result.results)
-      detail = ('%s, score %d' % 
+      score /= float(len(original_result.results))
+      detail = ('%s, score %s' % 
         (original_result.detail, score))
       expected_result = score == solution.expected_score
       if expected_result or not solution.expected_score:
@@ -147,7 +147,7 @@ class Testset(targets.registry.Testset):
         original_result.Finalize(False, 
           notable_testcase=test.TestCase(self, 'unexpected_score.in'),
           detail=detail, allow_override=True)
-        ui.errors.Error(self, 'expected score %d does not equal to %d' % 
+        ui.errors.Error(self, 'expected score %d does not equal to %s' % 
             (solution.expected_score, score))
       original_result.Finalize(True, detail=detail, allow_override=True)
     yield original_result
