@@ -108,8 +108,12 @@ class Testset(targets.registry.Testset):
           else:
             ui.errors.Error(self, 'expected score x = %s does not satisfy %s <= x <= %s' % 
               (solution.expected_score, min_score, max_score))
-      else:
+      elif original_result.expected:
         original_result.Finalize(True, detail=detail, allow_override=True)
+      else:
+        original_result.Finalize(False,
+          notable_testcase=original_result.notable_testcase, 
+          detail=detail, allow_override=True)
 
     elif original_result.IsAccepted() and self.scoring_judge:
       score = 0
