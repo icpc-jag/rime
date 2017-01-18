@@ -105,7 +105,7 @@ problem(
   )
 
 atcoder_config(
-  task_id=-1 # None means a spare
+  task_id=None # None means a spare
 )
 '''
       newdir = os.path.join(self.base_dir, name)
