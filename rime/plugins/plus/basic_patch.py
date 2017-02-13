@@ -473,8 +473,10 @@ class ScriptCode(basic_codes.ScriptCode):
 
     # when using env, try to output more detailed error message
     if interpreter == '/bin/env' or interpreter == '/usr/bin/env':
-      interpreter = subprocess.check_output(['which', self.run_args[1]])
-      if not interpreter:
+      try:
+        # if the command does not exist, "which" return 1 as the status code
+        interpreter = subprocess.check_output(['which', self.run_args[1]]).strip()
+      except subprocess.CalledProcessError:
         yield codes.RunResult('Interpreter not installed: %s' % self.run_args[1], None)
       if not os.path.exists(interpreter):
         yield codes.RunResult('Interpreter not found: %s' % interpreter, None)
