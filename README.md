@@ -13,9 +13,9 @@ Rime-plus
 ---------
 
 * Install rime-plus
-```$ pip install git+https://github.com/icpc-jag/rime-plus```
+```$ pip install git+https://github.com/icpc-jag/rime```
 * Update rime-plus
-```$ pip install -U git+https://github.com/icpc-jag/rime-plus```
+```$ pip install -U git+https://github.com/icpc-jag/rime```
 * Uninstall rime-plus
 ```$ pip uninstall rime-plus```
 
