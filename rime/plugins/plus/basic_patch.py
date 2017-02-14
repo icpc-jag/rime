@@ -454,7 +454,9 @@ class ScriptCode(basic_codes.ScriptCode):
     # Replace the executable with the shebang line
     run_args = list(self.run_args)
     try:
-      run_args = self._ReadAndParseShebangLine().split(' ') + run_args[1:]
+      run_args[0] = self._ReadAndParseShebangLine()
+      if run_args[0] is not None:
+        run_args = run_args[0].split(' ') + run_args[1:]
     except IOError:
       pass
     self.run_args = tuple(run_args)
