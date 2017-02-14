@@ -7,3 +7,7 @@
 *.rej
 *.swp
 .DS_Store
+*.egg-info
+dist
+build
+rime-out

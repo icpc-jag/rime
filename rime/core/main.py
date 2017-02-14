@@ -108,7 +108,7 @@ def InternalMain(argv):
   # Parse arguments.
   try:
     cmd, args, options = commands_mod.Parse(argv, commands)
-  except commands_mod.ParseError, e:
+  except commands_mod.ParseError as e:
     console.PrintError(str(e))
     return 1
 
