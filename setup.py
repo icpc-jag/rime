@@ -36,4 +36,6 @@ setuptools.setup(
   scripts=['bin/rime', 'bin/rime_init'],
   packages=['rime', 'rime.basic', 'rime.core', 'rime.plugins', 'rime.util'],
   package_dir={'rime': 'rime'},
+  test_suite='nose.collector',
+  tests_require=['nose', 'mox'],
 )

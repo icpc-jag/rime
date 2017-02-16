@@ -1,5 +1,5 @@
 Rime
-========
+====
 
 Rime is a tool for programming contest organizers to automate usual, boring and error-prone process of problem set preparation.
 It supports various programming contest styles like ACM-ICPC, TopCoder, etc. by plugins.
@@ -7,6 +7,16 @@ It supports various programming contest styles like ACM-ICPC, TopCoder, etc. by 
 Detailed documentations (in Japanese) are found at documentation site:
 
 https://rime.readthedocs.io/ja/latest/
+
+
+For Developers
+--------------
+
+#### How to run unit tests
+
+```
+$ python setup.py test
+```
 
 
 Rime-plus
