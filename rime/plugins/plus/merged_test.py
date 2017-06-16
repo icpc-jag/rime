@@ -132,7 +132,7 @@ class Testset(targets.registry.Testset):
 
 
     def casenum_replace(case_pattern, case_replace):
-      return lambda i, src: src.replace(pattern, replace.format(i))
+      return lambda i, src: src.replace(case_pattern, case_replace.format(i))
     self.exports['casenum_replace'] = casenum_replace
 
     def merged_testset(name, input_pattern):
