@@ -159,8 +159,8 @@ class AtCoderPacker(plus_commands.PackerBase):
       yield False
 
     # reactive
-    reactive = testset.reactives[0]
     if len(testset.reactives) == 1:
+      reactive = testset.reactives[0]
       ui.console.PrintAction('PACK', testset, 'reactive checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, reactive.src_name),
                        os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
