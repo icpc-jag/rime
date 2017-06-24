@@ -45,8 +45,7 @@ from rime.plugins.plus import commands as plus_commands
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
-    rime_out = os.path.join(self.problem.base_dir, consts.RIME_OUT_DIR)
-    self.aoj_pack_dir     = os.path.join(rime_out, 'aoj')
+    self.aoj_pack_dir = os.path.join(self.problem.out_dir, 'aoj')
 
 class AOJPacker(plus_commands.PackerBase):
   @taskgraph.task_method
