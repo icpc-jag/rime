@@ -38,6 +38,19 @@ from rime.core import targets
 from rime.util import class_registry
 from rime.util import files
 
+# add out_dir option
+class DefaultCommand(commands.registry.Default):
+  def __init__(self, parent):
+    super(DefaultCommand, self).__init__(parent)
+    self.AddOptionEntry(commands.OptionEntry(
+        'r', 'rel_out_dir', 'rel_out_dir', str, "-", "rel_path",
+        'Specify the relative path of the directory where rime-out\'s are put.'))
+    self.AddOptionEntry(commands.OptionEntry(
+        'a', 'abs_out_dir', 'abs_out_dir', str, "-", "abs_path",
+        'Specify the absolute path of the directory where rime-out\'s are put.'))
+
+commands.registry.Override('Default',  DefaultCommand)
+
 class PackerBase(object):
   @taskgraph.task_method
   def Pack(self, ui, testset):
@@ -120,6 +133,14 @@ atcoder_config(
       yield None
 
 class Problem(targets.registry.Problem):
+
+  def PreLoad(self, ui):
+    super(Problem, self).PreLoad(ui)
+    if ui.options.rel_out_dir != "-":
+      self.out_dir = os.path.join(self.project.base_dir, ui.options.rel_out_dir, self.name, consts.RIME_OUT_DIR)
+    if ui.options.abs_out_dir != "-":
+      self.out_dir = os.path.join(ui.options.abs_out_dir, self.name, consts.RIME_OUT_DIR)
+    print self.out_dir
 
   @taskgraph.task_method
   def Pack(self, ui):
