@@ -35,6 +35,7 @@ from rime.basic.util import test_summary
 import rime.basic.targets.project  # target dependency
 import rime.basic.targets.problem  # target dependency
 import rime.basic.targets.testset  # target dependency
+import rime.basic.targets.solution  # target dependency
 from rime.core import codes
 from rime.core import commands
 from rime.core import targets
@@ -141,17 +142,26 @@ class Testset(targets.registry.Testset):
       ui.errors.Error(solution, result.detail)
     yield result
 
-  # input pattern
+  # input pattern & expected verdict
   @taskgraph.task_method
   def _TestSolutionWithChallengeCasesOne(self, solution, testcase, result, ui):
     """Test a wrong solution which has explicitly-specified challenge cases."""
     case_result = yield self._TestOneCase(solution, testcase, ui)
     result.results[testcase] = case_result
-    if case_result.verdict == test.TestCaseResult.AC:
+    if solution.expected_verdicts is None and case_result.verdict == test.TestCaseResult.AC:
       ui.console.PrintAction('TEST', solution,
                            '%s: Unexpectedly accepted' % os.path.basename(testcase.infile),
                            progress=True)
       yield False
+    elif solution.expected_verdicts is not None and case_result.verdict not in solution.expected_verdicts:
+      result.Finalize(False,
+                      '%s: Unexpected Verdict (%s)' % (os.path.basename(testcase.infile), case_result.verdict),
+                      notable_testcase=testcase)
+      ui.errors.Error(solution, result.detail)
+      if ui.options.keep_going:
+        yield False
+      else:
+        raise taskgraph.Bailout([False])
     elif case_result.verdict not in (test.TestCaseResult.WA,
                                      test.TestCaseResult.TLE,
                                      test.TestCaseResult.RE):
@@ -690,3 +700,23 @@ def _CompareTestResultForListing(a, b):
 
 test_summary.PrintBuildSummary = PrintBuildSummary
 test_summary.PrintTestSummary = PrintTestSummary
+
+# expected verdict
+class Solution(targets.registry.Solution):
+  def __init__(self, *args, **kwargs):
+    super(Solution, self).__init__(*args, **kwargs)
+    self.expected_verdicts = None
+
+  def PreLoad(self, ui):
+    super(Solution, self).PreLoad(ui)
+
+    def expected_verdicts(verdicts):
+      self.expected_verdicts = verdicts
+    self.exports['expected_verdicts'] = expected_verdicts
+
+    self.exports['AC'] = test.TestCaseResult.AC
+    self.exports['WA'] = test.TestCaseResult.WA
+    self.exports['TLE'] = test.TestCaseResult.TLE
+    self.exports['RE'] = test.TestCaseResult.RE
+
+targets.registry.Override('Solution', Solution)
