@@ -140,7 +140,6 @@ class Problem(targets.registry.Problem):
       self.out_dir = os.path.join(self.project.base_dir, ui.options.rel_out_dir, self.name, consts.RIME_OUT_DIR)
     if ui.options.abs_out_dir != "-":
       self.out_dir = os.path.join(ui.options.abs_out_dir, self.name, consts.RIME_OUT_DIR)
-    print self.out_dir
 
   @taskgraph.task_method
   def Pack(self, ui):
