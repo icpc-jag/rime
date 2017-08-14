@@ -105,8 +105,7 @@ class Problem(targets.registry.Problem):
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
-    rime_out = os.path.join(self.problem.base_dir, consts.RIME_OUT_DIR)
-    self.atcoder_pack_dir = os.path.join(rime_out, 'atcoder')
+    self.atcoder_pack_dir = os.path.join(self.problem.out_dir, 'atcoder')
 
 class AtCoderPacker(plus_commands.PackerBase):
   @taskgraph.task_method
@@ -159,8 +158,8 @@ class AtCoderPacker(plus_commands.PackerBase):
       yield False
 
     # reactive
-    reactive = testset.reactives[0]
     if len(testset.reactives) == 1:
+      reactive = testset.reactives[0]
       ui.console.PrintAction('PACK', testset, 'reactive checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, reactive.src_name),
                        os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
@@ -210,14 +209,13 @@ class AtCoderUploader(plus_commands.UploaderBase):
       ui.errors.Error(problem, script + ' is not an upload script.')
       yield False
 
-    target_dir = os.path.join(problem.name, consts.RIME_OUT_DIR, 'atcoder')
-    log = os.path.join(problem.base_dir, consts.RIME_OUT_DIR, 'upload_log')
+    log = os.path.join(problem.out_dir, 'upload_log')
 
     if not dryrun:
-      args = ('php', script, str(problem.atcoder_task_id), target_dir)
+      args = ('php', script, str(problem.atcoder_task_id), problem.testset.atcoder_pack_dir)
     else:
       ui.console.PrintWarning('Dry-run mode')
-      args = ('echo', 'php', script, str(problem.atcoder_task_id), target_dir)
+      args = ('echo', 'php', script, str(problem.atcoder_task_id), problem.testset.atcoder_pack_dir)
 
     ui.console.PrintAction('UPLOAD', problem, ' '.join(args), progress=True)
     devnull = files.OpenNull()

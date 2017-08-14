@@ -45,8 +45,7 @@ from rime.plugins.plus import commands as plus_commands
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
-    rime_out = os.path.join(self.problem.base_dir, consts.RIME_OUT_DIR)
-    self.mjudge_pack_dir  = os.path.join(rime_out, 'mjudge')
+    self.mjudge_pack_dir = os.path.join(self.problem.out_dir, 'mjudge')
 
 class MJudgePacker(plus_commands.PackerBase):
   @taskgraph.task_method
