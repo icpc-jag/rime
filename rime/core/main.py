@@ -149,6 +149,8 @@ def InternalMain(argv):
     console.Print()
     console.Print(console.BOLD, 'Error Summary:', console.NORMAL)
     ui.errors.PrintSummary()
+  if ui.errors.HasError():
+    return 1
   return 0
 
 
