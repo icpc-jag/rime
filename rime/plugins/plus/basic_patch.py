@@ -204,7 +204,7 @@ class Testset(targets.registry.Testset):
         ui.errors.Error(solution, result.detail)
     yield result
 
-  # improve keep going
+  # improve keep going & expected verdict
   @taskgraph.task_method
   def _TestSolutionWithAllCasesOne(self, solution, testcase, result, ui):
     """Test a solution without challenge cases.
@@ -238,6 +238,21 @@ class Testset(targets.registry.Testset):
                                   case_result.verdict),
                       notable_testcase=testcase)
       if solution.IsCorrect():
+        if case_result.verdict == test.TestCaseResult.WA:
+          judgefile = os.path.join(
+            solution.out_dir,
+            os.path.splitext(os.path.basename(testcase.infile))[0] +
+            consts.JUDGE_EXT)
+          ui.errors.Error(solution,
+                          '%s\n  judge log: %s' % (r.detail, judgefile))
+        else:
+          ui.errors.Error(solution, r.detail)
+      elif solution.expected_verdicts is not None and case_result.verdict not in solution.expected_verdicts:
+        r = test.TestsetResult(result.testset, result.solution, result.testcases)
+        r.Finalize(False,
+                  '%s: Unexpected Verdict (%s)' % (os.path.basename(testcase.infile), case_result.verdict),
+                  notable_testcase=testcase)
+        ui.errors.Error(solution, r.detail)
         if case_result.verdict == test.TestCaseResult.WA:
           judgefile = os.path.join(
             solution.out_dir,
