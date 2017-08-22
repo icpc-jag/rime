@@ -62,8 +62,8 @@ class MJudgePacker(plus_commands.PackerBase):
     for (i, testcase) in enumerate(testcases):
       basename = os.path.splitext(testcase.infile)[0]
       difffile = basename + consts.DIFF_EXT
-      packed_infile = str(i+1) + consts.IN_EXT
-      packed_difffile = str(i+1) + consts.DIFF_EXT
+      packed_infile = str(i + 1) + consts.IN_EXT
+      packed_difffile = str(i + 1) + consts.DIFF_EXT
       try:
         ui.console.PrintAction(
           'PACK',

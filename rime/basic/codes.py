@@ -58,7 +58,7 @@ class CodeBase(codes.Code):
     """Run the code and return RunResult."""
     try:
       result = yield self._ExecForRun(
-        args=tuple(list(self.run_args)+list(args)), cwd=cwd,
+        args=tuple(list(self.run_args) + list(args)), cwd=cwd,
         input=input, output=output, timeout=timeout, precise=precise,
         redirect_error=redirect_error)
     except Exception as e:

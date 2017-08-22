@@ -227,7 +227,7 @@ def Parse(argv, commands):
           continue
         if '=' in optname:
           sep = optname.find('=')
-          optvalue = optname[sep+1:]
+          optvalue = optname[sep + 1:]
           optname = optname[:sep]
         optnames = [optname]
 

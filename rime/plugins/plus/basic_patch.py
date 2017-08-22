@@ -555,7 +555,7 @@ class HaskellCode(basic_codes.CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
-    exe_path=os.path.join(out_dir, exe_name)
+    exe_path = os.path.join(out_dir, exe_name)
     super(HaskellCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
       compile_args=(['stack', 'ghc', '--', '-O',
@@ -569,8 +569,8 @@ class CsCode(basic_codes.CodeBase):
   EXTENSIONS = ['cs']
 
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
-    exe_name=os.path.splitext(src_name)[0] + consts.EXE_EXT
-    exe_path=os.path.join(out_dir, exe_name)
+    exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+    exe_path = os.path.join(out_dir, exe_name)
     super(CsCode, self).__init__(src_name=src_name,
                                  src_dir=src_dir,
                                  out_dir=out_dir,

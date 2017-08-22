@@ -693,7 +693,7 @@ class FiberTaskGraph(object):
       return
     assert self.task_state[task] in (WAITING, BLOCKED)
     self._LogDebug('_ResolveTask: %s: resolved, counter: %d -> %d' %
-                   (task, self.task_counters[task], self.task_counters[task]-1))
+                   (task, self.task_counters[task], self.task_counters[task] - 1))
     self.task_counters[task] -= 1
     if self.task_counters[task] == 0:
       if task in self.task_graph and isinstance(self.task_graph[task], list):

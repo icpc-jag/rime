@@ -62,8 +62,8 @@ class AOJPacker(plus_commands.PackerBase):
     for (i, testcase) in enumerate(testcases):
       basename = os.path.splitext(testcase.infile)[0]
       difffile = basename + consts.DIFF_EXT
-      packed_infile = 'in' + str(i+1) + '.txt'
-      packed_difffile = 'out' + str(i+1) + '.txt'
+      packed_infile = 'in' + str(i + 1) + '.txt'
+      packed_difffile = 'out' + str(i + 1) + '.txt'
       try:
         ui.console.PrintAction(
           'PACK',

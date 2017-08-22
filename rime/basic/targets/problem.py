@@ -180,7 +180,7 @@ class ProblemComponentMixin(object):
   def __init__(self):
     self.src_dir = self.base_dir
     assert self.src_dir.startswith(self.base_dir)
-    rel_dir = self.src_dir[len(self.problem.base_dir)+1:]
+    rel_dir = self.src_dir[len(self.problem.base_dir) + 1:]
     self.out_dir = os.path.join(self.problem.out_dir, rel_dir)
     self.stamp_file = os.path.join(self.out_dir, consts.STAMP_FILE)
 
