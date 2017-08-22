@@ -107,7 +107,7 @@ class Project(targets.registry.Project):
 
   @taskgraph.task_method
   def _GenerateWikiFull(self, ui):
-    yield self.Clean(ui) # 重すぎるときはコメントアウト
+    yield self.Clean(ui)  # 重すぎるときはコメントアウト
     # Get system information.
     rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()

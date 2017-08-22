@@ -68,7 +68,7 @@ class TestlibCode(codes.registry.CXXCode):
     """Run the code and return RunResult."""
     try:
       result = yield self._ExecForRun(
-        args=tuple(list(self.run_args)+[args[1], args[5], args[3]]), cwd=cwd, # reorder
+        args=tuple(list(self.run_args)+[args[1], args[5], args[3]]), cwd=cwd,  # reorder
         input=input, output=output, timeout=timeout, precise=precise,
         redirect_error=redirect_error)
     except Exception as e:

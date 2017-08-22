@@ -51,7 +51,7 @@ class RimeJudgeRunner(JudgeRunner):
         cwd=cwd,
         input=os.devnull,
         output=judgefile,
-        timeout=None, precise=False, redirect_error=True) # !redirect_error
+        timeout=None, precise=False, redirect_error=True)  # !redirect_error
 
 
 class TestlibJudgeRunner(JudgeRunner):
@@ -63,7 +63,7 @@ class TestlibJudgeRunner(JudgeRunner):
         cwd=cwd,
         input=os.devnull,
         output=judgefile,
-        timeout=None, precise=False, redirect_error=True) # !redirect_error
+        timeout=None, precise=False, redirect_error=True)  # !redirect_error
 
 judge_runner_registry = class_registry.ClassRegistry(JudgeRunner)
 judge_runner_registry.Add(RimeJudgeRunner)
@@ -84,7 +84,7 @@ class KUPCReactiveRunner(ReactiveRunner):
         cwd=cwd,
         input=input,
         output=output,
-        timeout=timeout, precise=precise, redirect_error=True) # !redirect_error
+        timeout=timeout, precise=precise, redirect_error=True)  # !redirect_error
 
 
 class TestlibReactiveRunner(ReactiveRunner):
