@@ -73,7 +73,7 @@ class Project(targets.registry.Project):
       yield False
     yield super(Project, self).Upload(ui)
 
-  def _Request(self, path, data = None):
+  def _Request(self, path, data=None):
     if type(data) == dict:
       data = urllib.urlencode(data)
     req = urllib2.Request(self.atcoder_contest_url + path, data)
