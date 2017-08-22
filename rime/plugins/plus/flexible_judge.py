@@ -37,13 +37,13 @@ from rime.util import files
 
 class JudgeRunner(object):
   def Run(self, infile, difffile, outfile, cwd, judgefile):
-  	raise NotImplementedError()
+    raise NotImplementedError()
 
 
 class RimeJudgeRunner(JudgeRunner):
   PREFIX = 'rime'
   def Run(self, judge, infile, difffile, outfile, cwd, judgefile):
-  	return judge.Run(
+    return judge.Run(
         args=('--infile', infile,
               '--difffile', difffile,
               '--outfile', outfile),
@@ -56,7 +56,7 @@ class RimeJudgeRunner(JudgeRunner):
 class TestlibJudgeRunner(JudgeRunner):
   PREFIX = 'testlib'
   def Run(self, judge, infile, difffile, outfile, cwd, judgefile):
-  	return judge.Run(
+    return judge.Run(
         args=(infile, outfile, difffile),
         cwd=cwd,
         input=os.devnull,
@@ -153,12 +153,12 @@ class Testset(targets.registry.Testset):
     time = res.time
     for judge in self.judges:
       if not judge.variant:
-      	judge.variant = RimeJudgeRunner()
+        judge.variant = RimeJudgeRunner()
       res = yield judge.variant.Run(
-      	judge=judge,
-      	infile=testcase.infile,
-      	difffile=testcase.difffile,
-      	outfile=outfile,
+        judge=judge,
+        infile=testcase.infile,
+        difffile=testcase.difffile,
+        outfile=outfile,
         cwd=self.out_dir,
         judgefile=judgefile)
       if res.status == core_codes.RunResult.NG:
