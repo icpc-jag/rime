@@ -199,9 +199,9 @@ class Project(targets.registry.Project):
               GetFileSize(dir, casename + consts.IN_EXT),
               GetFileSize(dir, casename + consts.DIFF_EXT),
               GetFileHash(dir, casename + consts.IN_EXT)
-            ]
-            + [self._GetMessage(*t) for t in cols]
-            + [GetFileComment(dir, casename + '.comment')]
+            ] +
+            [self._GetMessage(*t) for t in cols] +
+            [GetFileComment(dir, casename + '.comment')]
             ) +
           '|\n')
     wikiFull += ''.join(rows)

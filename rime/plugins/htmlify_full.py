@@ -203,9 +203,9 @@ class Project(targets.registry.Project):
               '>' + GetFileSize(dir, casename + consts.IN_EXT),
               '>' + GetFileSize(dir, casename + consts.DIFF_EXT),
               '>' + GetFileHash(dir, casename + consts.IN_EXT)
-            ]
-            + [self._GetHtmlifyMessage(*t) for t in cols]
-            + ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
+            ] +
+            [self._GetHtmlifyMessage(*t) for t in cols] +
+            ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
             ) +
           '</td></tr>\n')
     htmlFull += ''.join(rows)
