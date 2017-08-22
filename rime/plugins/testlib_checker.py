@@ -27,9 +27,9 @@ import subprocess
 
 from rime.basic import consts
 from rime.basic import codes as basic_codes
-from rime.core  import codes
-from rime.core  import taskgraph
-from rime.util  import files
+from rime.core import codes
+from rime.core import taskgraph
+from rime.util import files
 
 
 class TestlibCode(codes.registry.CXXCode):
