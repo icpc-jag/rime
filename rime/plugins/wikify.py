@@ -39,16 +39,16 @@ from rime.core import targets
 from rime.core import taskgraph
 
 
-BGCOLOR_TITLE  = 'BGCOLOR(#eeeeee):'
-BGCOLOR_GOOD   = 'BGCOLOR(#ccffcc):'
+BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
+BGCOLOR_GOOD = 'BGCOLOR(#ccffcc):'
 BGCOLOR_NOTBAD = 'BGCOLOR(#ffffcc):'
-BGCOLOR_BAD    = 'BGCOLOR(#ffcccc):'
-BGCOLOR_NA     = 'BGCOLOR(#cccccc):'
+BGCOLOR_BAD = 'BGCOLOR(#ffcccc):'
+BGCOLOR_NA = 'BGCOLOR(#cccccc):'
 
-CELL_GOOD   = BGCOLOR_GOOD + '&#x25cb;'
+CELL_GOOD = BGCOLOR_GOOD + '&#x25cb;'
 CELL_NOTBAD = BGCOLOR_NOTBAD + '&#x25b3;'
-CELL_BAD    = BGCOLOR_BAD + '&#xd7;'
-CELL_NA     = BGCOLOR_NA + '-'
+CELL_BAD = BGCOLOR_BAD + '&#xd7;'
+CELL_NA = BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):

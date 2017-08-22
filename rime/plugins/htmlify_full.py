@@ -109,17 +109,17 @@ class Project(targets.registry.Project):
     username = getpass.getuser()
     hostname = socket.gethostname()
 
-    header  = u'<!DOCTYPE html>\n<html lang="ja"><head>'
+    header = u'<!DOCTYPE html>\n<html lang="ja"><head>'
     header += u'<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>'
-    info    = u'このセクションは htmlfy_full plugin により自動生成されています '
-    info   += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' % {'rev': rev, 'username': username, 'hostname': hostname})
-    footer  = u'</body></html>'
+    info = u'このセクションは htmlfy_full plugin により自動生成されています '
+    info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' % {'rev': rev, 'username': username, 'hostname': hostname})
+    footer = u'</body></html>'
 
     # Generate content.
-    html =  u'<h2>Summary</h2>\n<table class="table">\n'
+    html = u'<h2>Summary</h2>\n<table class="table">\n'
     html += u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th><th>出力</th><th>入検</th><th>出検</th></tr></thead>\n'
 
-    htmlFull =  u'<h2>Detail<h2>\n'
+    htmlFull = u'<h2>Detail<h2>\n'
 
     results = yield taskgraph.TaskBranch([
         self._GenerateHtmlFullOne(problem, ui)
@@ -128,11 +128,11 @@ class Project(targets.registry.Project):
     html += '<tbody>' + ''.join(htmlResults) + '</tbody></table>\n'
     htmlFull += ''.join(htmlFullResults)
 
-    environments =  '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
-    environments += '<dt>gcc:</dt><dd>'   + builtin_commands.getoutput('gcc --version')  + '</dd>\n'
-    environments += '<dt>g++:</dt><dd>'   + builtin_commands.getoutput('g++ --version')  + '</dd>\n'
+    environments = '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
+    environments += '<dt>gcc:</dt><dd>' + builtin_commands.getoutput('gcc --version') + '</dd>\n'
+    environments += '<dt>g++:</dt><dd>' + builtin_commands.getoutput('g++ --version') + '</dd>\n'
     environments += '<dt>javac:</dt><dd>' + builtin_commands.getoutput('javac -version') + '</dd>\n'
-    environments += '<dt>java:</dt><dd>'  + builtin_commands.getoutput('java -version')  + '</dd>\n'
+    environments += '<dt>java:</dt><dd>' + builtin_commands.getoutput('java -version') + '</dd>\n'
     environments += '</dl>\n'
 
     errors = ''

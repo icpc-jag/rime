@@ -113,11 +113,11 @@ class Project(targets.registry.Project):
     hostname = socket.gethostname()
 
     # Generate content.
-    wiki =  u'** Summary\n'
+    wiki = u'** Summary\n'
     wiki += u'|||CENTER:|CENTER:|CENTER:|CENTER:|CENTER:|c\n'
     wiki += u'|~問題|~担当|~解答|~入力|~出力|~入検|~出検|\n'
 
-    wikiFull =  u'** Detail\n'
+    wikiFull = u'** Detail\n'
 
     results = yield taskgraph.TaskBranch([
         self._GenerateWikiFullOne(problem, ui)
@@ -126,11 +126,11 @@ class Project(targets.registry.Project):
     wiki += ''.join(wikiResults)
     wikiFull += ''.join(wikiFullResults)
 
-    environments =  '** Environments\n'
-    environments += ':gcc:|'   + builtin_commands.getoutput('gcc --version')  + '\n'
-    environments += ':g++:|'   + builtin_commands.getoutput('g++ --version')  + '\n'
+    environments = '** Environments\n'
+    environments += ':gcc:|' + builtin_commands.getoutput('gcc --version') + '\n'
+    environments += ':g++:|' + builtin_commands.getoutput('g++ --version') + '\n'
     environments += ':javac:|' + builtin_commands.getoutput('javac -version') + '\n'
-    environments += ':java:|'  + builtin_commands.getoutput('java -version')  + '\n'
+    environments += ':java:|' + builtin_commands.getoutput('java -version') + '\n'
 
     errors = '** Error Messages\n'
     if ui.errors.HasError():
