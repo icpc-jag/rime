@@ -76,7 +76,7 @@ submitter_registry = class_registry.ClassRegistry(SubmitterBase)
 
 
 def EditFile(filename, initial):
-  EDITOR = os.environ.get('EDITOR','vi')
+  EDITOR = os.environ.get('EDITOR', 'vi')
   files.WriteFile(initial, filename)
   call([EDITOR, filename])
 

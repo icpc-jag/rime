@@ -315,7 +315,7 @@ class Testset(targets.registry.Testset):
     files.WriteFile(json.dumps({
       'verdict': case_result.verdict.msg,
       'time': case_result.time
-      }),cache_file_name)
+      }), cache_file_name)
 
     yield case_result
 
