@@ -104,7 +104,6 @@ class AutoCode(Code):
   EXTENSIONS = []
 
   def __init__(self, src_name, src_dir, out_dir, *args, **kwargs):
-    matched_code_class = None
     src_ext = os.path.splitext(src_name)[1][1:]
     for code_class in registry.classes.values():
       if src_ext in code_class.EXTENSIONS:

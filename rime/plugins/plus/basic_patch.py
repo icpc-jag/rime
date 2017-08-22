@@ -534,7 +534,6 @@ class JavaScriptCode(basic_codes.CodeBase):
   EXTENSIONS = ['js']
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
-    ext = src_name.split('.')[-1]
     super(JavaScriptCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
       compile_args=[],
@@ -544,8 +543,7 @@ class JavaScriptCode(basic_codes.CodeBase):
   def Compile(self, *args, **kwargs):
     """Fail if the script is missing a shebang line."""
     try:
-      with open(os.path.join(self.src_dir, self.src_name)) as f:
-        header = f.read(2)
+      open(os.path.join(self.src_dir, self.src_name))
     except IOError:
       yield codes.RunResult('File not found', None)
     yield (yield super(JavaScriptCode, self).Compile(*args, **kwargs))

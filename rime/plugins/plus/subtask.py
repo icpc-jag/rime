@@ -72,7 +72,6 @@ class Testset(targets.registry.Testset):
       yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
 
     if self.subtask_testcases:
-      testcases = self.ListTestCases()
       max_score = 0
       min_score = 0
 
