@@ -35,6 +35,7 @@ from rime.util  import files
 class TestlibCode(codes.registry.CXXCode):
   PREFIX = 'testlib'
   EXTENSIONS = []
+
   def __init__(self, src_name, src_dir, out_dir, flags=[], testlib=None):
     super(TestlibCode, self).__init__(src_name, src_dir, out_dir, flags)
     self.testlib = testlib

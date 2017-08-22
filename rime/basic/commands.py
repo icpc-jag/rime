@@ -119,6 +119,7 @@ class Test(commands.CommandBase):
     task = RunCommon('Test', project, args, ui)
     if not task:
       return task
+
     @taskgraph.task_method
     def TestWrapper():
       results = yield task

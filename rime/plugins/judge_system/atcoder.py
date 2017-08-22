@@ -54,6 +54,7 @@ class Project(targets.registry.Project):
   def PreLoad(self, ui):
     super(Project, self).PreLoad(ui)
     self.atcoder_config_defined = False
+
     def _atcoder_config(upload_script, contest_url, username, password, lang_ids):
       self.atcoder_config_defined = True
       self.atcoder_upload_script = upload_script
@@ -89,6 +90,7 @@ class Problem(targets.registry.Problem):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     self.atcoder_config_defined = False
+
     def _atcoder_config(task_id=None):
       self.atcoder_config_defined = True
       self.atcoder_task_id = task_id

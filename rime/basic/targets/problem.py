@@ -46,6 +46,7 @@ class Problem(targets.TargetBase):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     self.problem_defined = False
+
     def _problem(time_limit, reference_solution=None,
                  title=None, id=None, **kwargs):
       assert not self.problem_defined, 'Multiple problem definitions found'

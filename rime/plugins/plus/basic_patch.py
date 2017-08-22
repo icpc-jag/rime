@@ -58,6 +58,7 @@ class Project(targets.registry.Project):
     super(Project, self).PreLoad(ui)
     self.library_dir = None
     self.project_defined = False
+
     def _project(library_dir=None, required_rime_plus_version=rime_plus_version):
       if self.project_defined:
         # ui.errors.Error(self, 'project() is already defined.')
@@ -477,6 +478,7 @@ class CCode(codes.registry.CCode):
 
 class CXXCode(codes.registry.CXXCode):
   EXTENSIONS = ['cc', 'cxx', 'cpp']
+
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     super(CXXCode, self).__init__(src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
 

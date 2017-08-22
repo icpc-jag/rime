@@ -61,6 +61,7 @@ class Project(targets.registry.Project):
   def PreLoad(self, ui):
     super(Project, self).PreLoad(ui)
     self.wikify_config_defined = False
+
     def _wikify_config(url, page, encoding="utf-8",
                        auth_realm=None, auth_username=None, auth_password=None):
       self.wikify_config_defined = True
@@ -208,6 +209,7 @@ class Problem(targets.registry.Problem):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     base_problem = self.exports['problem']
+
     def _problem(wiki_name, assignees, need_custom_judge, **kwargs):
       self.wiki_name = wiki_name
       self.assignees = assignees

@@ -93,6 +93,7 @@ class Testset(targets.registry.Testset):
 
   def PreLoad(self, ui):
     super(Testset, self).PreLoad(ui)
+
     def merged_test(name=None, input_pattern=('*' + consts.IN_EXT),
                     input_separator='', input_terminator='',
                     output_separator='', output_terminator=''):
