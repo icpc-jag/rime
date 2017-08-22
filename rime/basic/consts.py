@@ -40,7 +40,7 @@ VALIDATION_EXT = '.validation'
 RIME_OUT_DIR = 'rime-out'
 
 
-### Limit the width of help messages to 75 characters!
+# Limit the width of help messages to 75 characters!
 
 GLOBAL_HELP = """\
 Rime is a tool for programming contest organizers to automate usual, boring

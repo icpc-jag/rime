@@ -45,7 +45,7 @@ from rime.core import taskgraph
 from rime.util import files
 from rime.plugins.plus import commands as plus_commands
 
-## opener with cookiejar
+# opener with cookiejar
 cookiejar = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
 
