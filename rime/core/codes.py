@@ -81,7 +81,8 @@ def CreateDictionary(name_fmt, codeset, src_dir, out_dir, wrapper=None):
   """Creates a dictionary used for configs."""
   exports = {}
   if wrapper is None:
-    wrapper = lambda c: c
+    def wrapper(c):
+      return c
   for code_class in registry.classes.values():
     def Closure(code_class):
       def Registerer(src, *args, **kwargs):
