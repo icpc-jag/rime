@@ -99,20 +99,20 @@ class Testset(targets.registry.Testset):
         if expected_result:
           original_result.Finalize(True, detail=detail, allow_override=True)
         else:
-          original_result.Finalize(False, 
+          original_result.Finalize(False,
             notable_testcase=test.TestCase(self, 'unexpected_score.in'),
             detail=detail, allow_override=True)
           if min_score == max_score:
-            ui.errors.Error(self, 'expected score %s does not equal to %s' % 
+            ui.errors.Error(self, 'expected score %s does not equal to %s' %
               (solution.expected_score, min_score))
           else:
-            ui.errors.Error(self, 'expected score x = %s does not satisfy %s <= x <= %s' % 
+            ui.errors.Error(self, 'expected score x = %s does not satisfy %s <= x <= %s' %
               (solution.expected_score, min_score, max_score))
       elif original_result.expected:
         original_result.Finalize(True, detail=detail, allow_override=True)
       else:
         original_result.Finalize(False,
-          notable_testcase=original_result.notable_testcase, 
+          notable_testcase=original_result.notable_testcase,
           detail=detail, allow_override=True)
 
     elif original_result.IsAccepted() and self.scoring_judge:
@@ -120,7 +120,7 @@ class Testset(targets.registry.Testset):
       p = re.compile("IMOJUDGE<<<(\\d+)>>>")
       for (testcase, result) in original_result.results.items():
         judge_detail = files.ReadFile(
-          os.path.join(solution.out_dir, 
+          os.path.join(solution.out_dir,
             os.path.splitext(os.path.basename(testcase.infile))[0] + consts.JUDGE_EXT))
         if judge_detail:
           judge_detail = judge_detail.strip()
@@ -129,29 +129,29 @@ class Testset(targets.registry.Testset):
           elif p.search(judge_detail):
             score += int(p.search(judge_detail).group(1))
           else:
-            ui.errors.Error(self, 'the judge result does not indicate a score: "%s"' % 
+            ui.errors.Error(self, 'the judge result does not indicate a score: "%s"' %
                 (judge_detail))
-            original_result.Finalize(False, 
+            original_result.Finalize(False,
               notable_testcase=test.TestCase(self, 'judge_error.in'),
               detail=original_result.detail, allow_override=True)
             yield original_result
         else:
           ui.errors.Error(self, 'the judge is silent.')
-          original_result.Finalize(False, 
+          original_result.Finalize(False,
               notable_testcase=test.TestCase(self, 'judge_error.in'),
               detail=original_result.detail, allow_override=True)
           yield original_result
       score /= float(len(original_result.results))
-      detail = ('%s, score %s' % 
+      detail = ('%s, score %s' %
         (original_result.detail, score))
       expected_result = score == solution.expected_score
       if expected_result or not solution.expected_score:
         original_result.Finalize(True, detail=detail, allow_override=True)
       else:
-        original_result.Finalize(False, 
+        original_result.Finalize(False,
           notable_testcase=test.TestCase(self, 'unexpected_score.in'),
           detail=detail, allow_override=True)
-        ui.errors.Error(self, 'expected score %d does not equal to %s' % 
+        ui.errors.Error(self, 'expected score %d does not equal to %s' %
             (solution.expected_score, score))
       original_result.Finalize(True, detail=detail, allow_override=True)
     yield original_result

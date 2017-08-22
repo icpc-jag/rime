@@ -160,7 +160,7 @@ class Problem(targets.registry.Problem):
       yield False
     if len(uploader_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
-        [uploader().Upload(ui, self, not ui.options.upload) for uploader 
+        [uploader().Upload(ui, self, not ui.options.upload) for uploader
           in uploader_registry.classes.values()])
       yield all(results)
     else:
@@ -190,10 +190,10 @@ class Problem(targets.registry.Problem):
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=[])
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=['10_corner*.in'])
 #script_solution(src='main.sh') # shebang line is required
-#script_solution(src='main.pl') # shebang line is required 
+#script_solution(src='main.pl') # shebang line is required
 #script_solution(src='main.py') # shebang line is required
 #script_solution(src='main.rb') # shebang line is required
-#js_solution(src='main.js') # javascript (nodejs) 
+#js_solution(src='main.js') # javascript (nodejs)
 #hs_solution(src='main.hs') # haskell (stack + ghc)
 #cs_solution(src='main.cs') # C# (mono)
 

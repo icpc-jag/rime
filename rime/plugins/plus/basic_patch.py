@@ -657,13 +657,13 @@ def PrintBuildSummary(results, ui):
     status_row += [
       result.solution.IsCorrect() and ui.console.GREEN or ui.console.YELLOW,
       result.solution.name.ljust(solution_name_width),
-      ' ', 
+      ' ',
       ui.console.GREEN,
       result.solution.code.PREFIX.upper().ljust(solution_prefix_width),
-      ' ', 
+      ' ',
       ui.console.NORMAL,
       _SolutionLine(result.solution).rjust(solution_line_width),
-      ', ', 
+      ', ',
       _SolutionSize(result.solution).rjust(solution_size_width)]
     ui.console.Print(*status_row)
 
