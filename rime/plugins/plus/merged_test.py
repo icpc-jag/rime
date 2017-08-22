@@ -133,7 +133,6 @@ class Testset(targets.registry.Testset):
         self.exports['{0}_merger'.format(test_merger.PREFIX)] = Registerer
       Closure(test_merger)
 
-
     def casenum_replace(case_pattern, case_replace):
       return lambda i, src: src.replace(case_pattern, case_replace.format(i))
     self.exports['casenum_replace'] = casenum_replace
@@ -156,7 +155,6 @@ class Testset(targets.registry.Testset):
         self.test_merger.Run([testcase], testcase, ui)
 
     yield True
-
 
   @taskgraph.task_method
   def _PostBuildHook(self, ui):

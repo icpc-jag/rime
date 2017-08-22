@@ -257,7 +257,6 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
     lang_id = solution.project.atcoder_lang_ids[solution.code.PREFIX]
     source_code = files.ReadFile(os.path.join(solution.src_dir, solution.code.src_name))
 
-
     ui.console.PrintAction('SUBMIT', solution, str({'task_id': task_id, 'lang_id': lang_id}), progress=True)
 
     html = solution.project._Request('submit?task_id=%s' % task_id).read()

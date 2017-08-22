@@ -222,7 +222,6 @@ class Testset(targets.registry.Testset):
         for reactive in self.reactives])
     yield all(results)
 
-
   @taskgraph.task_method
   def _CompileReactiveOne(self, reactive, ui):
     """Compile a single reative."""
