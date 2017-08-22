@@ -289,9 +289,9 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
 
     yield True
 
-targets.registry.Override('Project',  Project)
-targets.registry.Override('Problem',  Problem)
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Project', Project)
+targets.registry.Override('Problem', Problem)
+targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(AtCoderPacker)
 plus_commands.uploader_registry.Add(AtCoderUploader)

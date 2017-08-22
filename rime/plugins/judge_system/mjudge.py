@@ -84,6 +84,6 @@ class MJudgePacker(plus_commands.PackerBase):
         yield False
     yield True
 
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(MJudgePacker)

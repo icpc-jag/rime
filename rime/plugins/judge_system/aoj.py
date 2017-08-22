@@ -142,6 +142,6 @@ PUBLICATION_DATE = datetime.datetime(*, *, *, *, *)
 
     yield True
 
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(AOJPacker)

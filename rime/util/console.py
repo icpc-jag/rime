@@ -29,19 +29,19 @@ from rime.util import struct
 
 # Escape sequences.
 _COLOR_ESCAPE_SEQUENCES = {
-  'BOLD':    '\x1b[1m',
-  'RED':     '\x1b[31m',
-  'GREEN':   '\x1b[32m',
-  'YELLOW':  '\x1b[33m',
-  'BLUE':    '\x1b[34m',
+  'BOLD': '\x1b[1m',
+  'RED': '\x1b[31m',
+  'GREEN': '\x1b[32m',
+  'YELLOW': '\x1b[33m',
+  'BLUE': '\x1b[34m',
   'MAGENTA': '\x1b[35m',
-  'CYAN':    '\x1b[36m',
-  'WHITE':   '\x1b[37m',
-  'NORMAL':  '\x1b[0m',
+  'CYAN': '\x1b[36m',
+  'WHITE': '\x1b[37m',
+  'NORMAL': '\x1b[0m',
   }
 _CONTROL_ESCAPE_SEQUENCES = {
-  'UP':      '\x1b[1A',
-  'KILL':    '\x1b[K',
+  'UP': '\x1b[1A',
+  'KILL': '\x1b[K',
   }
 
 

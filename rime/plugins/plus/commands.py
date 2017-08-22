@@ -50,7 +50,7 @@ class DefaultCommand(commands.registry.Default):
         'a', 'abs_out_dir', 'abs_out_dir', str, "-", "abs_path",
         'Specify the absolute path of the directory where rime-out\'s are put.'))
 
-commands.registry.Override('Default',  DefaultCommand)
+commands.registry.Override('Default', DefaultCommand)
 
 
 class PackerBase(object):
@@ -307,10 +307,10 @@ class Testset(targets.registry.Testset):
     ui.errors.Error(self, "A testset is not a target.")
     yield False
 
-targets.registry.Override('Project',  Project)
-targets.registry.Override('Problem',  Problem)
+targets.registry.Override('Project', Project)
+targets.registry.Override('Problem', Problem)
 targets.registry.Override('Solution', Solution)
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Testset', Testset)
 
 
 class Pack(commands.CommandBase):
