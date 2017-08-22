@@ -103,7 +103,7 @@ class Project(targets.registry.Project):
 
   @taskgraph.task_method
   def _GenerateHtmlFull(self, ui):
-    #yield self.Clean(ui) # 重すぎるときはコメントアウト
+    # yield self.Clean(ui) # 重すぎるときはコメントアウト
 
     # Get system information.
     rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
@@ -171,8 +171,8 @@ class Project(targets.registry.Project):
 
     captions = [name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
     htmlFull += '<table class="table">\n<thead><tr><th>' + '</th><th>'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '</th></tr></thead>\n<tbody>\n'
-    #formats = ['RIGHT:' for solution in solutions]
-    #htmlFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
+    # formats = ['RIGHT:' for solution in solutions]
+    # htmlFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -213,7 +213,7 @@ class Project(targets.registry.Project):
     htmlFull += '</tbody></table>'
 
     # Fetch test results.
-    #results = yield problem.Test(ui)
+    # results = yield problem.Test(ui)
 
     # Get various information about the problem.
     num_solutions = len(results)

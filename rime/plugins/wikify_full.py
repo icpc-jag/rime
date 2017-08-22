@@ -208,7 +208,7 @@ class Project(targets.registry.Project):
     wikiFull += ''.join(rows)
 
     # Fetch test results.
-    #results = yield problem.Test(ui)
+    # results = yield problem.Test(ui)
 
     # Get various information about the problem.
     num_solutions = len(results)

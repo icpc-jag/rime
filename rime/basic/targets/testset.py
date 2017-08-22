@@ -232,7 +232,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
-        #ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
+        # ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
         ui.errors.Warning(self, 'Validator unavailable')
       yield True
     testcases = self.ListTestCases()
@@ -328,8 +328,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     """
     if os.path.isfile(testcase.difffile):
       yield True
-    #ui.console.PrintAction('REFRUN', reference_solution,
-    #                       testcase.infile, progress=True)
+    # ui.console.PrintAction('REFRUN', reference_solution,
+    #                        testcase.infile, progress=True)
     res = yield reference_solution.Run(
       args=(), cwd=self.out_dir,
       input=testcase.infile,

@@ -343,7 +343,7 @@ class Testset(targets.registry.Testset):
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
-        #ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
+        # ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
         ui.errors.Warning(self, 'Validator unavailable')
       yield True
     testcases = self.ListTestCases()
