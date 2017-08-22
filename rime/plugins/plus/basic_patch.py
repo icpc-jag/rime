@@ -313,8 +313,8 @@ class Testset(targets.registry.Testset):
 
     # always cache in json
     files.WriteFile(json.dumps({
-      'verdict' : case_result.verdict.msg,
-      'time'    : case_result.time
+      'verdict': case_result.verdict.msg,
+      'time': case_result.time
       }),cache_file_name)
 
     yield case_result
