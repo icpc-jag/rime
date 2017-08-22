@@ -277,7 +277,7 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
 
     while True:
       result, progress = solution.project._Request('submissions/' + submit_id).read().split('data-title="')[1].split('"', 1)
-      if not 'Judging' in result:
+      if 'Judging' not in result:
         break
       time.sleep(5.0)
 
