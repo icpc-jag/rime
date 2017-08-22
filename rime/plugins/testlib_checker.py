@@ -75,4 +75,3 @@ class TestlibCode(codes.registry.CXXCode):
     yield result
 
 codes.registry.Add(TestlibCode)
-

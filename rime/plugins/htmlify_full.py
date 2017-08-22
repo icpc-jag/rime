@@ -307,4 +307,3 @@ class HtmlifyFull(rime_commands.CommandBase):
 targets.registry.Override('Project', Project)
 
 rime_commands.registry.Add(HtmlifyFull)
-
