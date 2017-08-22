@@ -34,7 +34,6 @@ import urllib
 import urllib2
 import urlparse
 
-from rime.basic.targets import problem
 import rime.basic.targets.project  # target dependency
 import rime.basic.test
 from rime.basic import codes as basic_codes
