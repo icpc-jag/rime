@@ -66,6 +66,7 @@ def IsBasicTarget(obj):
                           solution.Solution,
                           testset.Testset))
 
+
 def RunCommon(method_name, project, args, ui):
   if args:
     base_dir = os.path.abspath(args[0])
@@ -90,7 +91,7 @@ def RunCommon(method_name, project, args, ui):
     return None
 
   return getattr(obj, method_name)(ui)
-  
+
 
 class Build(commands.CommandBase):
   def __init__(self, parent):

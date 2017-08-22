@@ -31,6 +31,7 @@ from rime.core  import codes
 from rime.core  import taskgraph
 from rime.util  import files
 
+
 class TestlibCode(codes.registry.CXXCode):
   PREFIX = 'testlib'
   EXTENSIONS = []

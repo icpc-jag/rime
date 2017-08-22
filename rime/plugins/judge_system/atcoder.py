@@ -49,6 +49,7 @@ from rime.plugins.plus import commands as plus_commands
 cookiejar = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
 
+
 class Project(targets.registry.Project):
   def PreLoad(self, ui):
     super(Project, self).PreLoad(ui)
@@ -83,6 +84,7 @@ class Project(targets.registry.Project):
       { 'name': self.atcoder_username, 'password': self.atcoder_password }).info().headers
       self.atcoder_logined = True
 
+
 class Problem(targets.registry.Problem):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
@@ -102,10 +104,12 @@ class Problem(targets.registry.Problem):
       yield True
     yield super(Problem, self).Submit(ui)
 
+
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
     self.atcoder_pack_dir = os.path.join(self.problem.out_dir, 'atcoder')
+
 
 class AtCoderPacker(plus_commands.PackerBase):
   @taskgraph.task_method
@@ -184,6 +188,7 @@ class AtCoderPacker(plus_commands.PackerBase):
 
     yield True
 
+
 class AtCoderUploader(plus_commands.UploaderBase):
   @taskgraph.task_method
   def Upload(self, ui, problem, dryrun):
@@ -235,6 +240,7 @@ class AtCoderUploader(plus_commands.UploaderBase):
         yield False
       ui.console.PrintAction('UPLOAD', problem, str(problem.atcoder_task_id))
       yield True
+
 
 class AtCoderSubmitter(plus_commands.SubmitterBase):
   @taskgraph.task_method

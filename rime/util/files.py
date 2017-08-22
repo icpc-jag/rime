@@ -38,9 +38,11 @@ _devnull = open(os.devnull, 'r+')
 def CopyFile(src, dst):
   shutil.copy(src, dst)
 
+
 def MakeDir(dir):
   if not os.path.isdir(dir):
     os.makedirs(dir)
+
 
 def CopyTree(src, dst):
   MakeDir(dst)
@@ -53,9 +55,11 @@ def CopyTree(src, dst):
     else:
       CopyFile(srcpath, dstpath)
 
+
 def RemoveTree(dir):
   if os.path.exists(dir):
     shutil.rmtree(dir)
+
 
 def GetModified(file):
   try:
@@ -63,12 +67,15 @@ def GetModified(file):
   except:
     return datetime.datetime.min
 
+
 def GetLastModifiedUnder(dir):
   return max([GetModified(os.path.join(dir, name))
               for name in (ListDir(dir, True) + [dir])])
 
+
 def CreateEmptyFile(file):
   open(file, 'w').close()
+
 
 def ListDir(dir, recursive=False):
   files = []
@@ -85,14 +92,17 @@ def ListDir(dir, recursive=False):
     pass
   return files
 
+
 def PickleSave(obj, file):
   with open(file, 'w') as f:
     pickle.dump(obj, f)
+
 
 def PickleLoad(file):
   with open(file, 'r') as f:
     obj = pickle.load(f)
     return obj
+
 
 def ConvPath(path):
   if not platform.uname()[0].lower().startswith('cygwin'):
@@ -106,6 +116,7 @@ def ConvPath(path):
     pass
   return path
 
+
 def LocateBinary(name):
   if 'PATH' in os.environ:
     paths = os.environ['PATH']
@@ -117,8 +128,10 @@ def LocateBinary(name):
       return bin
   return None
 
+
 def OpenNull():
   return _devnull
+
 
 def ReadFile(name):
   try:
@@ -127,6 +140,7 @@ def ReadFile(name):
   except:
     return None
 
+
 def WriteFile(content, name):
   try:
     with open(name, 'w') as f:
@@ -134,6 +148,7 @@ def WriteFile(content, name):
     return True
   except:
     return False
+
 
 def AppendFile(content, name):
   try:

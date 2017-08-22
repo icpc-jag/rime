@@ -45,8 +45,10 @@ from rime.plugins.plus import rime_plus_version
 
 libdir = None
 
+
 def parseVersion(v):
   return [int(d) for d in v.split('.')]
+
 
 class Project(targets.registry.Project):
   def __init__(self, *args, **kwargs):
@@ -70,6 +72,7 @@ class Project(targets.registry.Project):
       self.library_dir = libdir
       self.project_defined = True
     self.exports['project'] = _project
+
 
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
@@ -385,6 +388,7 @@ class Testset(targets.registry.Testset):
 targets.registry.Override('Project', Project)
 targets.registry.Override('Testset', Testset)
 
+
 # fast_test
 @taskgraph.task_method
 def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
@@ -412,6 +416,7 @@ def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
     status = codes.RunResult.NG
   yield codes.RunResult(status, task.time)
 
+
 def IsTimingValid(self, ui):
   """Checks if timing stats are valid."""
   return (self.results and
@@ -420,6 +425,7 @@ def IsTimingValid(self, ui):
 
 basic_codes.CodeBase._ExecInternal = _ExecInternal
 test.TestsetResult.IsTimingValid = IsTimingValid
+
 
 # code compile
 
@@ -449,6 +455,7 @@ def _ExecForCompile(self, args):
         args=args, cwd=self.out_dir,
         stdin=files.OpenNull(), stdout=outfile, stderr=subprocess.STDOUT))
 
+
 def GetLastModified(self):
   """Get timestamp of this target."""
   stamp = files.GetLastModifiedUnder(self.src_dir)
@@ -461,15 +468,18 @@ basic_codes.CodeBase.dependency = []
 basic_codes.CodeBase.variant = None
 rime.basic.targets.problem.ProblemComponentMixin.GetLastModified = GetLastModified
 
+
 # -O2
 class CCode(codes.registry.CCode):
   def __init__(self, src_name, src_dir, out_dir, flags=['-lm']):
     super(CCode, self).__init__(src_name, src_dir, out_dir, ['-O2'] + flags)
 
+
 class CXXCode(codes.registry.CXXCode):
   EXTENSIONS = ['cc', 'cxx', 'cpp']
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     super(CXXCode, self).__init__(src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
+
 
 # shebang support
 # codes.registry.ScriptCode is not supported
@@ -513,6 +523,7 @@ class ScriptCode(basic_codes.ScriptCode):
 codes.registry.Override('CCode', CCode)
 codes.registry.Override('CXXCode', CXXCode)
 codes.registry.Override('ScriptCode', ScriptCode)
+
 
 # thanks to Klab
 class JavaScriptCode(basic_codes.CodeBase):
@@ -572,6 +583,7 @@ codes.registry.Add(CsCode)
 codes.registry.Add(JavaScriptCode)
 codes.registry.Add(HaskellCode)
 
+
 # Summary
 
 def PrintTestSummary(results, ui):
@@ -611,6 +623,7 @@ def PrintTestSummary(results, ui):
     if result.IsCached():
       status_row += [' ', '(cached)']
     ui.console.Print(*status_row)
+
 
 def PrintBuildSummary(results, ui):
   if len(results) == 0:
@@ -654,6 +667,7 @@ def PrintBuildSummary(results, ui):
       _SolutionSize(result.solution).rjust(solution_size_width)]
     ui.console.Print(*status_row)
 
+
 def _TestsetHash(result):
   try:
     md5 = hashlib.md5()
@@ -663,6 +677,7 @@ def _TestsetHash(result):
   except:
     return '-'
 
+
 def _TestsetInSize(result):
   try:
     size = 0
@@ -671,6 +686,7 @@ def _TestsetInSize(result):
     return _SmartFileSize(size)
   except:
     return '-'
+
 
 def _TestsetDiffSize(result):
   try:
@@ -683,13 +699,14 @@ def _TestsetDiffSize(result):
   except:
     return '-'
 
+
 def _SolutionSize(solution):
   try:
     src = os.path.join(solution.src_dir, solution.code.src_name)
     return _SmartFileSize(len(files.ReadFile(src)))
   except:
     return '-'
-  
+
 
 def _SolutionLine(solution):
   try:
@@ -698,6 +715,7 @@ def _SolutionLine(solution):
   except:
     return '-'
 
+
 def _SmartFileSize(size):
   if size < 1000:
     return str(size) + 'B'
@@ -705,6 +723,7 @@ def _SmartFileSize(size):
     return str(size / 100 * 0.1) + 'kB'
   else:
     return str(size / 100000 * 0.1) + 'MB'
+
 
 # sort correctly
 def _CompareTestResultForListing(a, b):
@@ -715,6 +734,7 @@ def _CompareTestResultForListing(a, b):
 
 test_summary.PrintBuildSummary = PrintBuildSummary
 test_summary.PrintTestSummary = PrintTestSummary
+
 
 # expected verdict
 class Solution(targets.registry.Solution):

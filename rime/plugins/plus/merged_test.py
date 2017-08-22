@@ -34,6 +34,7 @@ from rime.util import files
 
 consts.IN_ORIGINAL_EXT = '.in_orig'
 
+
 class TestMerger(object):
   def __init__(self, output_replace=None):
     self.output_replace = output_replace
@@ -67,6 +68,7 @@ class TestMerger(object):
           else:
             f.write(files.ReadFile(src))
 
+
 class ICPCMerger(TestMerger):
   PREFIX = 'icpc'
 
@@ -81,6 +83,7 @@ class ICPCMerger(TestMerger):
       for i, src in enumerate(srcs):
         f.write(files.ReadFile(src))
       f.write(self.input_terminator)
+
 
 class GCJMerger(TestMerger):
   PREFIX = 'gcj'

@@ -2,6 +2,7 @@
 
 import sys
 
+
 def main():
   a, b = map(int, sys.stdin.read().strip().split())
   print a + b

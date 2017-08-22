@@ -21,6 +21,7 @@
 # THE SOFTWARE.
 #
 
+
 def PrintTestSummary(results, ui):
   if len(results) == 0:
     return

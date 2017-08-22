@@ -34,6 +34,7 @@ def LoadModule(module_fullname):
   package = __import__(package_name, globals(), locals(), [module_name])
   return hasattr(package, module_name)
 
+
 def LoadPackage(package_name):
   assert package_name
   package_dir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,

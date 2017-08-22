@@ -38,6 +38,7 @@ from rime.core import targets
 from rime.util import class_registry
 from rime.util import files
 
+
 # add out_dir option
 class DefaultCommand(commands.registry.Default):
   def __init__(self, parent):
@@ -51,15 +52,18 @@ class DefaultCommand(commands.registry.Default):
 
 commands.registry.Override('Default',  DefaultCommand)
 
+
 class PackerBase(object):
   @taskgraph.task_method
   def Pack(self, ui, testset):
     raise NotImplementedError()
 
+
 class UploaderBase(object):
   @taskgraph.task_method
   def Upload(self, ui, problem, dryrun):
     raise NotImplementedError()
+
 
 class SubmitterBase(object):
   @taskgraph.task_method
@@ -70,10 +74,12 @@ packer_registry = class_registry.ClassRegistry(PackerBase)
 uploader_registry = class_registry.ClassRegistry(UploaderBase)
 submitter_registry = class_registry.ClassRegistry(SubmitterBase)
 
+
 def EditFile(filename, initial):
   EDITOR = os.environ.get('EDITOR','vi')
   files.WriteFile(initial, filename)
   call([EDITOR, filename])
+
 
 class Project(targets.registry.Project):
 
@@ -131,6 +137,7 @@ atcoder_config(
     else:
       ui.errors.Error(self, "Target type {0} cannot be put here.".format(ttype))
       yield None
+
 
 class Problem(targets.registry.Problem):
 
@@ -248,8 +255,9 @@ id='{0}'
       ui.errors.Error(self, "Target type {0} cannot be put here.".format(ttype))
       yield None
 
+
 class Solution(targets.registry.Solution):
-  
+
   @taskgraph.task_method
   def Pack(self, ui):
     ui.errors.Error(self, "A solution is not a target.")
@@ -272,6 +280,7 @@ class Solution(targets.registry.Solution):
     else:
       ui.errors.Error(self, "Submit nothing: you must add some plugin.")
       yield False
+
 
 class Testset(targets.registry.Testset):
 
@@ -303,6 +312,7 @@ targets.registry.Override('Problem',  Problem)
 targets.registry.Override('Solution', Solution)
 targets.registry.Override('Testset',  Testset)
 
+
 class Pack(commands.CommandBase):
   def __init__(self, parent):
     super(Pack, self).__init__(
@@ -314,6 +324,7 @@ class Pack(commands.CommandBase):
 
   def Run(self, project, args, ui):
     return basic_commands.RunCommon('Pack', project, args, ui)
+
 
 class Upload(commands.CommandBase):
   def __init__(self, parent):
@@ -330,6 +341,7 @@ class Upload(commands.CommandBase):
 
   def Run(self, project, args, ui):
     return basic_commands.RunCommon('Upload', project, args, ui)
+
 
 class Submit(commands.CommandBase):
   def __init__(self, parent):
@@ -362,6 +374,7 @@ def Run(method_name, project, args, ui):
     return None
 
   return getattr(obj, method_name)(args, ui)
+
 
 class Add(commands.CommandBase):
   def __init__(self, parent):

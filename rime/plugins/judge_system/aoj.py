@@ -42,10 +42,12 @@ from rime.core import taskgraph
 from rime.util import files
 from rime.plugins.plus import commands as plus_commands
 
+
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
     self.aoj_pack_dir = os.path.join(self.problem.out_dir, 'aoj')
+
 
 class AOJPacker(plus_commands.PackerBase):
   @taskgraph.task_method

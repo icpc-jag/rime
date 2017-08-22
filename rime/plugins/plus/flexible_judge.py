@@ -39,6 +39,7 @@ class JudgeRunner(object):
   def Run(self, infile, difffile, outfile, cwd, judgefile):
   	raise NotImplementedError()
 
+
 class RimeJudgeRunner(JudgeRunner):
   PREFIX = 'rime'
   def Run(self, judge, infile, difffile, outfile, cwd, judgefile):
@@ -50,6 +51,7 @@ class RimeJudgeRunner(JudgeRunner):
         input=os.devnull,
         output=judgefile,
         timeout=None, precise=False, redirect_error=True) # !redirect_error
+
 
 class TestlibJudgeRunner(JudgeRunner):
   PREFIX = 'testlib'
@@ -65,9 +67,11 @@ judge_runner_registry = class_registry.ClassRegistry(JudgeRunner)
 judge_runner_registry.Add(RimeJudgeRunner)
 judge_runner_registry.Add(TestlibJudgeRunner)
 
+
 class ReactiveRunner(object):
   def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
     raise NotImplementedError()
+
 
 class KUPCReactiveRunner(ReactiveRunner):
   PREFIX = 'kupc'
@@ -79,10 +83,12 @@ class KUPCReactiveRunner(ReactiveRunner):
         output=output,
         timeout=timeout, precise=precise, redirect_error=True) # !redirect_error
 
+
 class TestlibReactiveRunner(ReactiveRunner):
   PREFIX = 'testlib'
   def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
     raise NotImplementedError()
+
 
 class NEERCReactiveRunner(ReactiveRunner):
   PREFIX = 'neerc'

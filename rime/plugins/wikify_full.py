@@ -64,6 +64,7 @@ def SafeUnicode(s):
     s = s.decode('utf-8')
   return s
 
+
 def GetFileSize(dir, filename):
   filepath = os.path.join(dir, filename)
   if os.path.exists(filepath):
@@ -82,6 +83,7 @@ def GetFileHash(dir, filename):
   else:
     return ''
 
+
 def GetFileComment(dir, filename):
   filepath = os.path.join(dir, filename)
   if os.path.exists(filepath):
@@ -91,6 +93,7 @@ def GetFileComment(dir, filename):
     return SafeUnicode(r).replace('\n', '&br;').replace('|', '&#x7c;')
   else:
     return ''
+
 
 class Project(targets.registry.Project):
   @taskgraph.task_method
