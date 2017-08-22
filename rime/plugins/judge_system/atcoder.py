@@ -82,7 +82,7 @@ class Project(targets.registry.Project):
   def _Login(self):
     if not self.atcoder_logined:
       self._Request('login',
-      { 'name': self.atcoder_username, 'password': self.atcoder_password }).info().headers
+      {'name': self.atcoder_username, 'password': self.atcoder_password}).info().headers
       self.atcoder_logined = True
 
 
@@ -267,7 +267,7 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
             '__session': session,
             'task_id': task_id,
             'language_id_' + task_id: lang_id,
-            'source_code': source_code })
+            'source_code': source_code})
     r.read()
 
     results = solution.project._Request('submissions/me').read()
