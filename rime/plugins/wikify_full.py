@@ -25,26 +25,18 @@
 import commands as builtin_commands
 import getpass
 import hashlib
-import itertools
 import os.path
-import re
 import socket
-import subprocess
-import urllib
-import urllib2
-import urlparse
 
-import rime.basic.targets.project  # target dependency
+import rime.basic.targets.project  # NOQA
 import rime.basic.test
 from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
-from rime.core import codes as core_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
-import rime.plugins.wikify  # target dependency
-from rime.util import files
+import rime.plugins.wikify  # NOQA
 
 BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
 BGCOLOR_GOOD = 'BGCOLOR(#ccffcc):'

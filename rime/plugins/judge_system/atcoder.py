@@ -21,25 +21,19 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
-import subprocess
 import cookielib
 import re
-import sys
 import time
 import urllib
 import urllib2
 
-import rime.basic.targets.problem   # target dependency
-import rime.basic.targets.project   # target dependency
-import rime.basic.targets.solution  # target dependency
-import rime.basic.targets.testset   # target dependency
+import rime.basic.targets.problem   # NOQA
+import rime.basic.targets.project   # NOQA
+import rime.basic.targets.solution  # NOQA
+import rime.basic.targets.testset   # NOQA
 from rime.basic import consts
-from rime.basic import commands as basic_commands
-from rime.basic import codes as basic_codes
-from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import files

@@ -26,13 +26,12 @@ import commands as builtin_commands
 import getpass
 import re
 import socket
-import subprocess
 import urllib
 import urllib2
 import urlparse
 
-import rime.basic.targets.problem  # target dependency
-import rime.basic.targets.project  # target dependency
+import rime.basic.targets.problem  # NOQA
+import rime.basic.targets.project  # NOQA
 from rime.basic import codes as basic_codes
 from rime.core import commands as rime_commands
 from rime.core import targets

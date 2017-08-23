@@ -32,12 +32,11 @@ from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
 from rime.basic.util import test_summary
-import rime.basic.targets.project  # target dependency
-import rime.basic.targets.problem  # target dependency
-import rime.basic.targets.testset  # target dependency
-import rime.basic.targets.solution  # target dependency
+import rime.basic.targets.project  # NOQA
+import rime.basic.targets.problem  # NOQA
+import rime.basic.targets.testset  # NOQA
+import rime.basic.targets.solution  # NOQA
 from rime.core import codes
-from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import files

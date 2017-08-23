@@ -21,15 +21,14 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
 from subprocess import call
 
-import rime.basic.targets.problem   # target dependency
-import rime.basic.targets.project   # target dependency
-import rime.basic.targets.solution  # target dependency
-import rime.basic.targets.testset   # target dependency
+import rime.basic.targets.problem   # NOQA
+import rime.basic.targets.project   # NOQA
+import rime.basic.targets.solution  # NOQA
+import rime.basic.targets.testset   # NOQA
 from rime.basic import commands as basic_commands
 from rime.basic import consts
 from rime.core import commands

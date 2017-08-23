@@ -21,7 +21,6 @@
 # THE SOFTWARE.
 #
 
-import glob
 import os
 import os.path
 

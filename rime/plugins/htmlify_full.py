@@ -26,25 +26,16 @@ import codecs
 import commands as builtin_commands
 import getpass
 import hashlib
-import itertools
 import os.path
-import re
 import socket
-import subprocess
-import urllib
-import urllib2
-import urlparse
 
-import rime.basic.targets.project  # target dependency
-import rime.basic.test
+import rime.basic.targets.project  # NOQA
 from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
-from rime.core import codes as core_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
-from rime.util import files
 
 HTMLIFY_BGCOLOR_GOOD = ' class="success">'
 HTMLIFY_BGCOLOR_NOTBAD = ' class="warning">'

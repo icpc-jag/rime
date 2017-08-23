@@ -25,7 +25,6 @@ import os
 import os.path
 
 from rime.core import commands
-from rime.core import targets
 from rime.core import taskgraph
 from rime.basic import consts
 from rime.basic.targets import problem

@@ -23,16 +23,13 @@
 
 import os.path
 
-from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
-import rime.basic.targets.testset  # target dependency
+import rime.basic.targets.testset  # NOQA
 from rime.core import codes as core_codes
-from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import class_registry
-from rime.util import files
 
 
 class JudgeRunner(object):
