@@ -536,7 +536,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     outfile, judgefile = [
       os.path.join(solution.out_dir,
                    os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-      for ext in consts.OUT_EXT, consts.JUDGE_EXT]
+      for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
       args=(), cwd=solution.out_dir,

@@ -32,6 +32,7 @@ import sys
 import threading
 import time
 
+from six import reraise
 
 # State of tasks.
 NUM_STATES = 6
@@ -384,7 +385,7 @@ class SerialTaskGraph(object):
     if success:
       return value
     else:
-      raise value[0], value[1], value[2]
+      reraise(value[0], value[1], value[2])
 
   def GetBlockedTasks(self):
     if self.blocked_task is not None:
@@ -449,7 +450,7 @@ class FiberTaskGraph(object):
     elif isinstance(value, Bailout):
       return value.value
     else:
-      raise value[0], value[1], value[2]
+      reraise(value[0], value[1], value[2])
 
   def _RunNextTask(self):
     while len(self.ready_tasks) == 0:
