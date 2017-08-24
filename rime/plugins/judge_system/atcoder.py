@@ -259,10 +259,10 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
     m = pat.search(html)
     session = m.group(1)
     r = solution.project._Request('submit?task_id=%s' % task_id, {
-            '__session': session,
-            'task_id': task_id,
-            'language_id_' + task_id: lang_id,
-            'source_code': source_code})
+      '__session': session,
+      'task_id': task_id,
+      'language_id_' + task_id: lang_id,
+      'source_code': source_code})
     r.read()
 
     results = solution.project._Request('submissions/me').read()

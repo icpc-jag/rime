@@ -116,8 +116,8 @@ class Testset(targets.registry.Testset):
     if not (yield super(Testset, self)._PostBuildHook(ui)):
       yield False
     yield all((yield taskgraph.TaskBranch([
-            self._GenerateMergedTest(testcase, ui)
-            for testcase in self.GetMergedTestCases()])))
+      self._GenerateMergedTest(testcase, ui)
+      for testcase in self.GetMergedTestCases()])))
 
   @taskgraph.task_method
   def _GenerateMergedTest(self, merged_testcase, ui):
