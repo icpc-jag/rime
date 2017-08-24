@@ -124,11 +124,11 @@ PUBLICATION_DATE = datetime.datetime(*, *, *, *, *)
     if not isinstance(checker, basic_codes.InternalDiffCode):
       files.WriteFile(
         aoj_conf.format('JUDGE_TYPE = \'special-validator\'', testset.problem.title),
-          os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
+        os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
     else:
       files.WriteFile(
         aoj_conf.format('JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
-          os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
+        os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
 
     yield True
 
