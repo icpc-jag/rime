@@ -84,24 +84,24 @@ class Testset(targets.registry.Testset):
     self.reactives = []
     self.exports.update(
       codes.CreateDictionary('%s_generator', self.generators,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir,
-                                  wrapper=self._WrapDependency))
+                             src_dir=self.src_dir,
+                             out_dir=self.out_dir,
+                             wrapper=self._WrapDependency))
     self.exports.update(
       codes.CreateDictionary('%s_validator', self.validators,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir,
-                                  wrapper=self._WrapDependency))
+                             src_dir=self.src_dir,
+                             out_dir=self.out_dir,
+                             wrapper=self._WrapDependency))
     self.exports.update(
       codes.CreateDictionary('%s_judge', self.judges,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir,
-                                  wrapper=self._WrapDependency))
+                             src_dir=self.src_dir,
+                             out_dir=self.out_dir,
+                             wrapper=self._WrapDependency))
     self.exports.update(
       codes.CreateDictionary('%s_reactive', self.reactives,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir,
-                                  wrapper=self._WrapDependency))
+                             src_dir=self.src_dir,
+                             out_dir=self.out_dir,
+                             wrapper=self._WrapDependency))
 
   def _WrapDependency(self, code_class):
     def Wrapped(src_name, src_dir, out_dir, dependency=[], variant=None,
@@ -182,7 +182,7 @@ class Testset(targets.registry.Testset):
     result.Finalize(True,
                     '%s: %s' % (os.path.basename(testcase.infile),
                                 case_result.verdict),
-                     notable_testcase=testcase)
+                    notable_testcase=testcase)
     yield True
 
   # input pattern
@@ -233,9 +233,9 @@ class Testset(targets.registry.Testset):
       expected = not solution.IsCorrect()
       r = test.TestsetResult(result.testset, result.solution, result.testcases)
       r.Finalize(expected,
-                      '%s: %s' % (os.path.basename(testcase.infile),
-                                  case_result.verdict),
-                      notable_testcase=testcase)
+                 '%s: %s' % (os.path.basename(testcase.infile),
+                             case_result.verdict),
+                 notable_testcase=testcase)
       result.Finalize(expected,
                       '%s: %s' % (os.path.basename(testcase.infile),
                                   case_result.verdict),

@@ -81,7 +81,7 @@ class AOJPacker(plus_commands.PackerBase):
     if len(testset.judges) == 1 and not isinstance(checker, basic_codes.InternalDiffCode):
       ui.console.PrintAction('PACK', testset, 'checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
-                       os.path.join(testset.aoj_pack_dir, 'checker.cpp'))
+                     os.path.join(testset.aoj_pack_dir, 'checker.cpp'))
       for f in checker.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.aoj_pack_dir, f))

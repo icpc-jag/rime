@@ -337,7 +337,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.errors.Error(reference_solution, res.status)
       raise taskgraph.Bailout([False])
     ui.console.PrintAction('REFRUN', reference_solution,
-                            '%s: DONE' % os.path.basename(testcase.infile),
+                           '%s: DONE' % os.path.basename(testcase.infile),
                            progress=True)
     yield True
 

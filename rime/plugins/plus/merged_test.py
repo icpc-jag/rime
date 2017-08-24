@@ -41,7 +41,7 @@ class TestMerger(object):
 
   def Run(self, testcases, merged_testcase, ui):
     infiles = [os.path.splitext(t.infile)[0] + consts.IN_ORIGINAL_EXT
-                 for t in testcases]
+               for t in testcases]
     difffiles = [os.path.splitext(infile)[0] + consts.DIFF_EXT
                  for infile in infiles]
     ui.console.PrintAction(

@@ -160,7 +160,7 @@ class Problem(targets.registry.Problem):
     if len(uploader_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
         [uploader().Upload(ui, self, not ui.options.upload) for uploader
-          in uploader_registry.classes.values()])
+         in uploader_registry.classes.values()])
       yield all(results)
     else:
       ui.errors.Error(self, "Upload nothing: you must add some plugin.")
@@ -274,7 +274,7 @@ class Solution(targets.registry.Solution):
     if len(submitter_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
         [submitter().Submit(ui, self) for submitter
-          in submitter_registry.classes.values()])
+         in submitter_registry.classes.values()])
       yield all(results)
     else:
       ui.errors.Error(self, "Submit nothing: you must add some plugin.")
@@ -290,7 +290,7 @@ class Testset(targets.registry.Testset):
     if len(packer_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
         [packer().Pack(ui, self) for packer
-          in packer_registry.classes.values()])
+         in packer_registry.classes.values()])
       yield all(results)
     else:
       ui.errors.Error(self, "Pack nothing: you must add some plugin.")

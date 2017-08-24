@@ -150,7 +150,7 @@ class AtCoderPacker(plus_commands.PackerBase):
     if len(testset.judges) == 1 and not isinstance(checker, basic_codes.InternalDiffCode):
       ui.console.PrintAction('PACK', testset, 'output checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
-                       os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
+                     os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
       for f in checker.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.atcoder_pack_dir, 'etc', f))
@@ -163,7 +163,7 @@ class AtCoderPacker(plus_commands.PackerBase):
       reactive = testset.reactives[0]
       ui.console.PrintAction('PACK', testset, 'reactive checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, reactive.src_name),
-                       os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
+                     os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
       for f in reactive.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.atcoder_pack_dir, 'etc', f))
