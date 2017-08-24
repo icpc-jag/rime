@@ -195,7 +195,7 @@ class Project(targets.registry.Project):
             ] +
             [self._GetMessage(*t) for t in cols] +
             [GetFileComment(dir, casename + '.comment')]
-            ) +
+          ) +
           '|\n')
     wikiFull += ''.join(rows)
 

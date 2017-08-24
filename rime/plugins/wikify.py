@@ -188,7 +188,7 @@ class Project(targets.registry.Project):
     edit_params = {
       'cmd': 'edit',
       'page': native_page,
-      }
+    }
     edit_page_content = urllib2.urlopen(
       '%s?%s' % (url, urllib.urlencode(edit_params))).read()
 
@@ -201,7 +201,7 @@ class Project(targets.registry.Project):
       'msg': native_wiki,
       'write': u'ページの更新'.encode(encoding),
       'encode_hint': u'ぷ'.encode(encoding),
-      }
+    }
     urllib2.urlopen(url, urllib.urlencode(update_params))
 
 

@@ -198,7 +198,7 @@ class Project(targets.registry.Project):
             ] +
             [self._GetHtmlifyMessage(*t) for t in cols] +
             ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
-            ) +
+          ) +
           '</td></tr>\n')
     htmlFull += ''.join(rows)
     htmlFull += '</tbody></table>'

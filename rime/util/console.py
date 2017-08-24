@@ -38,11 +38,11 @@ _COLOR_ESCAPE_SEQUENCES = {
   'CYAN': '\x1b[36m',
   'WHITE': '\x1b[37m',
   'NORMAL': '\x1b[0m',
-  }
+}
 _CONTROL_ESCAPE_SEQUENCES = {
   'UP': '\x1b[1A',
   'KILL': '\x1b[K',
-  }
+}
 
 
 class ConsoleBase(object):
