@@ -380,7 +380,7 @@ class SerialTaskGraph(object):
       except:
         self.cache[task] = (False, sys.exc_info())
     if self.cache[task] is None:
-      raise RuntimeException('Cyclic task dependency found')
+      raise RuntimeError('Cyclic task dependency found')
     success, value = self.cache[task]
     if success:
       return value

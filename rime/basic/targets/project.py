@@ -55,7 +55,7 @@ class Project(targets.registry.Project):
           self.problems.append(problem)
         except targets.ConfigurationError:
           ui.errors.Exception(problem)
-    self.problems.sort(lambda a, b: cmp((a.id, a.name), (b.id, b.name)))
+    self.problems.sort(key=lambda a: (a.id, a.name))
 
   def FindByBaseDir(self, base_dir):
     if self.base_dir == base_dir:

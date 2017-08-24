@@ -33,6 +33,7 @@ import rime.basic.targets.problem   # NOQA
 import rime.basic.targets.project   # NOQA
 import rime.basic.targets.solution  # NOQA
 import rime.basic.targets.testset   # NOQA
+from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.core import targets
 from rime.core import taskgraph

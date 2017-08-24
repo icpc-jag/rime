@@ -26,6 +26,7 @@ import commands as builtin_commands
 import getpass
 import re
 import socket
+import sys
 import urllib
 import urllib2
 import urlparse
@@ -51,7 +52,7 @@ CELL_NA = BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):
-  if not isinstance(s, unicode):
+  if sys.version_info.major == 2 and not isinstance(s, unicode):  # NOQA
     s = s.decode('utf-8')
   return s
 

@@ -81,12 +81,12 @@ def RunCommon(method_name, project, args, ui):
 
   if args:
     ui.errors.Error(None,
-                    'Extra argument passed to %s command!' % self.name)
+                    'Extra argument passed to %s command!' % method_name)
     return None
 
   if not IsBasicTarget(obj):
     ui.errors.Error(None,
-                    '%s is not supported for the specified target.' % self.name)
+                    '%s is not supported for the specified target.' % method_name)
     return None
 
   return getattr(obj, method_name)(ui)

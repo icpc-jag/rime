@@ -121,7 +121,7 @@ class CommandBase(Command):
 
     if not self.name:
       rows = []
-      for cmd in sorted(ui.commands.values(), lambda a, b: cmp(a.name, b.name)):
+      for cmd in sorted(ui.commands.values(), key=lambda a: a.name):
         if not cmd.name:
           continue
         rows.append((' %s    ' % cmd.name, cmd.oneline_summary))
@@ -136,7 +136,7 @@ class CommandBase(Command):
 
   def _PrintOptionDescription(self, ui):
     rows = []
-    for option in sorted(self.options, lambda a, b: cmp(a.longname, b.longname)):
+    for option in sorted(self.options, key=lambda a: a.longname):
       longopt = '--%s' % option.longname
       if option.argname:
         longopt += ' <%s>' % option.argname

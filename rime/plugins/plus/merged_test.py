@@ -175,7 +175,7 @@ class Testset(targets.registry.Testset):
   @taskgraph.task_method
   def _GenerateMergedTest(self, merged_testcase, ui):
     if not self.test_merger:
-      ui.errors.Error(testset, "No merger registered!")
+      ui.errors.Error(self, "No merger registered!")
       yield False
 
     testcases = [t for t in self.ListTestCases()

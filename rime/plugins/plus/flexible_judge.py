@@ -128,11 +128,11 @@ class Testset(targets.registry.Testset):
     # reactive
     if self.reactives:
       if len(self.reactives) > 1:
-        ui.errors.Error(testset, "Multiple reactive checkers registered.")
+        ui.errors.Error(self, "Multiple reactive checkers registered.")
         yield None
       reactive = self.reactives[0]
       if not reactive.variant:
-        reactive.variant = KUPCJudgeRunner()
+        reactive.variant = KUPCReactiveRunner()
       res = yield reactive.variant.Run(
         reactive=reactive,
         args=solution.code.run_args, cwd=solution.out_dir,
@@ -183,11 +183,11 @@ class Testset(targets.registry.Testset):
     # reactive
     if self.reactives:
       if len(self.reactives) > 1:
-        ui.errors.Error(testset, "Multiple reactive checkers registered.")
+        ui.errors.Error(self, "Multiple reactive checkers registered.")
         yield None
       reactive = self.reactives[0]
       if not reactive.variant:
-        reactive.variant = KUPCJudgeRunner()
+        reactive.variant = KUPCReactiveRunner()
       res = yield reactive.variant.Run(
         reactive=reactive,
         args=reference_solution.code.run_args, cwd=reference_solution.out_dir,

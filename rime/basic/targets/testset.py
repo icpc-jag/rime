@@ -103,13 +103,11 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   def _SortTestCases(self, testcases):
     """Sorts test cases in a little bit smarter way."""
-    def tokenize_cmp(a, b):
-      def tokenize(s):
-        def replace_digits(match):
-          return '%08s' % match.group(0)
-        return re.sub(r'\d+', replace_digits, s)
-      return cmp(tokenize(a.infile), tokenize(b.infile))
-    testcases.sort(tokenize_cmp)
+    def tokenize(s):
+      def replace_digits(match):
+        return '%08s' % match.group(0)
+      return re.sub(r'\d+', replace_digits, s.infile)
+    testcases.sort(key=tokenize)
 
   @taskgraph.task_method
   def Build(self, ui):

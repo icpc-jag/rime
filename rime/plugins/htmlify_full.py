@@ -28,6 +28,7 @@ import getpass
 import hashlib
 import os.path
 import socket
+import sys
 
 import rime.basic.targets.project  # NOQA
 from rime.basic import codes as basic_codes
@@ -49,7 +50,7 @@ HTMLIFY_CELL_NA = HTMLIFY_BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):
-  if not isinstance(s, unicode):
+  if sys.version_info.major == 2 and not isinstance(s, unicode):  # NOQA
     s = s.decode('utf-8')
   return s
 

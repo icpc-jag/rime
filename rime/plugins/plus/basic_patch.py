@@ -596,7 +596,7 @@ def PrintTestSummary(results, ui):
   solution_name_width = max(
     map(lambda t: len(t.solution.name), results))
   last_problem = None
-  for result in sorted(results, _CompareTestResultForListing):
+  for result in sorted(results, key=_KeyTestResultForListing):
     if last_problem is not result.problem:
       problem_row = [
         ui.console.BOLD,
@@ -638,7 +638,7 @@ def PrintBuildSummary(results, ui):
   solution_size_width = max(
     map(lambda t: len(_SolutionSize(t.solution)), results))
   last_problem = None
-  for result in sorted(results, _CompareTestResultForListing):
+  for result in sorted(results, key=_KeyTestResultForListing):
     if last_problem is not result.problem:
       problem_row = [
         ui.console.BOLD,
@@ -725,11 +725,9 @@ def _SmartFileSize(size):
 
 
 # sort correctly
-def _CompareTestResultForListing(a, b):
-  """Compare two TestResult for display-ordering."""
-  if a.problem.id != b.problem.id:
-    return cmp(a.problem.id, b.problem.id)
-  return test_summary.CompareTestResultForListing(a, b)
+def _KeyTestResultForListing(a):
+  """Key function of TestResult for display-ordering."""
+  return (a.problem.id, test_summary.KeyTestResultForListing(a))
 
 test_summary.PrintBuildSummary = PrintBuildSummary
 test_summary.PrintTestSummary = PrintTestSummary

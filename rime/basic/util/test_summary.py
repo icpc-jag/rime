@@ -30,7 +30,7 @@ def PrintTestSummary(results, ui):
   solution_name_width = max(
     map(lambda t: len(t.solution.name), results))
   last_problem = None
-  for result in sorted(results, CompareTestResultForListing):
+  for result in sorted(results, key=KeyTestResultForListing):
     if last_problem is not result.problem:
       problem_row = [
         ui.console.BOLD,
@@ -63,15 +63,9 @@ def PrintTestSummary(results, ui):
     ui.console.Print('      To show them, try -p (--precise).')
 
 
-def CompareTestResultForListing(a, b):
-  """Compare two TestResult for display-ordering."""
-  if a.problem.name != b.problem.name:
-    return cmp(a.problem.name, b.problem.name)
-  reference_solution = a.problem.reference_solution
-  if a.solution is reference_solution:
-    return -1
-  if b.solution is reference_solution:
-    return +1
-  if a.solution.IsCorrect() != b.solution.IsCorrect():
-    return -cmp(a.solution.IsCorrect(), b.solution.IsCorrect())
-  return cmp(a.solution.name, b.solution.name)
+def KeyTestResultForListing(a):
+  """Key function of TestResult for display-ordering."""
+  return (a.problem.name,
+          a.solution is not a.problem.reference_solution,
+          not a.solution.IsCorrect(),
+          a.solution.name)
