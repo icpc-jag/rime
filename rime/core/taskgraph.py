@@ -735,7 +735,7 @@ class FiberTaskGraph(object):
 
   def _InterruptTask(self, task):
     if (task is None or task not in self.task_state or
-        self.task_state[task] not in (WAITING, BLOCKED, READY)):
+      self.task_state[task] not in (WAITING, BLOCKED, READY)):
       return
     self._LogDebug('_InterruptTask: %s: interrupted' % task)
     try:
