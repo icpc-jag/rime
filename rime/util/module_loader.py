@@ -40,7 +40,7 @@ def LoadPackage(package_name):
                              *package_name.split('.'))
   for filename in files.ListDir(package_dir):
     if (os.path.isdir(os.path.join(package_dir, filename)) and
-      os.path.isfile(os.path.join(package_dir, filename, '__init__.py'))):
+            os.path.isfile(os.path.join(package_dir, filename, '__init__.py'))):
       LoadPackage('%s.%s' % (package_name, filename))
     elif filename.endswith('.py'):
       module_name = os.path.splitext(filename)[0]

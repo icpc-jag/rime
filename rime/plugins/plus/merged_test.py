@@ -179,8 +179,8 @@ class Testset(targets.registry.Testset):
       yield False
 
     testcases = [t for t in self.ListTestCases()
-               if fnmatch.fnmatch(os.path.basename(t.infile),
-                                  merged_testcase.input_pattern)]
+                 if fnmatch.fnmatch(os.path.basename(t.infile),
+                                    merged_testcase.input_pattern)]
     self.test_merger.Run(testcases, merged_testcase, ui)
     yield True
 

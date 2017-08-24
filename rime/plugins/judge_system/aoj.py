@@ -86,7 +86,7 @@ class AOJPacker(plus_commands.PackerBase):
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.aoj_pack_dir, f))
       files.WriteFile('#!/bin/bash\ng++ -o checker -std=c++11 checker.cpp',
-        os.path.join(testset.aoj_pack_dir, 'build.sh'))
+                      os.path.join(testset.aoj_pack_dir, 'build.sh'))
     elif len(testset.judges) > 1:
       ui.errors.Error(testset, "Multiple output checker is not supported!")
       yield False

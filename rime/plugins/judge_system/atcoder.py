@@ -77,7 +77,7 @@ class Project(targets.registry.Project):
   def _Login(self):
     if not self.atcoder_logined:
       self._Request('login',
-      {'name': self.atcoder_username, 'password': self.atcoder_password}).info().headers
+                    {'name': self.atcoder_username, 'password': self.atcoder_password}).info().headers
       self.atcoder_logined = True
 
 

@@ -122,7 +122,7 @@ class Testset(targets.registry.Testset):
     for infile in challenge_infiles:
       matched_testcases = [testcase for testcase in all_testcases
                            if fnmatch.fnmatch(os.path.basename(testcase.infile),
-                                  infile)]
+                                              infile)]
 
       if not matched_testcases:
         ui.errors.Error(solution,
@@ -153,8 +153,8 @@ class Testset(targets.registry.Testset):
     result.results[testcase] = case_result
     if solution.expected_verdicts is None and case_result.verdict == test.TestCaseResult.AC:
       ui.console.PrintAction('TEST', solution,
-                           '%s: Unexpectedly accepted' % os.path.basename(testcase.infile),
-                           progress=True)
+                             '%s: Unexpectedly accepted' % os.path.basename(testcase.infile),
+                             progress=True)
       yield False
     elif solution.expected_verdicts is not None and case_result.verdict not in solution.expected_verdicts:
       result.Finalize(False,
@@ -253,8 +253,8 @@ class Testset(targets.registry.Testset):
       elif solution.expected_verdicts is not None and case_result.verdict not in solution.expected_verdicts:
         r = test.TestsetResult(result.testset, result.solution, result.testcases)
         r.Finalize(False,
-                  '%s: Unexpected Verdict (%s)' % (os.path.basename(testcase.infile), case_result.verdict),
-                  notable_testcase=testcase)
+                   '%s: Unexpected Verdict (%s)' % (os.path.basename(testcase.infile), case_result.verdict),
+                   notable_testcase=testcase)
         ui.errors.Error(solution, r.detail)
         if case_result.verdict == test.TestCaseResult.WA:
           judgefile = os.path.join(
@@ -283,7 +283,7 @@ class Testset(targets.registry.Testset):
     Returns TestCaseResult.
     """
     cache_file_name = os.path.join(solution.out_dir,
-                   os.path.splitext(os.path.basename(testcase.infile))[0] + consts.CACHE_EXT)
+                                   os.path.splitext(os.path.basename(testcase.infile))[0] + consts.CACHE_EXT)
     solution_file_name = os.path.join(solution.src_dir, solution.code.src_name)
 
     cache_flag = (
@@ -692,7 +692,7 @@ def _TestsetDiffSize(result):
     size = 0
     for t in result.problem.testset.ListTestCases():
       out_file = os.path.join(result.problem.testset.out_dir,
-                     os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
+                              os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
       size += len(files.ReadFile(out_file))
     return _SmartFileSize(size)
   except:

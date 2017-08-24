@@ -137,9 +137,9 @@ class Project(targets.registry.Project):
     errors = SafeUnicode(errors)
 
     yield u'#contents\n' + (u'このセクションは wikify_full plugin により自動生成されています '
-            u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
-            {'rev': rev, 'username': username, 'hostname': hostname}
-            ) + wiki + environments + errors + wikiFull
+                            u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
+                            {'rev': rev, 'username': username, 'hostname': hostname}
+                            ) + wiki + environments + errors + wikiFull
 
   @taskgraph.task_method
   def _GenerateWikiFullOne(self, problem, ui):
@@ -256,8 +256,8 @@ class Project(targets.registry.Project):
 
     # Done.
     wiki = (('|[[%(title)s>%(wiki_name)s]]|%(assignees)s|'
-            '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
-            '%(cell_validator)s|%(cell_judge)s|\n') % locals())
+             '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
+             '%(cell_validator)s|%(cell_judge)s|\n') % locals())
 
     yield (wiki, wikiFull)
 

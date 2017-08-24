@@ -260,8 +260,8 @@ class Project(targets.registry.Project):
 
     # Done.
     html = (('<tr><td>%(title)s</td><td>%(assignees)s</td><td'
-            '%(cell_solutions)s</td><td%(cell_input)s</td><td%(cell_output)s</td><td'
-            '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
+             '%(cell_solutions)s</td><td%(cell_input)s</td><td%(cell_output)s</td><td'
+             '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
 
     yield (html, htmlFull)
 
