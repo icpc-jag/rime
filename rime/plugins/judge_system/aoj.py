@@ -74,11 +74,13 @@ class AOJPacker(plus_commands.PackerBase):
         yield False
 
     # case.txt
-    files.WriteFile(str(len(testcases)), os.path.join(testset.aoj_pack_dir, 'case.txt'))
+    files.WriteFile(str(len(testcases)),
+                    os.path.join(testset.aoj_pack_dir, 'case.txt'))
 
     # build.sh (TODO: reactive)
     checker = testset.judges[0]
-    if len(testset.judges) == 1 and not isinstance(checker, basic_codes.InternalDiffCode):
+    if (len(testset.judges) == 1 and
+            not isinstance(checker, basic_codes.InternalDiffCode)):
       ui.console.PrintAction('PACK', testset, 'checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
                      os.path.join(testset.aoj_pack_dir, 'checker.cpp'))
@@ -123,11 +125,13 @@ PUBLICATION_DATE = datetime.datetime(*, *, *, *, *)
 '''
     if not isinstance(checker, basic_codes.InternalDiffCode):
       files.WriteFile(
-        aoj_conf.format('JUDGE_TYPE = \'special-validator\'', testset.problem.title),
+        aoj_conf.format(
+          'JUDGE_TYPE = \'special-validator\'', testset.problem.title),
         os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
     else:
       files.WriteFile(
-        aoj_conf.format('JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
+        aoj_conf.format(
+          'JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
         os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
 
     yield True

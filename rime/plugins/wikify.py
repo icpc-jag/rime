@@ -62,8 +62,8 @@ class Project(targets.registry.Project):
     super(Project, self).PreLoad(ui)
     self.wikify_config_defined = False
 
-    def _wikify_config(url, page, encoding="utf-8",
-                       auth_realm=None, auth_username=None, auth_password=None):
+    def _wikify_config(url, page, encoding="utf-8", auth_realm=None,
+                       auth_username=None, auth_password=None):
       self.wikify_config_defined = True
       self.wikify_url = url
       self.wikify_page = page

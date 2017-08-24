@@ -62,12 +62,14 @@ class TestlibCode(codes.registry.CXXCode):
           stdin=files.OpenNull(), stdout=outfile, stderr=subprocess.STDOUT))
 
   @taskgraph.task_method
-  def Run(self, args, cwd, input, output, timeout, precise, redirect_error=False):
+  def Run(self, args, cwd, input, output, timeout, precise,
+          redirect_error=False):
     """Run the code and return RunResult."""
     try:
+      # reorder
       result = yield self._ExecForRun(
-        args=tuple(list(self.run_args) + [args[1], args[5], args[3]]), cwd=cwd,  # reorder
-        input=input, output=output, timeout=timeout, precise=precise,
+        args=tuple(list(self.run_args) + [args[1], args[5], args[3]]),
+        cwd=cwd, input=input, output=output, timeout=timeout, precise=precise,
         redirect_error=redirect_error)
     except Exception as e:
       result = codes.RunResult('On execution: %s' % e, None)

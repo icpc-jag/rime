@@ -58,11 +58,13 @@ class Project(targets.registry.Project):
     self.library_dir = None
     self.project_defined = False
 
-    def _project(library_dir=None, required_rime_plus_version=rime_plus_version):
+    def _project(library_dir=None,
+                 required_rime_plus_version=rime_plus_version):
       if self.project_defined:
         # ui.errors.Error(self, 'project() is already defined.')
         raise RuntimeError('project() is already defined.')
-      if parseVersion(rime_plus_version) < parseVersion(required_rime_plus_version):
+      if (parseVersion(rime_plus_version) <
+              parseVersion(required_rime_plus_version)):
         # ui.errors.Error(self, 'installed rime-plus is too old.')
         raise RuntimeError('installed rime-plus is too old.')
       global libdir
@@ -120,9 +122,9 @@ class Testset(targets.registry.Testset):
     challenge_infiles = solution.challenge_cases
     testcases = []
     for infile in challenge_infiles:
-      matched_testcases = [testcase for testcase in all_testcases
-                           if fnmatch.fnmatch(os.path.basename(testcase.infile),
-                                              infile)]
+      matched_testcases = [
+        testcase for testcase in all_testcases
+        if fnmatch.fnmatch(os.path.basename(testcase.infile), infile)]
 
       if not matched_testcases:
         ui.errors.Error(solution,
@@ -132,7 +134,8 @@ class Testset(targets.registry.Testset):
                         'Challenge case not found: %s' % infile)
         yield result
 
-      testcases.extend([t for t in matched_testcases if t.infile not in testcases])
+      testcases.extend(
+        [t for t in matched_testcases if t.infile not in testcases])
     # Try challenge cases.
     result = test.TestsetResult(self, solution, testcases)
     yield taskgraph.TaskBranch([
@@ -151,14 +154,18 @@ class Testset(targets.registry.Testset):
     """Test a wrong solution which has explicitly-specified challenge cases."""
     case_result = yield self._TestOneCase(solution, testcase, ui)
     result.results[testcase] = case_result
-    if solution.expected_verdicts is None and case_result.verdict == test.TestCaseResult.AC:
+    if (solution.expected_verdicts is None and
+            case_result.verdict == test.TestCaseResult.AC):
       ui.console.PrintAction('TEST', solution,
-                             '%s: Unexpectedly accepted' % os.path.basename(testcase.infile),
+                             '%s: Unexpectedly accepted'
+                             % os.path.basename(testcase.infile),
                              progress=True)
       yield False
-    elif solution.expected_verdicts is not None and case_result.verdict not in solution.expected_verdicts:
+    elif (solution.expected_verdicts is not None and
+          case_result.verdict not in solution.expected_verdicts):
       result.Finalize(False,
-                      '%s: Unexpected Verdict (%s)' % (os.path.basename(testcase.infile), case_result.verdict),
+                      '%s: Unexpected Verdict (%s)' %
+                      (os.path.basename(testcase.infile), case_result.verdict),
                       notable_testcase=testcase)
       ui.errors.Error(solution, result.detail)
       if ui.options.keep_going:
@@ -250,10 +257,13 @@ class Testset(targets.registry.Testset):
                           '%s\n  judge log: %s' % (r.detail, judgefile))
         else:
           ui.errors.Error(solution, r.detail)
-      elif solution.expected_verdicts is not None and case_result.verdict not in solution.expected_verdicts:
-        r = test.TestsetResult(result.testset, result.solution, result.testcases)
+      elif (solution.expected_verdicts is not None and
+            case_result.verdict not in solution.expected_verdicts):
+        r = test.TestsetResult(
+          result.testset, result.solution, result.testcases)
         r.Finalize(False,
-                   '%s: Unexpected Verdict (%s)' % (os.path.basename(testcase.infile), case_result.verdict),
+                   '%s: Unexpected Verdict (%s)' %
+                   (os.path.basename(testcase.infile), case_result.verdict),
                    notable_testcase=testcase)
         ui.errors.Error(solution, r.detail)
         if case_result.verdict == test.TestCaseResult.WA:
@@ -282,13 +292,16 @@ class Testset(targets.registry.Testset):
     Cache results if option is set.
     Returns TestCaseResult.
     """
-    cache_file_name = os.path.join(solution.out_dir,
-                                   os.path.splitext(os.path.basename(testcase.infile))[0] + consts.CACHE_EXT)
+    cache_file_name = os.path.join(
+      solution.out_dir,
+      os.path.splitext(
+        os.path.basename(testcase.infile))[0] + consts.CACHE_EXT)
     solution_file_name = os.path.join(solution.src_dir, solution.code.src_name)
 
     cache_flag = (
       ui.options.cache_tests and
-      files.GetModified(solution_file_name) < files.GetModified(cache_file_name) and
+      files.GetModified(solution_file_name) <
+      files.GetModified(cache_file_name) and
       files.GetModified(testcase.infile) < files.GetModified(cache_file_name))
 
     if cache_flag:
@@ -304,7 +317,8 @@ class Testset(targets.registry.Testset):
         case_result.time = j['time']
         case_result.verdict = [
           verdict for verdict in test.TestCaseResult.__dict__.values()
-          if isinstance(verdict, test.TestVerdict) and verdict.msg == j['verdict']][0]
+          if isinstance(verdict, test.TestVerdict) and
+          verdict.msg == j['verdict']][0]
 
       yield case_result
 
@@ -342,7 +356,6 @@ class Testset(targets.registry.Testset):
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
-        # ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
         ui.errors.Warning(self, 'Validator unavailable')
       yield True
     testcases = self.ListTestCases()
@@ -380,9 +393,10 @@ class Testset(targets.registry.Testset):
                       '%s: Unexpectedly Validator Accepted: %s' %
                       (os.path.basename(testcase.infile), res.status))
       raise taskgraph.Bailout([False])
-    ui.console.PrintAction('VALIDATE', self,
-                           '%s: Expectedly Failed' % os.path.basename(testcase.infile),
-                           progress=True)
+    ui.console.PrintAction(
+      'VALIDATE', self,
+      '%s: Expectedly Failed' % os.path.basename(testcase.infile),
+      progress=True)
     yield True
 
 targets.registry.Override('Project', Project)
@@ -402,8 +416,8 @@ def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
   if not precise and code == -(signal.SIGXCPU):
     self._ResetIO(stdin, stdout, stderr)
     task = taskgraph.ExternalProcessTask(
-      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, timeout=timeout,
-      exclusive=precise)
+      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+      timeout=timeout, exclusive=precise)
     proc = yield task
     code = proc.returncode
   if code == 0:
@@ -466,7 +480,8 @@ def GetLastModified(self):
 basic_codes.CodeBase._ExecForCompile = _ExecForCompile
 basic_codes.CodeBase.dependency = []
 basic_codes.CodeBase.variant = None
-rime.basic.targets.problem.ProblemComponentMixin.GetLastModified = GetLastModified
+rime.basic.targets.problem.ProblemComponentMixin.GetLastModified = \
+  GetLastModified
 
 
 # -O2
@@ -479,7 +494,8 @@ class CXXCode(codes.registry.CXXCode):
   EXTENSIONS = ['cc', 'cxx', 'cpp']
 
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
-    super(CXXCode, self).__init__(src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
+    super(CXXCode, self).__init__(
+      src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
 
 
 # shebang support
@@ -513,9 +529,11 @@ class ScriptCode(basic_codes.ScriptCode):
     if interpreter == '/bin/env' or interpreter == '/usr/bin/env':
       try:
         # if the command does not exist, "which" return 1 as the status code
-        interpreter = subprocess.check_output(['which', self.run_args[1]]).strip()
+        interpreter = subprocess.check_output(
+          ['which', self.run_args[1]]).strip()
       except subprocess.CalledProcessError:
-        yield codes.RunResult('Interpreter not installed: %s' % self.run_args[1], None)
+        yield codes.RunResult(
+          'Interpreter not installed: %s' % self.run_args[1], None)
       if not os.path.exists(interpreter):
         yield codes.RunResult('Interpreter not found: %s' % interpreter, None)
 
@@ -570,13 +588,14 @@ class CsCode(basic_codes.CodeBase):
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     exe_path = os.path.join(out_dir, exe_name)
-    super(CsCode, self).__init__(src_name=src_name,
-                                 src_dir=src_dir,
-                                 out_dir=out_dir,
-                                 compile_args=(['mcs',
-                                                src_name,
-                                                '-out:' + exe_path] + list(flags)),
-                                 run_args=['mono', exe_path])
+    super(CsCode, self).__init__(
+      src_name=src_name,
+      src_dir=src_dir,
+      out_dir=out_dir,
+      compile_args=(['mcs',
+                     src_name,
+                     '-out:' + exe_path] + list(flags)),
+      run_args=['mono', exe_path])
 
 codes.registry.Add(CsCode)
 codes.registry.Add(JavaScriptCode)
@@ -691,8 +710,9 @@ def _TestsetDiffSize(result):
   try:
     size = 0
     for t in result.problem.testset.ListTestCases():
-      out_file = os.path.join(result.problem.testset.out_dir,
-                              os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
+      out_file = os.path.join(
+        result.problem.testset.out_dir,
+        os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
       size += len(files.ReadFile(out_file))
     return _SmartFileSize(size)
   except:

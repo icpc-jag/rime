@@ -108,8 +108,8 @@ class Task(object):
   def CacheKey(self):
     """Returns the cache key of this task.
 
-    Need to be overridden in subclasses. If this returns None, the task value is
-    never cached.
+    Need to be overridden in subclasses.
+    If this returns None, the task value is never cached.
     """
     raise NotImplementedError()
 
@@ -690,11 +690,13 @@ class FiberTaskGraph(object):
 
   def _ResolveTask(self, task):
     if task not in self.task_counters:
-      self._LogDebug('_ResolveTask: %s: resolved, but already bailed out' % task)
+      self._LogDebug(
+        '_ResolveTask: %s: resolved, but already bailed out' % task)
       return
     assert self.task_state[task] in (WAITING, BLOCKED)
-    self._LogDebug('_ResolveTask: %s: resolved, counter: %d -> %d' %
-                   (task, self.task_counters[task], self.task_counters[task] - 1))
+    self._LogDebug(
+      '_ResolveTask: %s: resolved, counter: %d -> %d' %
+      (task, self.task_counters[task], self.task_counters[task] - 1))
     self.task_counters[task] -= 1
     if self.task_counters[task] == 0:
       if task in self.task_graph and isinstance(self.task_graph[task], list):

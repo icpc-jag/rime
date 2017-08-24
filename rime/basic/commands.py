@@ -85,8 +85,8 @@ def RunCommon(method_name, project, args, ui):
     return None
 
   if not IsBasicTarget(obj):
-    ui.errors.Error(None,
-                    '%s is not supported for the specified target.' % method_name)
+    ui.errors.Error(
+      None, '%s is not supported for the specified target.' % method_name)
     return None
 
   return getattr(obj, method_name)(ui)

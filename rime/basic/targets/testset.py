@@ -166,8 +166,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.console.PrintAction('COMPILE', self, generator.src_name)
     res = yield generator.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self,
-                      '%s: Compile Error (%s)' % (generator.src_name, res.status))
+      ui.errors.Error(
+        self, '%s: Compile Error (%s)' % (generator.src_name, res.status))
       ui.console.PrintLog(generator.ReadCompileLog())
       raise taskgraph.Bailout([False])
     yield True
@@ -216,8 +216,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.console.PrintAction('COMPILE', self, validator.src_name)
     res = yield validator.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self,
-                      '%s: Compile Error (%s)' % (validator.src_name, res.status))
+      ui.errors.Error(
+        self, '%s: Compile Error (%s)' % (validator.src_name, res.status))
       ui.console.PrintLog(validator.ReadCompileLog())
       raise taskgraph.Bailout([False])
     yield True
@@ -230,7 +230,6 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
-        # ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
         ui.errors.Warning(self, 'Validator unavailable')
       yield True
     testcases = self.ListTestCases()
@@ -257,8 +256,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       timeout=None, precise=False,
       redirect_error=True)
     if res.status == core_codes.RunResult.NG:
-      ui.errors.Error(self,
-                      '%s: Validation Failed' % os.path.basename(testcase.infile))
+      ui.errors.Error(
+        self, '%s: Validation Failed' % os.path.basename(testcase.infile))
       log = files.ReadFile(validationfile)
       ui.console.PrintLog(log)
       raise taskgraph.Bailout([False])
@@ -287,7 +286,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.console.PrintAction('COMPILE', self, judge.src_name)
     res = yield judge.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self, '%s: Compile Error (%s)' % (judge.src_name, res.status))
+      ui.errors.Error(
+        self, '%s: Compile Error (%s)' % (judge.src_name, res.status))
       ui.console.PrintLog(judge.ReadCompileLog())
       yield False
     yield True
@@ -532,8 +532,9 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     Returns TestCaseResult.
     """
     outfile, judgefile = [
-      os.path.join(solution.out_dir,
-                   os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+      os.path.join(
+        solution.out_dir,
+        os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
       for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
@@ -561,9 +562,9 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
         yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
                                   time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
-        yield test.TestCaseResult(solution, testcase,
-                                  test.TestVerdict('Validator %s' % res.status),
-                                  time=None, cached=False)
+        yield test.TestCaseResult(
+          solution, testcase, test.TestVerdict('Validator %s' % res.status),
+          time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
 

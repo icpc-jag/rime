@@ -68,7 +68,8 @@ judge_runner_registry.Add(TestlibJudgeRunner)
 
 
 class ReactiveRunner(object):
-  def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
+  def Run(self, reactive, solution, args, cwd, input, output, timeout,
+          precise):
     raise NotImplementedError()
 
 
@@ -81,20 +82,24 @@ class KUPCReactiveRunner(ReactiveRunner):
         cwd=cwd,
         input=input,
         output=output,
-        timeout=timeout, precise=precise, redirect_error=True)  # !redirect_error
+        timeout=timeout,
+        precise=precise,
+        redirect_error=True)  # !redirect_error
 
 
 class TestlibReactiveRunner(ReactiveRunner):
   PREFIX = 'testlib'
 
-  def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
+  def Run(self, reactive, solution, args, cwd, input, output, timeout,
+          precise):
     raise NotImplementedError()
 
 
 class NEERCReactiveRunner(ReactiveRunner):
   PREFIX = 'neerc'
 
-  def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
+  def Run(self, reactive, solution, args, cwd, input, output, timeout,
+          precise):
     raise NotImplementedError()
 
 reactive_runner_registry = class_registry.ClassRegistry(ReactiveRunner)
@@ -108,10 +113,12 @@ class Testset(targets.registry.Testset):
     super(Testset, self).__init__(*args, **kwargs)
 
     for judge_runner in judge_runner_registry.classes.values():
-      self.exports['{0}_judge_runner'.format(judge_runner.PREFIX)] = judge_runner()
+      self.exports['{0}_judge_runner'.format(
+        judge_runner.PREFIX)] = judge_runner()
 
     for reactive_runner in reactive_runner_registry.classes.values():
-      self.exports['{0}_reactive_runner'.format(reactive_runner.PREFIX)] = reactive_runner()
+      self.exports['{0}_reactive_runner'.format(
+        reactive_runner.PREFIX)] = reactive_runner()
 
   @taskgraph.task_method
   def _TestOneCaseNoCache(self, solution, testcase, ui):
@@ -121,8 +128,9 @@ class Testset(targets.registry.Testset):
     Returns TestCaseResult.
     """
     outfile, judgefile = [
-      os.path.join(solution.out_dir,
-                   os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+      os.path.join(
+        solution.out_dir,
+        os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
       for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     # reactive
@@ -167,9 +175,10 @@ class Testset(targets.registry.Testset):
         yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
                                   time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
-        yield test.TestCaseResult(solution, testcase,
-                                  test.TestVerdict('Validator %s' % res.status),
-                                  time=None, cached=False)
+        yield test.TestCaseResult(
+          solution, testcase,
+          test.TestVerdict('Validator %s' % res.status),
+          time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
 
@@ -226,7 +235,8 @@ class Testset(targets.registry.Testset):
       ui.console.PrintAction('COMPILE', self, reactive.src_name)
     res = yield reactive.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self, '%s: Compile Error (%s)' % (reactive.src_name, res.status))
+      ui.errors.Error(self, '%s: Compile Error (%s)'
+                      % (reactive.src_name, res.status))
       ui.console.PrintLog(reactive.ReadCompileLog())
       yield False
     yield True

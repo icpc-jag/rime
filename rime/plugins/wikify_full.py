@@ -101,7 +101,8 @@ class Project(targets.registry.Project):
   def _GenerateWikiFull(self, ui):
     yield self.Clean(ui)  # 重すぎるときはコメントアウト
     # Get system information.
-    rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
+    rev = SafeUnicode(builtin_commands.getoutput(
+      'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
@@ -120,10 +121,14 @@ class Project(targets.registry.Project):
     wikiFull += ''.join(wikiFullResults)
 
     environments = '** Environments\n'
-    environments += ':gcc:|' + builtin_commands.getoutput('gcc --version') + '\n'
-    environments += ':g++:|' + builtin_commands.getoutput('g++ --version') + '\n'
-    environments += ':javac:|' + builtin_commands.getoutput('javac -version') + '\n'
-    environments += ':java:|' + builtin_commands.getoutput('java -version') + '\n'
+    environments += (
+      ':gcc:|' + builtin_commands.getoutput('gcc --version') + '\n')
+    environments += (
+      ':g++:|' + builtin_commands.getoutput('g++ --version') + '\n')
+    environments += (
+      ':javac:|' + builtin_commands.getoutput('javac -version') + '\n')
+    environments += (
+      ':java:|' + builtin_commands.getoutput('java -version') + '\n')
 
     errors = '** Error Messages\n'
     if ui.errors.HasError():
@@ -136,10 +141,11 @@ class Project(targets.registry.Project):
         errors += '--' + e + '\n'
     errors = SafeUnicode(errors)
 
-    yield u'#contents\n' + (u'このセクションは wikify_full plugin により自動生成されています '
-                            u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
-                            {'rev': rev, 'username': username, 'hostname': hostname}
-                            ) + wiki + environments + errors + wikiFull
+    yield (u'#contents\n' +
+           (u'このセクションは wikify_full plugin により自動生成されています '
+            u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
+            {'rev': rev, 'username': username, 'hostname': hostname}
+            ) + wiki + environments + errors + wikiFull)
 
   @taskgraph.task_method
   def _GenerateWikiFullOne(self, problem, ui):
@@ -157,10 +163,15 @@ class Project(targets.registry.Project):
     wikiFull = '***' + title + '\n'
     solutions = sorted(problem.solutions, key=lambda x: x.name)
     solutionnames = [solution.name for solution in solutions]
-    captions = [name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-    wikiFull += '|CENTER:~' + '|CENTER:~'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '|h\n'
+    captions = [name.replace('-', ' ').replace('_', ' ')
+                for name in solutionnames]
+    wikiFull += '|CENTER:~' + '|CENTER:~'.join(
+      ['testcase', 'in', 'diff', 'md5'] + captions +
+      ['Comments']) + '|h\n'
     formats = ['RIGHT:' for solution in solutions]
-    wikiFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
+    wikiFull += '|' + '|'.join(
+      ['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats +
+      ['LEFT:']) + '|c\n'
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -287,7 +298,8 @@ class WikifyFull(rime_commands.CommandBase):
     if isinstance(obj, Project):
       return obj.WikifyFull(ui)
 
-    ui.console.PrintError('Wikify_full is not supported for the specified target.')
+    ui.console.PrintError(
+      'Wikify_full is not supported for the specified target.')
     return None
 
 

@@ -97,19 +97,23 @@ class Project(targets.registry.Project):
     # yield self.Clean(ui) # 重すぎるときはコメントアウト
 
     # Get system information.
-    rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
+    rev = SafeUnicode(builtin_commands.getoutput(
+      'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
     header = u'<!DOCTYPE html>\n<html lang="ja"><head>'
-    header += u'<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>'
+    header += (u'<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com'
+               '/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>')
     info = u'このセクションは htmlfy_full plugin により自動生成されています '
-    info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' % {'rev': rev, 'username': username, 'hostname': hostname})
+    info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n'
+             % {'rev': rev, 'username': username, 'hostname': hostname})
     footer = u'</body></html>'
 
     # Generate content.
     html = u'<h2>Summary</h2>\n<table class="table">\n'
-    html += u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th><th>出力</th><th>入検</th><th>出検</th></tr></thead>\n'
+    html += (u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th>'
+             '<th>出力</th><th>入検</th><th>出検</th></tr></thead>\n')
 
     htmlFull = u'<h2>Detail<h2>\n'
 
@@ -121,10 +125,14 @@ class Project(targets.registry.Project):
     htmlFull += ''.join(htmlFullResults)
 
     environments = '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
-    environments += '<dt>gcc:</dt><dd>' + builtin_commands.getoutput('gcc --version') + '</dd>\n'
-    environments += '<dt>g++:</dt><dd>' + builtin_commands.getoutput('g++ --version') + '</dd>\n'
-    environments += '<dt>javac:</dt><dd>' + builtin_commands.getoutput('javac -version') + '</dd>\n'
-    environments += '<dt>java:</dt><dd>' + builtin_commands.getoutput('java -version') + '</dd>\n'
+    environments += ('<dt>gcc:</dt><dd>' +
+                     builtin_commands.getoutput('gcc --version') + '</dd>\n')
+    environments += ('<dt>g++:</dt><dd>' +
+                     builtin_commands.getoutput('g++ --version') + '</dd>\n')
+    environments += ('<dt>javac:</dt><dd>' +
+                     builtin_commands.getoutput('javac -version') + '</dd>\n')
+    environments += ('<dt>java:</dt><dd>' +
+                     builtin_commands.getoutput('java -version') + '</dd>\n')
     environments += '</dl>\n'
 
     errors = ''
@@ -160,10 +168,12 @@ class Project(targets.registry.Project):
     solutions = sorted(problem.solutions, key=lambda x: x.name)
     solutionnames = [solution.name for solution in solutions]
 
-    captions = [name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-    htmlFull += '<table class="table">\n<thead><tr><th>' + '</th><th>'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '</th></tr></thead>\n<tbody>\n'
-    # formats = ['RIGHT:' for solution in solutions]
-    # htmlFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
+    captions = [
+      name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
+    htmlFull += ('<table class="table">\n<thead><tr><th>' +
+                 '</th><th>'.join(
+                   ['testcase', 'in', 'diff', 'md5'] + captions +
+                   ['Comments']) + '</th></tr></thead>\n<tbody>\n')
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -260,7 +270,8 @@ class Project(targets.registry.Project):
 
     # Done.
     html = (('<tr><td>%(title)s</td><td>%(assignees)s</td><td'
-             '%(cell_solutions)s</td><td%(cell_input)s</td><td%(cell_output)s</td><td'
+             '%(cell_solutions)s</td><td%(cell_input)s</td>'
+             '<td%(cell_output)s</td><td'
              '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
 
     yield (html, htmlFull)
@@ -291,7 +302,8 @@ class HtmlifyFull(rime_commands.CommandBase):
     if isinstance(obj, Project):
       return obj.HtmlifyFull(ui)
 
-    ui.console.PrintError('Htmlify_full is not supported for the specified target.')
+    ui.console.PrintError(
+      'Htmlify_full is not supported for the specified target.')
     return None
 
 

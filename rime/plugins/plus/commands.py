@@ -44,10 +44,12 @@ class DefaultCommand(commands.registry.Default):
     super(DefaultCommand, self).__init__(parent)
     self.AddOptionEntry(commands.OptionEntry(
         'r', 'rel_out_dir', 'rel_out_dir', str, "-", "rel_path",
-        'Specify the relative path of the directory where rime-out\'s are put.'))
+        'Specify the relative path of the directory'
+        'where rime-out\'s are put.'))
     self.AddOptionEntry(commands.OptionEntry(
         'a', 'abs_out_dir', 'abs_out_dir', str, "-", "abs_path",
-        'Specify the absolute path of the directory where rime-out\'s are put.'))
+        'Specify the absolute path of the directory'
+        'where rime-out\'s are put.'))
 
 commands.registry.Override('Default', DefaultCommand)
 
@@ -134,7 +136,8 @@ atcoder_config(
       EditFile(os.path.join(newdir, 'PROBLEM'), content)
       ui.console.PrintAction('ADD', None, '%s/PROBLEM' % newdir)
     else:
-      ui.errors.Error(self, "Target type {0} cannot be put here.".format(ttype))
+      ui.errors.Error(self,
+                      "Target type {0} cannot be put here.".format(ttype))
       yield None
 
 
@@ -143,9 +146,12 @@ class Problem(targets.registry.Problem):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     if ui.options.rel_out_dir != "-":
-      self.out_dir = os.path.join(self.project.base_dir, ui.options.rel_out_dir, self.name, consts.RIME_OUT_DIR)
+      self.out_dir = os.path.join(
+        self.project.base_dir, ui.options.rel_out_dir, self.name,
+        consts.RIME_OUT_DIR)
     if ui.options.abs_out_dir != "-":
-      self.out_dir = os.path.join(ui.options.abs_out_dir, self.name, consts.RIME_OUT_DIR)
+      self.out_dir = os.path.join(
+        ui.options.abs_out_dir, self.name, consts.RIME_OUT_DIR)
 
   @taskgraph.task_method
   def Pack(self, ui):
@@ -186,8 +192,10 @@ class Problem(targets.registry.Problem):
 #c_solution(src='main.c') # -lm -O2 as default
 #cxx_solution(src='main.cc', flags=[]) # -std=c++11 -O2 as default
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main')
-#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=[])
-#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=['10_corner*.in'])
+#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
+#              challenge_cases=[])
+#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
+#              challenge_cases=['10_corner*.in'])
 #script_solution(src='main.sh') # shebang line is required
 #script_solution(src='main.pl') # shebang line is required
 #script_solution(src='main.py') # shebang line is required
@@ -219,29 +227,36 @@ class Problem(targets.registry.Problem):
 ## Input validators.
 #c_validator(src='validator.c')
 #cxx_validator(src='validator.cc', dependency=['testlib.h'])
-#java_validator(src='Validator.java', encoding='UTF-8', mainclass='tmp/validator/Validator')
+#java_validator(src='Validator.java', encoding='UTF-8',
+#               mainclass='tmp/validator/Validator')
 #script_validator(src='validator.pl')
 
 ## Output judges.
 #c_judge(src='judge.c')
-#cxx_judge(src='judge.cc', dependency=['testlib.h'], variant=testlib_judge_runner)
+#cxx_judge(src='judge.cc', dependency=['testlib.h'],
+#          variant=testlib_judge_runner)
 #java_judge(src='Judge.java', encoding='UTF-8', mainclass='Judge')
 #script_judge(src='judge.py')
 
 ## Reactives.
 #c_reactive(src='reactive.c')
-#cxx_reactive(src='reactive.cc', dependency=['testlib.h', 'reactive.hpp'], variant=kupc_reactive_runner)
+#cxx_reactive(src='reactive.cc', dependency=['testlib.h', 'reactive.hpp'],
+#             variant=kupc_reactive_runner)
 #java_reactive(src='Reactive.java', encoding='UTF-8', mainclass='Judge')
 #script_reactive(src='reactive.py')
 
 ## Extra Testsets.
-#icpc_merger(input_terminator='0 0\\n') # icpc type
-#icpc_merger(input_terminator='0 0\\n', output_replace=casenum_replace('Case 1', 'Case {{0}}')) # icpc wf ~2011
+# icpc type
+#icpc_merger(input_terminator='0 0\\n')
+# icpc wf ~2011
+#icpc_merger(input_terminator='0 0\\n',
+#            output_replace=casenum_replace('Case 1', 'Case {{0}}'))
 #gcj_merger(output_replace=casenum_replace('Case 1', 'Case {{0}}'))
 id='{0}'
 #merged_testset(name=id + '_Merged', input_pattern='*.in')
 #subtask_testset(name='All', score=100, input_patterns=['*'])
-#scoring_judge() # precisely scored by judge program like Jiyukenkyu (KUPC 2013)
+# precisely scored by judge program like Jiyukenkyu (KUPC 2013)
+#scoring_judge()
 '''
       newdir = os.path.join(self.base_dir, name)
       if(os.path.exists(newdir)):
@@ -251,7 +266,8 @@ id='{0}'
       EditFile(os.path.join(newdir, 'TESTSET'), content.format(self.id))
       ui.console.PrintAction('ADD', self, '%s/TESTSET' % newdir)
     else:
-      ui.errors.Error(self, "Target type {0} cannot be put here.".format(ttype))
+      ui.errors.Error(self,
+                      "Target type {0} cannot be put here.".format(ttype))
       yield None
 
 

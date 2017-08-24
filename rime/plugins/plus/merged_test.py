@@ -76,7 +76,8 @@ class ICPCMerger(TestMerger):
     super(ICPCMerger, self).__init__(output_replace)
     self.input_terminator = input_terminator
     if self.input_terminator and not self.input_terminator.endswith('\n'):
-      raise RuntimeError('icpc_merger(): input_terminator is not ending with \\n.')
+      raise RuntimeError(
+        'icpc_merger(): input_terminator is not ending with \\n.')
 
   def _ConcatenateIn(self, srcs, dst):
     with open(dst, 'w') as f:
@@ -204,7 +205,9 @@ class Testset(targets.registry.Testset):
   def _TestSolutionWithAllCases(self, solution, ui):
     original_result = (
       yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
-    if original_result.expected and solution.IsCorrect() and self.merged_testcases:
+    if (original_result.expected and
+            solution.IsCorrect() and
+            self.merged_testcases):
       merged_result = (yield self._TestSolutionWithMergedTests(solution, ui))
       original_result.results.update(merged_result.results)
       if not merged_result.expected:

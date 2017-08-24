@@ -32,7 +32,8 @@ class ParseError(Exception):
 
 
 class OptionEntry(object):
-  def __init__(self, shortname, longname, varname, argtype, argdef, argname, description):
+  def __init__(self, shortname, longname, varname, argtype, argdef, argname,
+               description):
     assert argtype in (bool, int, str)
     assert isinstance(argdef, argtype)
     self.shortname = shortname
@@ -151,7 +152,8 @@ class CommandBase(Command):
       offset = max([len(left_col_head) for left_col_head, _ in rows])
       for left_col_head, right_col_lines in rows:
         for i, right_col_line in enumerate(right_col_lines):
-          left_col_line = string.ljust((i == 0 and left_col_head or ''), offset)
+          left_col_line = string.ljust(
+            (i == 0 and left_col_head or ''), offset)
           ui.console.Print(left_col_line + right_col_line)
     ui.console.Print()
 
@@ -179,8 +181,8 @@ def Parse(argv, commands):
   """Parses the command line arguments.
 
   Arguments:
-    argv: A list of string passed to the command.  Note that this should include
-        sys.argv[0] as well.
+    argv: A list of string passed to the command.
+        Note that this should include sys.argv[0] as well.
 
   Returns:
     A tuple of (cmd_name, extra_args, options) where:

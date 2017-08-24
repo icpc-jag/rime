@@ -67,7 +67,8 @@ class Code(object):
   def Compile(self):
     raise NotImplementedError()
 
-  def Run(self, args, cwd, input, output, timeout, precise, redirect_error=False):
+  def Run(self, args, cwd, input, output, timeout, precise,
+          redirect_error=False):
     raise NotImplementedError()
 
   def Clean(self):
