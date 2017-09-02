@@ -113,7 +113,7 @@ class Project(targets.registry.Project):
     # Generate content.
     html = u'<h2>Summary</h2>\n<table class="table">\n'
     html += (u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th>'
-             '<th>出力</th><th>入検</th><th>出検</th></tr></thead>\n')
+             u'<th>出力</th><th>入検</th><th>出検</th></tr></thead>\n')
 
     htmlFull = u'<h2>Detail<h2>\n'
 
