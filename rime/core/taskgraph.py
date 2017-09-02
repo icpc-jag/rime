@@ -32,6 +32,7 @@ import sys
 import threading
 import time
 
+from six import reraise
 
 # State of tasks.
 NUM_STATES = 6
@@ -107,8 +108,8 @@ class Task(object):
   def CacheKey(self):
     """Returns the cache key of this task.
 
-    Need to be overridden in subclasses. If this returns None, the task value is
-    never cached.
+    Need to be overridden in subclasses.
+    If this returns None, the task value is never cached.
     """
     raise NotImplementedError()
 
@@ -379,12 +380,12 @@ class SerialTaskGraph(object):
       except:
         self.cache[task] = (False, sys.exc_info())
     if self.cache[task] is None:
-      raise RuntimeException('Cyclic task dependency found')
+      raise RuntimeError('Cyclic task dependency found')
     success, value = self.cache[task]
     if success:
       return value
     else:
-      raise value[0], value[1], value[2]
+      reraise(value[0], value[1], value[2])
 
   def GetBlockedTasks(self):
     if self.blocked_task is not None:
@@ -449,7 +450,7 @@ class FiberTaskGraph(object):
     elif isinstance(value, Bailout):
       return value.value
     else:
-      raise value[0], value[1], value[2]
+      reraise(value[0], value[1], value[2])
 
   def _RunNextTask(self):
     while len(self.ready_tasks) == 0:
@@ -689,11 +690,13 @@ class FiberTaskGraph(object):
 
   def _ResolveTask(self, task):
     if task not in self.task_counters:
-      self._LogDebug('_ResolveTask: %s: resolved, but already bailed out' % task)
+      self._LogDebug(
+        '_ResolveTask: %s: resolved, but already bailed out' % task)
       return
     assert self.task_state[task] in (WAITING, BLOCKED)
-    self._LogDebug('_ResolveTask: %s: resolved, counter: %d -> %d' %
-                   (task, self.task_counters[task], self.task_counters[task]-1))
+    self._LogDebug(
+      '_ResolveTask: %s: resolved, counter: %d -> %d' %
+      (task, self.task_counters[task], self.task_counters[task] - 1))
     self.task_counters[task] -= 1
     if self.task_counters[task] == 0:
       if task in self.task_graph and isinstance(self.task_graph[task], list):
@@ -734,7 +737,7 @@ class FiberTaskGraph(object):
 
   def _InterruptTask(self, task):
     if (task is None or task not in self.task_state or
-        self.task_state[task] not in (WAITING, BLOCKED, READY)):
+            self.task_state[task] not in (WAITING, BLOCKED, READY)):
       return
     self._LogDebug('_InterruptTask: %s: interrupted' % task)
     try:

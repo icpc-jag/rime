@@ -21,31 +21,23 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
-import subprocess
-import cookielib
-import re
-import sys
-import time
-import urllib
-import urllib2
 
-import rime.basic.targets.testset   # target dependency
+import rime.basic.targets.testset   # NOQA
 from rime.basic import consts
-from rime.basic import commands as basic_commands
 from rime.basic import codes as basic_codes
-from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import files
 from rime.plugins.plus import commands as plus_commands
 
+
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
     self.aoj_pack_dir = os.path.join(self.problem.out_dir, 'aoj')
+
 
 class AOJPacker(plus_commands.PackerBase):
   @taskgraph.task_method
@@ -60,8 +52,8 @@ class AOJPacker(plus_commands.PackerBase):
     for (i, testcase) in enumerate(testcases):
       basename = os.path.splitext(testcase.infile)[0]
       difffile = basename + consts.DIFF_EXT
-      packed_infile = 'in' + str(i+1) + '.txt'
-      packed_difffile = 'out' + str(i+1) + '.txt'
+      packed_infile = 'in' + str(i + 1) + '.txt'
+      packed_difffile = 'out' + str(i + 1) + '.txt'
       try:
         ui.console.PrintAction(
           'PACK',
@@ -82,19 +74,21 @@ class AOJPacker(plus_commands.PackerBase):
         yield False
 
     # case.txt
-    files.WriteFile(str(len(testcases)), os.path.join(testset.aoj_pack_dir, 'case.txt'))
+    files.WriteFile(str(len(testcases)),
+                    os.path.join(testset.aoj_pack_dir, 'case.txt'))
 
     # build.sh (TODO: reactive)
     checker = testset.judges[0]
-    if len(testset.judges) == 1 and not isinstance(checker, basic_codes.InternalDiffCode):
+    if (len(testset.judges) == 1 and
+            not isinstance(checker, basic_codes.InternalDiffCode)):
       ui.console.PrintAction('PACK', testset, 'checker files', progress=True)
       files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
-                       os.path.join(testset.aoj_pack_dir, 'checker.cpp'))
+                     os.path.join(testset.aoj_pack_dir, 'checker.cpp'))
       for f in checker.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.aoj_pack_dir, f))
       files.WriteFile('#!/bin/bash\ng++ -o checker -std=c++11 checker.cpp',
-        os.path.join(testset.aoj_pack_dir, 'build.sh'))
+                      os.path.join(testset.aoj_pack_dir, 'build.sh'))
     elif len(testset.judges) > 1:
       ui.errors.Error(testset, "Multiple output checker is not supported!")
       yield False
@@ -131,15 +125,17 @@ PUBLICATION_DATE = datetime.datetime(*, *, *, *, *)
 '''
     if not isinstance(checker, basic_codes.InternalDiffCode):
       files.WriteFile(
-        aoj_conf.format('JUDGE_TYPE = \'special-validator\'', testset.problem.title),
-          os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
+        aoj_conf.format(
+          'JUDGE_TYPE = \'special-validator\'', testset.problem.title),
+        os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
     else:
       files.WriteFile(
-        aoj_conf.format('JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
-          os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
+        aoj_conf.format(
+          'JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
+        os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
 
     yield True
 
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(AOJPacker)

@@ -21,31 +21,22 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
-import subprocess
-import cookielib
-import re
-import sys
-import time
-import urllib
-import urllib2
 
-import rime.basic.targets.testset   # target dependency
+import rime.basic.targets.testset   # NOQA
 from rime.basic import consts
-from rime.basic import commands as basic_commands
-from rime.basic import codes as basic_codes
-from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import files
 from rime.plugins.plus import commands as plus_commands
 
+
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
     self.mjudge_pack_dir = os.path.join(self.problem.out_dir, 'mjudge')
+
 
 class MJudgePacker(plus_commands.PackerBase):
   @taskgraph.task_method
@@ -60,8 +51,8 @@ class MJudgePacker(plus_commands.PackerBase):
     for (i, testcase) in enumerate(testcases):
       basename = os.path.splitext(testcase.infile)[0]
       difffile = basename + consts.DIFF_EXT
-      packed_infile = str(i+1) + consts.IN_EXT
-      packed_difffile = str(i+1) + consts.DIFF_EXT
+      packed_infile = str(i + 1) + consts.IN_EXT
+      packed_difffile = str(i + 1) + consts.DIFF_EXT
       try:
         ui.console.PrintAction(
           'PACK',
@@ -82,6 +73,6 @@ class MJudgePacker(plus_commands.PackerBase):
         yield False
     yield True
 
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(MJudgePacker)

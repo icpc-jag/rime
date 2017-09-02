@@ -22,7 +22,6 @@
 #
 
 import itertools
-import os.path
 
 from rime.basic.targets import problem
 from rime.core import codes

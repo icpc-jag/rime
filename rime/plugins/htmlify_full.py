@@ -26,26 +26,17 @@ import codecs
 import commands as builtin_commands
 import getpass
 import hashlib
-import itertools
 import os.path
-import re
 import socket
-import subprocess
-import urllib
-import urllib2
-import urlparse
+import sys
 
-from rime.basic.targets import problem
-import rime.basic.targets.project  # target dependency
-import rime.basic.test
+import rime.basic.targets.project  # NOQA
 from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
-from rime.core import codes as core_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
-from rime.util import files
 
 HTMLIFY_BGCOLOR_GOOD = ' class="success">'
 HTMLIFY_BGCOLOR_NOTBAD = ' class="warning">'
@@ -59,9 +50,10 @@ HTMLIFY_CELL_NA = HTMLIFY_BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):
-  if not isinstance(s, unicode):
+  if sys.version_info.major == 2 and not isinstance(s, unicode):  # NOQA
     s = s.decode('utf-8')
   return s
+
 
 def GetFileSize(dir, filename):
   filepath = os.path.join(dir, filename)
@@ -81,6 +73,7 @@ def GetFileHash(dir, filename):
   else:
     return ''
 
+
 def GetHtmlifyFileComment(dir, filename):
   filepath = os.path.join(dir, filename)
   if os.path.exists(filepath):
@@ -91,6 +84,7 @@ def GetHtmlifyFileComment(dir, filename):
   else:
     return ''
 
+
 class Project(targets.registry.Project):
   @taskgraph.task_method
   def HtmlifyFull(self, ui):
@@ -100,24 +94,28 @@ class Project(targets.registry.Project):
 
   @taskgraph.task_method
   def _GenerateHtmlFull(self, ui):
-    #yield self.Clean(ui) # 重すぎるときはコメントアウト
+    # yield self.Clean(ui) # 重すぎるときはコメントアウト
 
     # Get system information.
-    rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
+    rev = SafeUnicode(builtin_commands.getoutput(
+      'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
-    header  = u'<!DOCTYPE html>\n<html lang="ja"><head>'
-    header += u'<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>'
-    info    = u'このセクションは htmlfy_full plugin により自動生成されています '
-    info   += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' % {'rev': rev, 'username': username, 'hostname': hostname})
-    footer  = u'</body></html>'
+    header = u'<!DOCTYPE html>\n<html lang="ja"><head>'
+    header += (u'<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com'
+               '/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>')
+    info = u'このセクションは htmlfy_full plugin により自動生成されています '
+    info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n'
+             % {'rev': rev, 'username': username, 'hostname': hostname})
+    footer = u'</body></html>'
 
     # Generate content.
-    html =  u'<h2>Summary</h2>\n<table class="table">\n'
-    html += u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th><th>出力</th><th>入検</th><th>出検</th></tr></thead>\n'
+    html = u'<h2>Summary</h2>\n<table class="table">\n'
+    html += (u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th>'
+             '<th>出力</th><th>入検</th><th>出検</th></tr></thead>\n')
 
-    htmlFull =  u'<h2>Detail<h2>\n'
+    htmlFull = u'<h2>Detail<h2>\n'
 
     results = yield taskgraph.TaskBranch([
         self._GenerateHtmlFullOne(problem, ui)
@@ -126,11 +124,15 @@ class Project(targets.registry.Project):
     html += '<tbody>' + ''.join(htmlResults) + '</tbody></table>\n'
     htmlFull += ''.join(htmlFullResults)
 
-    environments =  '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
-    environments += '<dt>gcc:</dt><dd>'   + builtin_commands.getoutput('gcc --version')  + '</dd>\n'
-    environments += '<dt>g++:</dt><dd>'   + builtin_commands.getoutput('g++ --version')  + '</dd>\n'
-    environments += '<dt>javac:</dt><dd>' + builtin_commands.getoutput('javac -version') + '</dd>\n'
-    environments += '<dt>java:</dt><dd>'  + builtin_commands.getoutput('java -version')  + '</dd>\n'
+    environments = '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
+    environments += ('<dt>gcc:</dt><dd>' +
+                     builtin_commands.getoutput('gcc --version') + '</dd>\n')
+    environments += ('<dt>g++:</dt><dd>' +
+                     builtin_commands.getoutput('g++ --version') + '</dd>\n')
+    environments += ('<dt>javac:</dt><dd>' +
+                     builtin_commands.getoutput('javac -version') + '</dd>\n')
+    environments += ('<dt>java:</dt><dd>' +
+                     builtin_commands.getoutput('java -version') + '</dd>\n')
     environments += '</dl>\n'
 
     errors = ''
@@ -166,10 +168,12 @@ class Project(targets.registry.Project):
     solutions = sorted(problem.solutions, key=lambda x: x.name)
     solutionnames = [solution.name for solution in solutions]
 
-    captions = [name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-    htmlFull += '<table class="table">\n<thead><tr><th>' + '</th><th>'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '</th></tr></thead>\n<tbody>\n'
-    #formats = ['RIGHT:' for solution in solutions]
-    #htmlFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
+    captions = [
+      name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
+    htmlFull += ('<table class="table">\n<thead><tr><th>' +
+                 '</th><th>'.join(
+                   ['testcase', 'in', 'diff', 'md5'] + captions +
+                   ['Comments']) + '</th></tr></thead>\n<tbody>\n')
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -201,16 +205,16 @@ class Project(targets.registry.Project):
               '>' + GetFileSize(dir, casename + consts.IN_EXT),
               '>' + GetFileSize(dir, casename + consts.DIFF_EXT),
               '>' + GetFileHash(dir, casename + consts.IN_EXT)
-            ]
-            + [self._GetHtmlifyMessage(*t) for t in cols]
-            + ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
-            ) +
+            ] +
+            [self._GetHtmlifyMessage(*t) for t in cols] +
+            ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
+          ) +
           '</td></tr>\n')
     htmlFull += ''.join(rows)
     htmlFull += '</tbody></table>'
 
     # Fetch test results.
-    #results = yield problem.Test(ui)
+    # results = yield problem.Test(ui)
 
     # Get various information about the problem.
     num_solutions = len(results)
@@ -266,8 +270,9 @@ class Project(targets.registry.Project):
 
     # Done.
     html = (('<tr><td>%(title)s</td><td>%(assignees)s</td><td'
-            '%(cell_solutions)s</td><td%(cell_input)s</td><td%(cell_output)s</td><td'
-            '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
+             '%(cell_solutions)s</td><td%(cell_input)s</td>'
+             '<td%(cell_output)s</td><td'
+             '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
 
     yield (html, htmlFull)
 
@@ -297,11 +302,11 @@ class HtmlifyFull(rime_commands.CommandBase):
     if isinstance(obj, Project):
       return obj.HtmlifyFull(ui)
 
-    ui.console.PrintError('Htmlify_full is not supported for the specified target.')
+    ui.console.PrintError(
+      'Htmlify_full is not supported for the specified target.')
     return None
 
 
 targets.registry.Override('Project', Project)
 
 rime_commands.registry.Add(HtmlifyFull)
-

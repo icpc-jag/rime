@@ -54,11 +54,12 @@ class CodeBase(codes.Code):
     yield result
 
   @taskgraph.task_method
-  def Run(self, args, cwd, input, output, timeout, precise, redirect_error=False):
+  def Run(self, args, cwd, input, output, timeout, precise,
+          redirect_error=False):
     """Run the code and return RunResult."""
     try:
       result = yield self._ExecForRun(
-        args=tuple(list(self.run_args)+list(args)), cwd=cwd,
+        args=tuple(list(self.run_args) + list(args)), cwd=cwd,
         input=input, output=output, timeout=timeout, precise=precise,
         redirect_error=redirect_error)
     except Exception as e:
@@ -106,16 +107,16 @@ class CodeBase(codes.Code):
   def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
                     timeout=None, precise=False):
     task = taskgraph.ExternalProcessTask(
-      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, timeout=timeout,
-      exclusive=precise)
+      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+      timeout=timeout, exclusive=precise)
     proc = yield task
     code = proc.returncode
     # Retry if TLE.
     if not precise and code == -(signal.SIGXCPU):
       self._ResetIO(stdin, stdout, stderr)
       task = taskgraph.ExternalProcessTask(
-        args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, timeout=timeout,
-        exclusive=True)
+        args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+        timeout=timeout, exclusive=True)
       proc = yield task
       code = proc.returncode
     if code == 0:
@@ -235,7 +236,8 @@ class InternalDiffCode(CodeBase):
       run_args=[])
 
   @taskgraph.task_method
-  def Run(self, args, cwd, input, output, timeout, precise, redirect_error=False):
+  def Run(self, args, cwd, input, output, timeout, precise,
+          redirect_error=False):
     parser = optparse.OptionParser()
     parser.add_option('-i', '--infile', dest='infile')
     parser.add_option('-d', '--difffile', dest='difffile')

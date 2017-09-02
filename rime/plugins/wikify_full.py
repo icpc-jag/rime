@@ -25,27 +25,19 @@
 import commands as builtin_commands
 import getpass
 import hashlib
-import itertools
 import os.path
-import re
 import socket
-import subprocess
-import urllib
-import urllib2
-import urlparse
+import sys
 
-from rime.basic.targets import problem
-import rime.basic.targets.project  # target dependency
+import rime.basic.targets.project  # NOQA
 import rime.basic.test
 from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
-from rime.core import codes as core_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
-import rime.plugins.wikify  # target dependency
-from rime.util import files
+import rime.plugins.wikify  # NOQA
 
 BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
 BGCOLOR_GOOD = 'BGCOLOR(#ccffcc):'
@@ -60,9 +52,10 @@ CELL_NA = BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):
-  if not isinstance(s, unicode):
+  if sys.version_info.major == 2 and not isinstance(s, unicode):  # NOQA
     s = s.decode('utf-8')
   return s
+
 
 def GetFileSize(dir, filename):
   filepath = os.path.join(dir, filename)
@@ -82,6 +75,7 @@ def GetFileHash(dir, filename):
   else:
     return ''
 
+
 def GetFileComment(dir, filename):
   filepath = os.path.join(dir, filename)
   if os.path.exists(filepath):
@@ -91,6 +85,7 @@ def GetFileComment(dir, filename):
     return SafeUnicode(r).replace('\n', '&br;').replace('|', '&#x7c;')
   else:
     return ''
+
 
 class Project(targets.registry.Project):
   @taskgraph.task_method
@@ -104,18 +99,19 @@ class Project(targets.registry.Project):
 
   @taskgraph.task_method
   def _GenerateWikiFull(self, ui):
-    yield self.Clean(ui) # 重すぎるときはコメントアウト
+    yield self.Clean(ui)  # 重すぎるときはコメントアウト
     # Get system information.
-    rev = SafeUnicode(builtin_commands.getoutput('git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
+    rev = SafeUnicode(builtin_commands.getoutput(
+      'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
     # Generate content.
-    wiki =  u'** Summary\n'
+    wiki = u'** Summary\n'
     wiki += u'|||CENTER:|CENTER:|CENTER:|CENTER:|CENTER:|c\n'
     wiki += u'|~問題|~担当|~解答|~入力|~出力|~入検|~出検|\n'
 
-    wikiFull =  u'** Detail\n'
+    wikiFull = u'** Detail\n'
 
     results = yield taskgraph.TaskBranch([
         self._GenerateWikiFullOne(problem, ui)
@@ -124,11 +120,15 @@ class Project(targets.registry.Project):
     wiki += ''.join(wikiResults)
     wikiFull += ''.join(wikiFullResults)
 
-    environments =  '** Environments\n'
-    environments += ':gcc:|'   + builtin_commands.getoutput('gcc --version')  + '\n'
-    environments += ':g++:|'   + builtin_commands.getoutput('g++ --version')  + '\n'
-    environments += ':javac:|' + builtin_commands.getoutput('javac -version') + '\n'
-    environments += ':java:|'  + builtin_commands.getoutput('java -version')  + '\n'
+    environments = '** Environments\n'
+    environments += (
+      ':gcc:|' + builtin_commands.getoutput('gcc --version') + '\n')
+    environments += (
+      ':g++:|' + builtin_commands.getoutput('g++ --version') + '\n')
+    environments += (
+      ':javac:|' + builtin_commands.getoutput('javac -version') + '\n')
+    environments += (
+      ':java:|' + builtin_commands.getoutput('java -version') + '\n')
 
     errors = '** Error Messages\n'
     if ui.errors.HasError():
@@ -141,10 +141,11 @@ class Project(targets.registry.Project):
         errors += '--' + e + '\n'
     errors = SafeUnicode(errors)
 
-    yield u'#contents\n' + (u'このセクションは wikify_full plugin により自動生成されています '
+    yield (u'#contents\n' +
+           (u'このセクションは wikify_full plugin により自動生成されています '
             u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
             {'rev': rev, 'username': username, 'hostname': hostname}
-            ) + wiki + environments + errors + wikiFull
+            ) + wiki + environments + errors + wikiFull)
 
   @taskgraph.task_method
   def _GenerateWikiFullOne(self, problem, ui):
@@ -162,10 +163,15 @@ class Project(targets.registry.Project):
     wikiFull = '***' + title + '\n'
     solutions = sorted(problem.solutions, key=lambda x: x.name)
     solutionnames = [solution.name for solution in solutions]
-    captions = [name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-    wikiFull += '|CENTER:~' + '|CENTER:~'.join(['testcase', 'in', 'diff', 'md5'] + captions + ['Comments']) + '|h\n'
+    captions = [name.replace('-', ' ').replace('_', ' ')
+                for name in solutionnames]
+    wikiFull += '|CENTER:~' + '|CENTER:~'.join(
+      ['testcase', 'in', 'diff', 'md5'] + captions +
+      ['Comments']) + '|h\n'
     formats = ['RIGHT:' for solution in solutions]
-    wikiFull += '|' + '|'.join(['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats + ['LEFT:']) + '|c\n'
+    wikiFull += '|' + '|'.join(
+      ['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats +
+      ['LEFT:']) + '|c\n'
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -197,15 +203,15 @@ class Project(targets.registry.Project):
               GetFileSize(dir, casename + consts.IN_EXT),
               GetFileSize(dir, casename + consts.DIFF_EXT),
               GetFileHash(dir, casename + consts.IN_EXT)
-            ]
-            + [self._GetMessage(*t) for t in cols]
-            + [GetFileComment(dir, casename + '.comment')]
-            ) +
+            ] +
+            [self._GetMessage(*t) for t in cols] +
+            [GetFileComment(dir, casename + '.comment')]
+          ) +
           '|\n')
     wikiFull += ''.join(rows)
 
     # Fetch test results.
-    #results = yield problem.Test(ui)
+    # results = yield problem.Test(ui)
 
     # Get various information about the problem.
     num_solutions = len(results)
@@ -261,8 +267,8 @@ class Project(targets.registry.Project):
 
     # Done.
     wiki = (('|[[%(title)s>%(wiki_name)s]]|%(assignees)s|'
-            '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
-            '%(cell_validator)s|%(cell_judge)s|\n') % locals())
+             '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
+             '%(cell_validator)s|%(cell_judge)s|\n') % locals())
 
     yield (wiki, wikiFull)
 
@@ -292,11 +298,11 @@ class WikifyFull(rime_commands.CommandBase):
     if isinstance(obj, Project):
       return obj.WikifyFull(ui)
 
-    ui.console.PrintError('Wikify_full is not supported for the specified target.')
+    ui.console.PrintError(
+      'Wikify_full is not supported for the specified target.')
     return None
 
 
 targets.registry.Override('Project', Project)
 
 rime_commands.registry.Add(WikifyFull)
-

@@ -25,7 +25,6 @@ import os
 import os.path
 
 from rime.core import commands
-from rime.core import targets
 from rime.core import taskgraph
 from rime.basic import consts
 from rime.basic.targets import problem
@@ -66,6 +65,7 @@ def IsBasicTarget(obj):
                           solution.Solution,
                           testset.Testset))
 
+
 def RunCommon(method_name, project, args, ui):
   if args:
     base_dir = os.path.abspath(args[0])
@@ -81,16 +81,16 @@ def RunCommon(method_name, project, args, ui):
 
   if args:
     ui.errors.Error(None,
-                    'Extra argument passed to %s command!' % self.name)
+                    'Extra argument passed to %s command!' % method_name)
     return None
 
   if not IsBasicTarget(obj):
-    ui.errors.Error(None,
-                    '%s is not supported for the specified target.' % self.name)
+    ui.errors.Error(
+      None, '%s is not supported for the specified target.' % method_name)
     return None
 
   return getattr(obj, method_name)(ui)
-  
+
 
 class Build(commands.CommandBase):
   def __init__(self, parent):
@@ -118,6 +118,7 @@ class Test(commands.CommandBase):
     task = RunCommon('Test', project, args, ui)
     if not task:
       return task
+
     @taskgraph.task_method
     def TestWrapper():
       results = yield task

@@ -32,7 +32,8 @@ class ParseError(Exception):
 
 
 class OptionEntry(object):
-  def __init__(self, shortname, longname, varname, argtype, argdef, argname, description):
+  def __init__(self, shortname, longname, varname, argtype, argdef, argname,
+               description):
     assert argtype in (bool, int, str)
     assert isinstance(argdef, argtype)
     self.shortname = shortname
@@ -121,7 +122,7 @@ class CommandBase(Command):
 
     if not self.name:
       rows = []
-      for cmd in sorted(ui.commands.values(), lambda a, b: cmp(a.name, b.name)):
+      for cmd in sorted(ui.commands.values(), key=lambda a: a.name):
         if not cmd.name:
           continue
         rows.append((' %s    ' % cmd.name, cmd.oneline_summary))
@@ -136,7 +137,7 @@ class CommandBase(Command):
 
   def _PrintOptionDescription(self, ui):
     rows = []
-    for option in sorted(self.options, lambda a, b: cmp(a.longname, b.longname)):
+    for option in sorted(self.options, key=lambda a: a.longname):
       longopt = '--%s' % option.longname
       if option.argname:
         longopt += ' <%s>' % option.argname
@@ -151,7 +152,8 @@ class CommandBase(Command):
       offset = max([len(left_col_head) for left_col_head, _ in rows])
       for left_col_head, right_col_lines in rows:
         for i, right_col_line in enumerate(right_col_lines):
-          left_col_line = string.ljust((i == 0 and left_col_head or ''), offset)
+          left_col_line = string.ljust(
+            (i == 0 and left_col_head or ''), offset)
           ui.console.Print(left_col_line + right_col_line)
     ui.console.Print()
 
@@ -179,8 +181,8 @@ def Parse(argv, commands):
   """Parses the command line arguments.
 
   Arguments:
-    argv: A list of string passed to the command.  Note that this should include
-        sys.argv[0] as well.
+    argv: A list of string passed to the command.
+        Note that this should include sys.argv[0] as well.
 
   Returns:
     A tuple of (cmd_name, extra_args, options) where:
@@ -227,7 +229,7 @@ def Parse(argv, commands):
           continue
         if '=' in optname:
           sep = optname.find('=')
-          optvalue = optname[sep+1:]
+          optvalue = optname[sep + 1:]
           optname = optname[:sep]
         optnames = [optname]
 

@@ -141,6 +141,7 @@ class Project(TargetBase):
   def PreLoad(self, ui):
     # Do not use super() here because targets.Project will be overridden.
     TargetBase.PreLoad(self, ui)
+
     def use_plugin(name):
       module_name = 'rime.plugins.%s' % name
       if module_name not in sys.modules:

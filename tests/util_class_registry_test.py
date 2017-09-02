@@ -29,8 +29,10 @@ from rime.util import class_registry
 class HogeBase(object):
   pass
 
+
 class HogeImpl(HogeBase):
   pass
+
 
 class Piyo(object):
   pass

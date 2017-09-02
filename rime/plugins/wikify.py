@@ -26,33 +26,33 @@ import commands as builtin_commands
 import getpass
 import re
 import socket
-import subprocess
+import sys
 import urllib
 import urllib2
 import urlparse
 
-import rime.basic.targets.problem  # target dependency
-import rime.basic.targets.project  # target dependency
+import rime.basic.targets.problem  # NOQA
+import rime.basic.targets.project  # NOQA
 from rime.basic import codes as basic_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
 
 
-BGCOLOR_TITLE  = 'BGCOLOR(#eeeeee):'
-BGCOLOR_GOOD   = 'BGCOLOR(#ccffcc):'
+BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
+BGCOLOR_GOOD = 'BGCOLOR(#ccffcc):'
 BGCOLOR_NOTBAD = 'BGCOLOR(#ffffcc):'
-BGCOLOR_BAD    = 'BGCOLOR(#ffcccc):'
-BGCOLOR_NA     = 'BGCOLOR(#cccccc):'
+BGCOLOR_BAD = 'BGCOLOR(#ffcccc):'
+BGCOLOR_NA = 'BGCOLOR(#cccccc):'
 
-CELL_GOOD   = BGCOLOR_GOOD + '&#x25cb;'
+CELL_GOOD = BGCOLOR_GOOD + '&#x25cb;'
 CELL_NOTBAD = BGCOLOR_NOTBAD + '&#x25b3;'
-CELL_BAD    = BGCOLOR_BAD + '&#xd7;'
-CELL_NA     = BGCOLOR_NA + '-'
+CELL_BAD = BGCOLOR_BAD + '&#xd7;'
+CELL_NA = BGCOLOR_NA + '-'
 
 
 def SafeUnicode(s):
-  if not isinstance(s, unicode):
+  if sys.version_info.major == 2 and not isinstance(s, unicode):  # NOQA
     s = s.decode('utf-8')
   return s
 
@@ -61,8 +61,9 @@ class Project(targets.registry.Project):
   def PreLoad(self, ui):
     super(Project, self).PreLoad(ui)
     self.wikify_config_defined = False
-    def _wikify_config(url, page, encoding="utf-8",
-                       auth_realm=None, auth_username=None, auth_password=None):
+
+    def _wikify_config(url, page, encoding="utf-8", auth_realm=None,
+                       auth_username=None, auth_password=None):
       self.wikify_config_defined = True
       self.wikify_url = url
       self.wikify_page = page
@@ -187,7 +188,7 @@ class Project(targets.registry.Project):
     edit_params = {
       'cmd': 'edit',
       'page': native_page,
-      }
+    }
     edit_page_content = urllib2.urlopen(
       '%s?%s' % (url, urllib.urlencode(edit_params))).read()
 
@@ -200,7 +201,7 @@ class Project(targets.registry.Project):
       'msg': native_wiki,
       'write': u'ページの更新'.encode(encoding),
       'encode_hint': u'ぷ'.encode(encoding),
-      }
+    }
     urllib2.urlopen(url, urllib.urlencode(update_params))
 
 
@@ -208,6 +209,7 @@ class Problem(targets.registry.Problem):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     base_problem = self.exports['problem']
+
     def _problem(wiki_name, assignees, need_custom_judge, **kwargs):
       self.wiki_name = wiki_name
       self.assignees = assignees

@@ -26,7 +26,7 @@ import os.path
 
 from rime.basic import consts
 from rime.basic import test
-import rime.basic.targets.testset  # target dependency
+import rime.basic.targets.testset  # NOQA
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import files
@@ -93,6 +93,7 @@ class Testset(targets.registry.Testset):
 
   def PreLoad(self, ui):
     super(Testset, self).PreLoad(ui)
+
     def merged_test(name=None, input_pattern=('*' + consts.IN_EXT),
                     input_separator='', input_terminator='',
                     output_separator='', output_terminator=''):
@@ -115,8 +116,8 @@ class Testset(targets.registry.Testset):
     if not (yield super(Testset, self)._PostBuildHook(ui)):
       yield False
     yield all((yield taskgraph.TaskBranch([
-            self._GenerateMergedTest(testcase, ui)
-            for testcase in self.GetMergedTestCases()])))
+      self._GenerateMergedTest(testcase, ui)
+      for testcase in self.GetMergedTestCases()])))
 
   @taskgraph.task_method
   def _GenerateMergedTest(self, merged_testcase, ui):

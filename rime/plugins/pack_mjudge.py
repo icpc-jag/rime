@@ -21,13 +21,12 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
 
-import rime.basic.targets.problem  # target dependency
-import rime.basic.targets.project  # target dependency
-import rime.basic.targets.testset  # target dependency
+import rime.basic.targets.problem  # NOQA
+import rime.basic.targets.project  # NOQA
+import rime.basic.targets.testset  # NOQA
 from rime.basic import consts
 from rime.core import commands
 from rime.core import targets
@@ -74,8 +73,8 @@ class Testset(targets.registry.Testset):
     for (i, testcase) in enumerate(testcases):
       basename = os.path.splitext(testcase.infile)[0]
       difffile = basename + consts.DIFF_EXT
-      packed_infile = str(i+1) + consts.IN_EXT
-      packed_difffile = str(i+1) + consts.DIFF_EXT
+      packed_infile = str(i + 1) + consts.IN_EXT
+      packed_difffile = str(i + 1) + consts.DIFF_EXT
       try:
         ui.console.PrintAction(
           'PACK',

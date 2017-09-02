@@ -23,6 +23,7 @@
 
 from rime.core import commands
 
+
 class Example(commands.CommandBase):
   def __init__(self, parent):
     super(Example, self).__init__(

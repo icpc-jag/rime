@@ -103,13 +103,11 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   def _SortTestCases(self, testcases):
     """Sorts test cases in a little bit smarter way."""
-    def tokenize_cmp(a, b):
-      def tokenize(s):
-        def replace_digits(match):
-          return '%08s' % match.group(0)
-        return re.sub(r'\d+', replace_digits, s)
-      return cmp(tokenize(a.infile), tokenize(b.infile))
-    testcases.sort(tokenize_cmp)
+    def tokenize(s):
+      def replace_digits(match):
+        return '%08s' % match.group(0)
+      return re.sub(r'\d+', replace_digits, s.infile)
+    testcases.sort(key=tokenize)
 
   @taskgraph.task_method
   def Build(self, ui):
@@ -168,8 +166,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.console.PrintAction('COMPILE', self, generator.src_name)
     res = yield generator.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self,
-                      '%s: Compile Error (%s)' % (generator.src_name, res.status))
+      ui.errors.Error(
+        self, '%s: Compile Error (%s)' % (generator.src_name, res.status))
       ui.console.PrintLog(generator.ReadCompileLog())
       raise taskgraph.Bailout([False])
     yield True
@@ -218,8 +216,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.console.PrintAction('COMPILE', self, validator.src_name)
     res = yield validator.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self,
-                      '%s: Compile Error (%s)' % (validator.src_name, res.status))
+      ui.errors.Error(
+        self, '%s: Compile Error (%s)' % (validator.src_name, res.status))
       ui.console.PrintLog(validator.ReadCompileLog())
       raise taskgraph.Bailout([False])
     yield True
@@ -232,7 +230,6 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
-        #ui.console.PrintAction('VALIDATE', self, 'skipping: validator unavailable')
         ui.errors.Warning(self, 'Validator unavailable')
       yield True
     testcases = self.ListTestCases()
@@ -259,8 +256,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       timeout=None, precise=False,
       redirect_error=True)
     if res.status == core_codes.RunResult.NG:
-      ui.errors.Error(self,
-                      '%s: Validation Failed' % os.path.basename(testcase.infile))
+      ui.errors.Error(
+        self, '%s: Validation Failed' % os.path.basename(testcase.infile))
       log = files.ReadFile(validationfile)
       ui.console.PrintLog(log)
       raise taskgraph.Bailout([False])
@@ -289,7 +286,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.console.PrintAction('COMPILE', self, judge.src_name)
     res = yield judge.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self, '%s: Compile Error (%s)' % (judge.src_name, res.status))
+      ui.errors.Error(
+        self, '%s: Compile Error (%s)' % (judge.src_name, res.status))
       ui.console.PrintLog(judge.ReadCompileLog())
       yield False
     yield True
@@ -328,8 +326,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     """
     if os.path.isfile(testcase.difffile):
       yield True
-    #ui.console.PrintAction('REFRUN', reference_solution,
-    #                       testcase.infile, progress=True)
+    # ui.console.PrintAction('REFRUN', reference_solution,
+    #                        testcase.infile, progress=True)
     res = yield reference_solution.Run(
       args=(), cwd=self.out_dir,
       input=testcase.infile,
@@ -339,7 +337,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       ui.errors.Error(reference_solution, res.status)
       raise taskgraph.Bailout([False])
     ui.console.PrintAction('REFRUN', reference_solution,
-                            '%s: DONE' % os.path.basename(testcase.infile),
+                           '%s: DONE' % os.path.basename(testcase.infile),
                            progress=True)
     yield True
 
@@ -534,9 +532,10 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     Returns TestCaseResult.
     """
     outfile, judgefile = [
-      os.path.join(solution.out_dir,
-                   os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-      for ext in consts.OUT_EXT, consts.JUDGE_EXT]
+      os.path.join(
+        solution.out_dir,
+        os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+      for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
       args=(), cwd=solution.out_dir,
@@ -563,9 +562,9 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
         yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
                                   time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
-        yield test.TestCaseResult(solution, testcase,
-                                  test.TestVerdict('Validator %s' % res.status),
-                                  time=None, cached=False)
+        yield test.TestCaseResult(
+          solution, testcase, test.TestVerdict('Validator %s' % res.status),
+          time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
 

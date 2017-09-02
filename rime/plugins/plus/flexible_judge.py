@@ -23,70 +23,83 @@
 
 import os.path
 
-from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.basic import test
-import rime.basic.targets.testset  # target dependency
+import rime.basic.targets.testset  # NOQA
 from rime.core import codes as core_codes
-from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import class_registry
-from rime.util import files
 
 
 class JudgeRunner(object):
   def Run(self, infile, difffile, outfile, cwd, judgefile):
-  	raise NotImplementedError()
+    raise NotImplementedError()
+
 
 class RimeJudgeRunner(JudgeRunner):
   PREFIX = 'rime'
+
   def Run(self, judge, infile, difffile, outfile, cwd, judgefile):
-  	return judge.Run(
+    return judge.Run(
         args=('--infile', infile,
               '--difffile', difffile,
               '--outfile', outfile),
         cwd=cwd,
         input=os.devnull,
         output=judgefile,
-        timeout=None, precise=False, redirect_error=True) # !redirect_error
+        timeout=None, precise=False, redirect_error=True)  # !redirect_error
+
 
 class TestlibJudgeRunner(JudgeRunner):
   PREFIX = 'testlib'
+
   def Run(self, judge, infile, difffile, outfile, cwd, judgefile):
-  	return judge.Run(
+    return judge.Run(
         args=(infile, outfile, difffile),
         cwd=cwd,
         input=os.devnull,
         output=judgefile,
-        timeout=None, precise=False, redirect_error=True) # !redirect_error
+        timeout=None, precise=False, redirect_error=True)  # !redirect_error
 
 judge_runner_registry = class_registry.ClassRegistry(JudgeRunner)
 judge_runner_registry.Add(RimeJudgeRunner)
 judge_runner_registry.Add(TestlibJudgeRunner)
 
+
 class ReactiveRunner(object):
-  def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
+  def Run(self, reactive, solution, args, cwd, input, output, timeout,
+          precise):
     raise NotImplementedError()
+
 
 class KUPCReactiveRunner(ReactiveRunner):
   PREFIX = 'kupc'
+
   def Run(self, reactive, args, cwd, input, output, timeout, precise):
     return reactive.Run(
         args=("'%s'" % ' '.join(args),),
         cwd=cwd,
         input=input,
         output=output,
-        timeout=timeout, precise=precise, redirect_error=True) # !redirect_error
+        timeout=timeout,
+        precise=precise,
+        redirect_error=True)  # !redirect_error
+
 
 class TestlibReactiveRunner(ReactiveRunner):
   PREFIX = 'testlib'
-  def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
+
+  def Run(self, reactive, solution, args, cwd, input, output, timeout,
+          precise):
     raise NotImplementedError()
+
 
 class NEERCReactiveRunner(ReactiveRunner):
   PREFIX = 'neerc'
-  def Run(self, reactive, solution, args, cwd, input, output, timeout, precise):
+
+  def Run(self, reactive, solution, args, cwd, input, output, timeout,
+          precise):
     raise NotImplementedError()
 
 reactive_runner_registry = class_registry.ClassRegistry(ReactiveRunner)
@@ -100,10 +113,12 @@ class Testset(targets.registry.Testset):
     super(Testset, self).__init__(*args, **kwargs)
 
     for judge_runner in judge_runner_registry.classes.values():
-      self.exports['{0}_judge_runner'.format(judge_runner.PREFIX)] = judge_runner()
+      self.exports['{0}_judge_runner'.format(
+        judge_runner.PREFIX)] = judge_runner()
 
     for reactive_runner in reactive_runner_registry.classes.values():
-      self.exports['{0}_reactive_runner'.format(reactive_runner.PREFIX)] = reactive_runner()
+      self.exports['{0}_reactive_runner'.format(
+        reactive_runner.PREFIX)] = reactive_runner()
 
   @taskgraph.task_method
   def _TestOneCaseNoCache(self, solution, testcase, ui):
@@ -113,18 +128,19 @@ class Testset(targets.registry.Testset):
     Returns TestCaseResult.
     """
     outfile, judgefile = [
-      os.path.join(solution.out_dir,
-                   os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-      for ext in consts.OUT_EXT, consts.JUDGE_EXT]
+      os.path.join(
+        solution.out_dir,
+        os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+      for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     # reactive
     if self.reactives:
       if len(self.reactives) > 1:
-        ui.errors.Error(testset, "Multiple reactive checkers registered.")
+        ui.errors.Error(self, "Multiple reactive checkers registered.")
         yield None
       reactive = self.reactives[0]
       if not reactive.variant:
-        reactive.variant = KUPCJudgeRunner()
+        reactive.variant = KUPCReactiveRunner()
       res = yield reactive.variant.Run(
         reactive=reactive,
         args=solution.code.run_args, cwd=solution.out_dir,
@@ -147,21 +163,22 @@ class Testset(targets.registry.Testset):
     time = res.time
     for judge in self.judges:
       if not judge.variant:
-      	judge.variant = RimeJudgeRunner()
+        judge.variant = RimeJudgeRunner()
       res = yield judge.variant.Run(
-      	judge=judge,
-      	infile=testcase.infile,
-      	difffile=testcase.difffile,
-      	outfile=outfile,
+        judge=judge,
+        infile=testcase.infile,
+        difffile=testcase.difffile,
+        outfile=outfile,
         cwd=self.out_dir,
         judgefile=judgefile)
       if res.status == core_codes.RunResult.NG:
         yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
                                   time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
-        yield test.TestCaseResult(solution, testcase,
-                                  test.TestVerdict('Validator %s' % res.status),
-                                  time=None, cached=False)
+        yield test.TestCaseResult(
+          solution, testcase,
+          test.TestVerdict('Validator %s' % res.status),
+          time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
 
@@ -175,11 +192,11 @@ class Testset(targets.registry.Testset):
     # reactive
     if self.reactives:
       if len(self.reactives) > 1:
-        ui.errors.Error(testset, "Multiple reactive checkers registered.")
+        ui.errors.Error(self, "Multiple reactive checkers registered.")
         yield None
       reactive = self.reactives[0]
       if not reactive.variant:
-        reactive.variant = KUPCJudgeRunner()
+        reactive.variant = KUPCReactiveRunner()
       res = yield reactive.variant.Run(
         reactive=reactive,
         args=reference_solution.code.run_args, cwd=reference_solution.out_dir,
@@ -196,7 +213,7 @@ class Testset(targets.registry.Testset):
       ui.errors.Error(reference_solution, res.status)
       raise taskgraph.Bailout([False])
     ui.console.PrintAction('REFRUN', reference_solution,
-                            '%s: DONE' % os.path.basename(testcase.infile),
+                           '%s: DONE' % os.path.basename(testcase.infile),
                            progress=True)
     yield True
 
@@ -211,7 +228,6 @@ class Testset(targets.registry.Testset):
         for reactive in self.reactives])
     yield all(results)
 
-
   @taskgraph.task_method
   def _CompileReactiveOne(self, reactive, ui):
     """Compile a single reative."""
@@ -219,7 +235,8 @@ class Testset(targets.registry.Testset):
       ui.console.PrintAction('COMPILE', self, reactive.src_name)
     res = yield reactive.Compile()
     if res.status != core_codes.RunResult.OK:
-      ui.errors.Error(self, '%s: Compile Error (%s)' % (reactive.src_name, res.status))
+      ui.errors.Error(self, '%s: Compile Error (%s)'
+                      % (reactive.src_name, res.status))
       ui.console.PrintLog(reactive.ReadCompileLog())
       yield False
     yield True

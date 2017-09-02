@@ -26,7 +26,7 @@ import os.path
 
 from rime.basic import consts
 from rime.basic import test
-import rime.basic.targets.testset  # target dependency
+import rime.basic.targets.testset  # NOQA
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import class_registry
@@ -34,13 +34,14 @@ from rime.util import files
 
 consts.IN_ORIGINAL_EXT = '.in_orig'
 
+
 class TestMerger(object):
   def __init__(self, output_replace=None):
     self.output_replace = output_replace
 
   def Run(self, testcases, merged_testcase, ui):
     infiles = [os.path.splitext(t.infile)[0] + consts.IN_ORIGINAL_EXT
-                 for t in testcases]
+               for t in testcases]
     difffiles = [os.path.splitext(infile)[0] + consts.DIFF_EXT
                  for infile in infiles]
     ui.console.PrintAction(
@@ -67,6 +68,7 @@ class TestMerger(object):
           else:
             f.write(files.ReadFile(src))
 
+
 class ICPCMerger(TestMerger):
   PREFIX = 'icpc'
 
@@ -74,13 +76,15 @@ class ICPCMerger(TestMerger):
     super(ICPCMerger, self).__init__(output_replace)
     self.input_terminator = input_terminator
     if self.input_terminator and not self.input_terminator.endswith('\n'):
-      raise RuntimeError('icpc_merger(): input_terminator is not ending with \\n.')
+      raise RuntimeError(
+        'icpc_merger(): input_terminator is not ending with \\n.')
 
   def _ConcatenateIn(self, srcs, dst):
     with open(dst, 'w') as f:
       for i, src in enumerate(srcs):
         f.write(files.ReadFile(src))
       f.write(self.input_terminator)
+
 
 class GCJMerger(TestMerger):
   PREFIX = 'gcj'
@@ -130,7 +134,6 @@ class Testset(targets.registry.Testset):
         self.exports['{0}_merger'.format(test_merger.PREFIX)] = Registerer
       Closure(test_merger)
 
-
     def casenum_replace(case_pattern, case_replace):
       return lambda i, src: src.replace(case_pattern, case_replace.format(i))
     self.exports['casenum_replace'] = casenum_replace
@@ -154,7 +157,6 @@ class Testset(targets.registry.Testset):
 
     yield True
 
-
   @taskgraph.task_method
   def _PostBuildHook(self, ui):
     if not (yield super(Testset, self)._PostBuildHook(ui)):
@@ -174,12 +176,12 @@ class Testset(targets.registry.Testset):
   @taskgraph.task_method
   def _GenerateMergedTest(self, merged_testcase, ui):
     if not self.test_merger:
-      ui.errors.Error(testset, "No merger registered!")
+      ui.errors.Error(self, "No merger registered!")
       yield False
 
     testcases = [t for t in self.ListTestCases()
-               if fnmatch.fnmatch(os.path.basename(t.infile),
-                                  merged_testcase.input_pattern)]
+                 if fnmatch.fnmatch(os.path.basename(t.infile),
+                                    merged_testcase.input_pattern)]
     self.test_merger.Run(testcases, merged_testcase, ui)
     yield True
 
@@ -203,7 +205,9 @@ class Testset(targets.registry.Testset):
   def _TestSolutionWithAllCases(self, solution, ui):
     original_result = (
       yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
-    if original_result.expected and solution.IsCorrect() and self.merged_testcases:
+    if (original_result.expected and
+            solution.IsCorrect() and
+            self.merged_testcases):
       merged_result = (yield self._TestSolutionWithMergedTests(solution, ui))
       original_result.results.update(merged_result.results)
       if not merged_result.expected:

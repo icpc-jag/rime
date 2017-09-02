@@ -67,7 +67,8 @@ class Code(object):
   def Compile(self):
     raise NotImplementedError()
 
-  def Run(self, args, cwd, input, output, timeout, precise, redirect_error=False):
+  def Run(self, args, cwd, input, output, timeout, precise,
+          redirect_error=False):
     raise NotImplementedError()
 
   def Clean(self):
@@ -81,7 +82,8 @@ def CreateDictionary(name_fmt, codeset, src_dir, out_dir, wrapper=None):
   """Creates a dictionary used for configs."""
   exports = {}
   if wrapper is None:
-    wrapper = lambda c: c
+    def wrapper(c):
+      return c
   for code_class in registry.classes.values():
     def Closure(code_class):
       def Registerer(src, *args, **kwargs):
@@ -104,7 +106,6 @@ class AutoCode(Code):
   EXTENSIONS = []
 
   def __init__(self, src_name, src_dir, out_dir, *args, **kwargs):
-    matched_code_class = None
     src_ext = os.path.splitext(src_name)[1][1:]
     for code_class in registry.classes.values():
       if src_ext in code_class.EXTENSIONS:

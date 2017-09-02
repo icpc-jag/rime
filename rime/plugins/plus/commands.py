@@ -21,15 +21,14 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
 from subprocess import call
 
-import rime.basic.targets.problem   # target dependency
-import rime.basic.targets.project   # target dependency
-import rime.basic.targets.solution  # target dependency
-import rime.basic.targets.testset   # target dependency
+import rime.basic.targets.problem   # NOQA
+import rime.basic.targets.project   # NOQA
+import rime.basic.targets.solution  # NOQA
+import rime.basic.targets.testset   # NOQA
 from rime.basic import commands as basic_commands
 from rime.basic import consts
 from rime.core import commands
@@ -38,28 +37,34 @@ from rime.core import targets
 from rime.util import class_registry
 from rime.util import files
 
+
 # add out_dir option
 class DefaultCommand(commands.registry.Default):
   def __init__(self, parent):
     super(DefaultCommand, self).__init__(parent)
     self.AddOptionEntry(commands.OptionEntry(
         'r', 'rel_out_dir', 'rel_out_dir', str, "-", "rel_path",
-        'Specify the relative path of the directory where rime-out\'s are put.'))
+        'Specify the relative path of the directory'
+        'where rime-out\'s are put.'))
     self.AddOptionEntry(commands.OptionEntry(
         'a', 'abs_out_dir', 'abs_out_dir', str, "-", "abs_path",
-        'Specify the absolute path of the directory where rime-out\'s are put.'))
+        'Specify the absolute path of the directory'
+        'where rime-out\'s are put.'))
 
-commands.registry.Override('Default',  DefaultCommand)
+commands.registry.Override('Default', DefaultCommand)
+
 
 class PackerBase(object):
   @taskgraph.task_method
   def Pack(self, ui, testset):
     raise NotImplementedError()
 
+
 class UploaderBase(object):
   @taskgraph.task_method
   def Upload(self, ui, problem, dryrun):
     raise NotImplementedError()
+
 
 class SubmitterBase(object):
   @taskgraph.task_method
@@ -70,10 +75,12 @@ packer_registry = class_registry.ClassRegistry(PackerBase)
 uploader_registry = class_registry.ClassRegistry(UploaderBase)
 submitter_registry = class_registry.ClassRegistry(SubmitterBase)
 
+
 def EditFile(filename, initial):
-  EDITOR = os.environ.get('EDITOR','vi')
+  EDITOR = os.environ.get('EDITOR', 'vi')
   files.WriteFile(initial, filename)
   call([EDITOR, filename])
+
 
 class Project(targets.registry.Project):
 
@@ -129,17 +136,22 @@ atcoder_config(
       EditFile(os.path.join(newdir, 'PROBLEM'), content)
       ui.console.PrintAction('ADD', None, '%s/PROBLEM' % newdir)
     else:
-      ui.errors.Error(self, "Target type {0} cannot be put here.".format(ttype))
+      ui.errors.Error(self,
+                      "Target type {0} cannot be put here.".format(ttype))
       yield None
+
 
 class Problem(targets.registry.Problem):
 
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     if ui.options.rel_out_dir != "-":
-      self.out_dir = os.path.join(self.project.base_dir, ui.options.rel_out_dir, self.name, consts.RIME_OUT_DIR)
+      self.out_dir = os.path.join(
+        self.project.base_dir, ui.options.rel_out_dir, self.name,
+        consts.RIME_OUT_DIR)
     if ui.options.abs_out_dir != "-":
-      self.out_dir = os.path.join(ui.options.abs_out_dir, self.name, consts.RIME_OUT_DIR)
+      self.out_dir = os.path.join(
+        ui.options.abs_out_dir, self.name, consts.RIME_OUT_DIR)
 
   @taskgraph.task_method
   def Pack(self, ui):
@@ -153,8 +165,8 @@ class Problem(targets.registry.Problem):
       yield False
     if len(uploader_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
-        [uploader().Upload(ui, self, not ui.options.upload) for uploader 
-          in uploader_registry.classes.values()])
+        [uploader().Upload(ui, self, not ui.options.upload) for uploader
+         in uploader_registry.classes.values()])
       yield all(results)
     else:
       ui.errors.Error(self, "Upload nothing: you must add some plugin.")
@@ -180,13 +192,15 @@ class Problem(targets.registry.Problem):
 #c_solution(src='main.c') # -lm -O2 as default
 #cxx_solution(src='main.cc', flags=[]) # -std=c++11 -O2 as default
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main')
-#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=[])
-#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main', challenge_cases=['10_corner*.in'])
+#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
+#              challenge_cases=[])
+#java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
+#              challenge_cases=['10_corner*.in'])
 #script_solution(src='main.sh') # shebang line is required
-#script_solution(src='main.pl') # shebang line is required 
+#script_solution(src='main.pl') # shebang line is required
 #script_solution(src='main.py') # shebang line is required
 #script_solution(src='main.rb') # shebang line is required
-#js_solution(src='main.js') # javascript (nodejs) 
+#js_solution(src='main.js') # javascript (nodejs)
 #hs_solution(src='main.hs') # haskell (stack + ghc)
 #cs_solution(src='main.cs') # C# (mono)
 
@@ -213,29 +227,36 @@ class Problem(targets.registry.Problem):
 ## Input validators.
 #c_validator(src='validator.c')
 #cxx_validator(src='validator.cc', dependency=['testlib.h'])
-#java_validator(src='Validator.java', encoding='UTF-8', mainclass='tmp/validator/Validator')
+#java_validator(src='Validator.java', encoding='UTF-8',
+#               mainclass='tmp/validator/Validator')
 #script_validator(src='validator.pl')
 
 ## Output judges.
 #c_judge(src='judge.c')
-#cxx_judge(src='judge.cc', dependency=['testlib.h'], variant=testlib_judge_runner)
+#cxx_judge(src='judge.cc', dependency=['testlib.h'],
+#          variant=testlib_judge_runner)
 #java_judge(src='Judge.java', encoding='UTF-8', mainclass='Judge')
 #script_judge(src='judge.py')
 
 ## Reactives.
 #c_reactive(src='reactive.c')
-#cxx_reactive(src='reactive.cc', dependency=['testlib.h', 'reactive.hpp'], variant=kupc_reactive_runner)
+#cxx_reactive(src='reactive.cc', dependency=['testlib.h', 'reactive.hpp'],
+#             variant=kupc_reactive_runner)
 #java_reactive(src='Reactive.java', encoding='UTF-8', mainclass='Judge')
 #script_reactive(src='reactive.py')
 
 ## Extra Testsets.
-#icpc_merger(input_terminator='0 0\\n') # icpc type
-#icpc_merger(input_terminator='0 0\\n', output_replace=casenum_replace('Case 1', 'Case {{0}}')) # icpc wf ~2011
+# icpc type
+#icpc_merger(input_terminator='0 0\\n')
+# icpc wf ~2011
+#icpc_merger(input_terminator='0 0\\n',
+#            output_replace=casenum_replace('Case 1', 'Case {{0}}'))
 #gcj_merger(output_replace=casenum_replace('Case 1', 'Case {{0}}'))
 id='{0}'
 #merged_testset(name=id + '_Merged', input_pattern='*.in')
 #subtask_testset(name='All', score=100, input_patterns=['*'])
-#scoring_judge() # precisely scored by judge program like Jiyukenkyu (KUPC 2013)
+# precisely scored by judge program like Jiyukenkyu (KUPC 2013)
+#scoring_judge()
 '''
       newdir = os.path.join(self.base_dir, name)
       if(os.path.exists(newdir)):
@@ -245,11 +266,13 @@ id='{0}'
       EditFile(os.path.join(newdir, 'TESTSET'), content.format(self.id))
       ui.console.PrintAction('ADD', self, '%s/TESTSET' % newdir)
     else:
-      ui.errors.Error(self, "Target type {0} cannot be put here.".format(ttype))
+      ui.errors.Error(self,
+                      "Target type {0} cannot be put here.".format(ttype))
       yield None
 
+
 class Solution(targets.registry.Solution):
-  
+
   @taskgraph.task_method
   def Pack(self, ui):
     ui.errors.Error(self, "A solution is not a target.")
@@ -267,11 +290,12 @@ class Solution(targets.registry.Solution):
     if len(submitter_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
         [submitter().Submit(ui, self) for submitter
-          in submitter_registry.classes.values()])
+         in submitter_registry.classes.values()])
       yield all(results)
     else:
       ui.errors.Error(self, "Submit nothing: you must add some plugin.")
       yield False
+
 
 class Testset(targets.registry.Testset):
 
@@ -282,7 +306,7 @@ class Testset(targets.registry.Testset):
     if len(packer_registry.classes) > 0:
       results = yield taskgraph.TaskBranch(
         [packer().Pack(ui, self) for packer
-          in packer_registry.classes.values()])
+         in packer_registry.classes.values()])
       yield all(results)
     else:
       ui.errors.Error(self, "Pack nothing: you must add some plugin.")
@@ -298,10 +322,11 @@ class Testset(targets.registry.Testset):
     ui.errors.Error(self, "A testset is not a target.")
     yield False
 
-targets.registry.Override('Project',  Project)
-targets.registry.Override('Problem',  Problem)
+targets.registry.Override('Project', Project)
+targets.registry.Override('Problem', Problem)
 targets.registry.Override('Solution', Solution)
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Testset', Testset)
+
 
 class Pack(commands.CommandBase):
   def __init__(self, parent):
@@ -314,6 +339,7 @@ class Pack(commands.CommandBase):
 
   def Run(self, project, args, ui):
     return basic_commands.RunCommon('Pack', project, args, ui)
+
 
 class Upload(commands.CommandBase):
   def __init__(self, parent):
@@ -330,6 +356,7 @@ class Upload(commands.CommandBase):
 
   def Run(self, project, args, ui):
     return basic_commands.RunCommon('Upload', project, args, ui)
+
 
 class Submit(commands.CommandBase):
   def __init__(self, parent):
@@ -362,6 +389,7 @@ def Run(method_name, project, args, ui):
     return None
 
   return getattr(obj, method_name)(args, ui)
+
 
 class Add(commands.CommandBase):
   def __init__(self, parent):

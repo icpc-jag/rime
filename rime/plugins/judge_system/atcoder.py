@@ -21,39 +21,37 @@
 # THE SOFTWARE.
 #
 
-import itertools
 import os
 import os.path
-import subprocess
 import cookielib
 import re
-import sys
 import time
 import urllib
 import urllib2
 
-import rime.basic.targets.problem   # target dependency
-import rime.basic.targets.project   # target dependency
-import rime.basic.targets.solution  # target dependency
-import rime.basic.targets.testset   # target dependency
-from rime.basic import consts
-from rime.basic import commands as basic_commands
+import rime.basic.targets.problem   # NOQA
+import rime.basic.targets.project   # NOQA
+import rime.basic.targets.solution  # NOQA
+import rime.basic.targets.testset   # NOQA
 from rime.basic import codes as basic_codes
-from rime.core import commands
+from rime.basic import consts
 from rime.core import targets
 from rime.core import taskgraph
 from rime.util import files
 from rime.plugins.plus import commands as plus_commands
 
-## opener with cookiejar
+# opener with cookiejar
 cookiejar = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+
 
 class Project(targets.registry.Project):
   def PreLoad(self, ui):
     super(Project, self).PreLoad(ui)
     self.atcoder_config_defined = False
-    def _atcoder_config(upload_script, contest_url, username, password, lang_ids):
+
+    def _atcoder_config(upload_script, contest_url, username, password,
+                        lang_ids):
       self.atcoder_config_defined = True
       self.atcoder_upload_script = upload_script
       self.atcoder_contest_url = contest_url
@@ -71,7 +69,7 @@ class Project(targets.registry.Project):
       yield False
     yield super(Project, self).Upload(ui)
 
-  def _Request(self, path, data = None):
+  def _Request(self, path, data=None):
     if type(data) == dict:
       data = urllib.urlencode(data)
     req = urllib2.Request(self.atcoder_contest_url + path, data)
@@ -80,13 +78,16 @@ class Project(targets.registry.Project):
   def _Login(self):
     if not self.atcoder_logined:
       self._Request('login',
-      { 'name': self.atcoder_username, 'password': self.atcoder_password }).info().headers
+                    {'name': self.atcoder_username,
+                     'password': self.atcoder_password}).info().headers
       self.atcoder_logined = True
+
 
 class Problem(targets.registry.Problem):
   def PreLoad(self, ui):
     super(Problem, self).PreLoad(ui)
     self.atcoder_config_defined = False
+
     def _atcoder_config(task_id=None):
       self.atcoder_config_defined = True
       self.atcoder_task_id = task_id
@@ -98,14 +99,18 @@ class Problem(targets.registry.Problem):
       ui.errors.Error(self, 'atcoder_config() is not defined in PROBLEM.')
       yield False
     if self.atcoder_task_id is None:
-      ui.console.PrintAction('SUBMIT', self, 'This problem is considered to a spare. Not submitted.')
+      ui.console.PrintAction(
+        'SUBMIT', self,
+        'This problem is considered to a spare. Not submitted.')
       yield True
     yield super(Problem, self).Submit(ui)
+
 
 class Testset(targets.registry.Testset):
   def __init__(self, *args, **kwargs):
     super(Testset, self).__init__(*args, **kwargs)
     self.atcoder_pack_dir = os.path.join(self.problem.out_dir, 'atcoder')
+
 
 class AtCoderPacker(plus_commands.PackerBase):
   @taskgraph.task_method
@@ -146,10 +151,13 @@ class AtCoderPacker(plus_commands.PackerBase):
 
     # checker
     checker = testset.judges[0]
-    if len(testset.judges) == 1 and not isinstance(checker, basic_codes.InternalDiffCode):
-      ui.console.PrintAction('PACK', testset, 'output checker files', progress=True)
-      files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
-                       os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
+    if (len(testset.judges) == 1 and
+            not isinstance(checker, basic_codes.InternalDiffCode)):
+      ui.console.PrintAction(
+        'PACK', testset, 'output checker files', progress=True)
+      files.CopyFile(
+        os.path.join(testset.src_dir, checker.src_name),
+        os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
       for f in checker.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.atcoder_pack_dir, 'etc', f))
@@ -160,9 +168,11 @@ class AtCoderPacker(plus_commands.PackerBase):
     # reactive
     if len(testset.reactives) == 1:
       reactive = testset.reactives[0]
-      ui.console.PrintAction('PACK', testset, 'reactive checker files', progress=True)
-      files.CopyFile(os.path.join(testset.src_dir, reactive.src_name),
-                       os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
+      ui.console.PrintAction(
+        'PACK', testset, 'reactive checker files', progress=True)
+      files.CopyFile(
+        os.path.join(testset.src_dir, reactive.src_name),
+        os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
       for f in reactive.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.atcoder_pack_dir, 'etc', f))
@@ -180,9 +190,11 @@ class AtCoderPacker(plus_commands.PackerBase):
         for s in subtasks])
     else:
       score = 'All(100): *'
-    files.WriteFile(score, os.path.join(testset.atcoder_pack_dir, 'etc', 'score.txt'))
+    files.WriteFile(
+      score, os.path.join(testset.atcoder_pack_dir, 'etc', 'score.txt'))
 
     yield True
+
 
 class AtCoderUploader(plus_commands.UploaderBase):
   @taskgraph.task_method
@@ -196,7 +208,9 @@ class AtCoderUploader(plus_commands.UploaderBase):
       yield False
 
     if problem.atcoder_task_id is None:
-      ui.console.PrintAction('UPLOAD', problem, 'This problem is considered to a spare. Not uploaded.')
+      ui.console.PrintAction(
+        'UPLOAD', problem,
+        'This problem is considered to a spare. Not uploaded.')
       yield True
 
     script = os.path.join(problem.project.atcoder_upload_script)
@@ -212,10 +226,12 @@ class AtCoderUploader(plus_commands.UploaderBase):
     log = os.path.join(problem.out_dir, 'upload_log')
 
     if not dryrun:
-      args = ('php', script, str(problem.atcoder_task_id), problem.testset.atcoder_pack_dir)
+      args = ('php', script, str(problem.atcoder_task_id),
+              problem.testset.atcoder_pack_dir)
     else:
       ui.console.PrintWarning('Dry-run mode')
-      args = ('echo', 'php', script, str(problem.atcoder_task_id), problem.testset.atcoder_pack_dir)
+      args = ('echo', 'php', script, str(problem.atcoder_task_id),
+              problem.testset.atcoder_pack_dir)
 
     ui.console.PrintAction('UPLOAD', problem, ' '.join(args), progress=True)
     devnull = files.OpenNull()
@@ -236,6 +252,7 @@ class AtCoderUploader(plus_commands.UploaderBase):
       ui.console.PrintAction('UPLOAD', problem, str(problem.atcoder_task_id))
       yield True
 
+
 class AtCoderSubmitter(plus_commands.SubmitterBase):
   @taskgraph.task_method
   def Submit(self, ui, solution):
@@ -247,30 +264,35 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
 
     task_id = str(solution.problem.atcoder_task_id)
     lang_id = solution.project.atcoder_lang_ids[solution.code.PREFIX]
-    source_code = files.ReadFile(os.path.join(solution.src_dir, solution.code.src_name))
+    source_code = files.ReadFile(
+      os.path.join(solution.src_dir, solution.code.src_name))
 
-
-    ui.console.PrintAction('SUBMIT', solution, str({'task_id': task_id, 'lang_id': lang_id}), progress=True)
+    ui.console.PrintAction(
+      'SUBMIT', solution, str({'task_id': task_id, 'lang_id': lang_id}),
+      progress=True)
 
     html = solution.project._Request('submit?task_id=%s' % task_id).read()
     pat = re.compile(r'name="__session" value="([^"]+)"')
     m = pat.search(html)
     session = m.group(1)
     r = solution.project._Request('submit?task_id=%s' % task_id, {
-            '__session': session,
-            'task_id': task_id,
-            'language_id_' + task_id: lang_id,
-            'source_code': source_code })
+      '__session': session,
+      'task_id': task_id,
+      'language_id_' + task_id: lang_id,
+      'source_code': source_code})
     r.read()
 
     results = solution.project._Request('submissions/me').read()
     submit_id = results.split('<td><a href="/submissions/')[1].split('"')[0]
 
-    ui.console.PrintAction('SUBMIT', solution, 'submitted: ' + str(submit_id), progress=True)
+    ui.console.PrintAction(
+      'SUBMIT', solution, 'submitted: ' + str(submit_id), progress=True)
 
     while True:
-      result, progress = solution.project._Request('submissions/' + submit_id).read().split('data-title="')[1].split('"', 1)
-      if not 'Judging' in result:
+      result, progress = solution.project._Request(
+        'submissions/' + submit_id).read().split(
+          'data-title="')[1].split('"', 1)
+      if 'Judging' not in result:
         break
       time.sleep(5.0)
 
@@ -278,13 +300,14 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
       expected = ''
     else:
       expected = '(fake solution)'
-    ui.console.PrintAction('SUBMIT', solution, '{0} {1}'.format(result, expected))
+    ui.console.PrintAction(
+      'SUBMIT', solution, '{0} {1}'.format(result, expected))
 
     yield True
 
-targets.registry.Override('Project',  Project)
-targets.registry.Override('Problem',  Problem)
-targets.registry.Override('Testset',  Testset)
+targets.registry.Override('Project', Project)
+targets.registry.Override('Problem', Problem)
+targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(AtCoderPacker)
 plus_commands.uploader_registry.Add(AtCoderUploader)
