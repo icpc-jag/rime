@@ -38,6 +38,7 @@ setuptools.setup(
             'rime.core', 'rime.plugins', 'rime.plugins.judge_system',
             'rime.plugins.plus', 'rime.util'],
   package_dir={'rime': 'rime'},
+  install_requires=['six'],
   test_suite='nose.collector',
   tests_require=['nose', 'mox'],
 )
