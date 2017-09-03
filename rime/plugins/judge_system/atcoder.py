@@ -187,7 +187,7 @@ class AtCoderPacker(plus_commands.PackerBase):
     subtasks = testset.subtask_testcases
     if len(subtasks) > 0:
       score = '\n'.join([
-        s.name + '(' + str(s.score) + ')' + ': ' + ' '.join(s.input_patterns)
+        s.name + '(' + str(s.score) + ')' + ': ' + ','.join(s.input_patterns)
         for s in subtasks])
     else:
       score = 'All(100): *'
