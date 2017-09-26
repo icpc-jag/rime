@@ -123,9 +123,13 @@ class Project(targets.registry.Project):
 
     cc = os.getenv('CC', 'gcc')
     cxx = os.getenv('CXX', 'g++')
-    java_home = os.getenv('JAVA_HOME', '/usr')
-    java = os.path.join(java_home, 'bin/java')
-    javac = os.path.join(java_home, 'bin/javac')
+    java_home = os.getenv('JAVA_HOME')
+    if java_home is not None:
+      java = os.path.join(java_home, 'bin/java')
+      javac = os.path.join(java_home, 'bin/javac')
+    else:
+      java = 'java'
+      javac = 'javac'
     environments = '** Environments\n'
     environments += (
       ':gcc:|' + builtin_commands.getoutput('{0} --version'.format(cc)) +
