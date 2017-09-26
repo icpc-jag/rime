@@ -25,6 +25,7 @@
 import commands as builtin_commands
 import getpass
 import hashlib
+import os
 import os.path
 import socket
 import sys
@@ -120,15 +121,28 @@ class Project(targets.registry.Project):
     wiki += ''.join(wikiResults)
     wikiFull += ''.join(wikiFullResults)
 
+    cc = os.getenv('CC', 'gcc')
+    cxx = os.getenv('CXX', 'g++')
+    java_home = os.getenv('JAVA_HOME')
+    if java_home is not None:
+      java = os.path.join(java_home, 'bin/java')
+      javac = os.path.join(java_home, 'bin/javac')
+    else:
+      java = 'java'
+      javac = 'javac'
     environments = '** Environments\n'
     environments += (
-      ':gcc:|' + builtin_commands.getoutput('gcc --version') + '\n')
+      ':gcc:|' + builtin_commands.getoutput('{0} --version'.format(cc)) +
+      '\n')
     environments += (
-      ':g++:|' + builtin_commands.getoutput('g++ --version') + '\n')
+      ':g++:|' + builtin_commands.getoutput('{0} --version'.format(cxx)) +
+      '\n')
     environments += (
-      ':javac:|' + builtin_commands.getoutput('javac -version') + '\n')
+      ':javac:|' + builtin_commands.getoutput('{0} -version'.format(javac)) +
+      '\n')
     environments += (
-      ':java:|' + builtin_commands.getoutput('java -version') + '\n')
+      ':java:|' + builtin_commands.getoutput('{0} -version'.format(java)) +
+      '\n')
 
     errors = '** Error Messages\n'
     if ui.errors.HasError():

@@ -26,6 +26,7 @@ import codecs
 import commands as builtin_commands
 import getpass
 import hashlib
+import os
 import os.path
 import socket
 import sys
@@ -124,15 +125,28 @@ class Project(targets.registry.Project):
     html += '<tbody>' + ''.join(htmlResults) + '</tbody></table>\n'
     htmlFull += ''.join(htmlFullResults)
 
+    cc = os.getenv('CC', 'gcc')
+    cxx = os.getenv('CXX', 'g++')
+    java_home = os.getenv('JAVA_HOME')
+    if java_home is not None:
+      java = os.path.join(java_home, 'bin/java')
+      javac = os.path.join(java_home, 'bin/javac')
+    else:
+      java = 'java'
+      javac = 'javac'
     environments = '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
     environments += ('<dt>gcc:</dt><dd>' +
-                     builtin_commands.getoutput('gcc --version') + '</dd>\n')
+                     builtin_commands.getoutput('{0} --version'.format(cc)) +
+                     '</dd>\n')
     environments += ('<dt>g++:</dt><dd>' +
-                     builtin_commands.getoutput('g++ --version') + '</dd>\n')
+                     builtin_commands.getoutput('{0} --version'.format(cxx)) +
+                     '</dd>\n')
     environments += ('<dt>javac:</dt><dd>' +
-                     builtin_commands.getoutput('javac -version') + '</dd>\n')
+                     builtin_commands.getoutput('{0} -version').format(javac) +
+                     '</dd>\n')
     environments += ('<dt>java:</dt><dd>' +
-                     builtin_commands.getoutput('java -version') + '</dd>\n')
+                     builtin_commands.getoutput('{0} -version').format(java) +
+                     '</dd>\n')
     environments += '</dl>\n'
 
     errors = ''

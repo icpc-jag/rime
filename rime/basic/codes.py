@@ -22,6 +22,7 @@
 #
 
 import optparse
+import os
 import os.path
 import signal
 import subprocess
@@ -146,9 +147,10 @@ class CCode(CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, flags=['-lm']):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+    cc = os.getenv('CC', 'gcc')
     super(CCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['gcc',
+      compile_args=([cc,
                      '-o', os.path.join(out_dir, exe_name),
                      src_name] + list(flags)),
       run_args=[os.path.join(out_dir, exe_name)])
@@ -160,9 +162,10 @@ class CXXCode(CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+    cxx = os.getenv('CXX', 'g++')
     super(CXXCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['g++',
+      compile_args=([cxx,
                      '-o', os.path.join(out_dir, exe_name),
                      src_name] + list(flags)),
       run_args=[os.path.join(out_dir, exe_name)])
@@ -175,12 +178,19 @@ class JavaCode(CodeBase):
   def __init__(self, src_name, src_dir, out_dir,
                compile_flags=[], run_flags=[],
                encoding='UTF-8', mainclass='Main'):
+    java_home = os.getenv('JAVA_HOME')
+    if java_home is not None:
+      java = os.path.join(java_home, 'bin/java')
+      javac = os.path.join(java_home, 'bin/javac')
+    else:
+      java = 'java'
+      javac = 'javac'
     super(JavaCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['javac', '-encoding', encoding,
+      compile_args=([javac, '-encoding', encoding,
                      '-d', files.ConvPath(out_dir)] +
                     compile_flags + [src_name]),
-      run_args=(['java', '-Dline.separator=\n',
+      run_args=([java, '-Dline.separator=\n',
                  '-cp', files.ConvPath(out_dir)] +
                 run_flags + [mainclass]))
 
