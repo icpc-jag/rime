@@ -25,6 +25,7 @@
 import commands as builtin_commands
 import getpass
 import hashlib
+import os
 import os.path
 import socket
 import sys
@@ -120,11 +121,15 @@ class Project(targets.registry.Project):
     wiki += ''.join(wikiResults)
     wikiFull += ''.join(wikiFullResults)
 
+    cc = os.getenv('CC', 'gcc')
+    cxx = os.getenv('CXX', 'g++')
     environments = '** Environments\n'
     environments += (
-      ':gcc:|' + builtin_commands.getoutput('gcc --version') + '\n')
+      ':gcc:|' + builtin_commands.getoutput('{0} --version'.format(cc)) +
+      '\n')
     environments += (
-      ':g++:|' + builtin_commands.getoutput('g++ --version') + '\n')
+      ':g++:|' + builtin_commands.getoutput('{0} --version'.format(cxx)) +
+      '\n')
     environments += (
       ':javac:|' + builtin_commands.getoutput('javac -version') + '\n')
     environments += (

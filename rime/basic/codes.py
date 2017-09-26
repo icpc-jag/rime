@@ -22,6 +22,7 @@
 #
 
 import optparse
+import os
 import os.path
 import signal
 import subprocess
@@ -146,9 +147,10 @@ class CCode(CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, flags=['-lm']):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+    cc = os.getenv('CC', 'gcc')
     super(CCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['gcc',
+      compile_args=([cc,
                      '-o', os.path.join(out_dir, exe_name),
                      src_name] + list(flags)),
       run_args=[os.path.join(out_dir, exe_name)])
@@ -160,9 +162,10 @@ class CXXCode(CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+    cxx = os.getenv('CXX', 'g++')
     super(CXXCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['g++',
+      compile_args=([cxx,
                      '-o', os.path.join(out_dir, exe_name),
                      src_name] + list(flags)),
       run_args=[os.path.join(out_dir, exe_name)])
