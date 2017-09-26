@@ -178,12 +178,15 @@ class JavaCode(CodeBase):
   def __init__(self, src_name, src_dir, out_dir,
                compile_flags=[], run_flags=[],
                encoding='UTF-8', mainclass='Main'):
+    java_home = os.getenv('JAVA_HOME', '/usr')
+    java = os.path.join(java_home, 'bin/java')
+    javac = os.path.join(java_home, 'bin/javac')
     super(JavaCode, self).__init__(
       src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['javac', '-encoding', encoding,
+      compile_args=([javac, '-encoding', encoding,
                      '-d', files.ConvPath(out_dir)] +
                     compile_flags + [src_name]),
-      run_args=(['java', '-Dline.separator=\n',
+      run_args=([java, '-Dline.separator=\n',
                  '-cp', files.ConvPath(out_dir)] +
                 run_flags + [mainclass]))
 

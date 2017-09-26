@@ -123,6 +123,9 @@ class Project(targets.registry.Project):
 
     cc = os.getenv('CC', 'gcc')
     cxx = os.getenv('CXX', 'g++')
+    java_home = os.getenv('JAVA_HOME', '/usr')
+    java = os.path.join(java_home, 'bin/java')
+    javac = os.path.join(java_home, 'bin/javac')
     environments = '** Environments\n'
     environments += (
       ':gcc:|' + builtin_commands.getoutput('{0} --version'.format(cc)) +
@@ -131,9 +134,11 @@ class Project(targets.registry.Project):
       ':g++:|' + builtin_commands.getoutput('{0} --version'.format(cxx)) +
       '\n')
     environments += (
-      ':javac:|' + builtin_commands.getoutput('javac -version') + '\n')
+      ':javac:|' + builtin_commands.getoutput('{0} -version'.format(javac)) +
+      '\n')
     environments += (
-      ':java:|' + builtin_commands.getoutput('java -version') + '\n')
+      ':java:|' + builtin_commands.getoutput('{0} -version'.format(java)) +
+      '\n')
 
     errors = '** Error Messages\n'
     if ui.errors.HasError():

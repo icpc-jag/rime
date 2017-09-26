@@ -127,6 +127,9 @@ class Project(targets.registry.Project):
 
     cc = os.getenv('CC', 'gcc')
     cxx = os.getenv('CXX', 'g++')
+    java_home = os.getenv('JAVA_HOME', '/usr')
+    java = os.path.join(java_home, 'bin/java')
+    javac = os.path.join(java_home, 'bin/javac')
     environments = '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
     environments += ('<dt>gcc:</dt><dd>' +
                      builtin_commands.getoutput('{0} --version'.format(cc)) +
@@ -135,9 +138,11 @@ class Project(targets.registry.Project):
                      builtin_commands.getoutput('{0} --version'.format(cxx)) +
                      '</dd>\n')
     environments += ('<dt>javac:</dt><dd>' +
-                     builtin_commands.getoutput('javac -version') + '</dd>\n')
+                     builtin_commands.getoutput('{0} -version').format(javac) +
+                     '</dd>\n')
     environments += ('<dt>java:</dt><dd>' +
-                     builtin_commands.getoutput('java -version') + '</dd>\n')
+                     builtin_commands.getoutput('{0} -version').format(java) +
+                     '</dd>\n')
     environments += '</dl>\n'
 
     errors = ''
