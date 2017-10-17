@@ -22,24 +22,24 @@
 # THE SOFTWARE.
 #
 
+import cookielib
 import os
 import os.path
-import cookielib
 import re
 import time
 import urllib
 import urllib2
 
+from rime.basic import codes as basic_codes
+from rime.basic import consts
 import rime.basic.targets.problem   # NOQA
 import rime.basic.targets.project   # NOQA
 import rime.basic.targets.solution  # NOQA
 import rime.basic.targets.testset   # NOQA
-from rime.basic import codes as basic_codes
-from rime.basic import consts
 from rime.core import targets
 from rime.core import taskgraph
-from rime.util import files
 from rime.plugins.plus import commands as plus_commands
+from rime.util import files
 
 # opener with cookiejar
 cookiejar = cookielib.CookieJar()
@@ -123,7 +123,7 @@ class AtCoderPacker(plus_commands.PackerBase):
       files.MakeDir(os.path.join(testset.atcoder_pack_dir, 'in'))
       files.MakeDir(os.path.join(testset.atcoder_pack_dir, 'out'))
       files.MakeDir(os.path.join(testset.atcoder_pack_dir, 'etc'))
-    except:
+    except Exception:
       ui.errors.Exception(testset)
       yield False
     for (i, testcase) in enumerate(testcases):
@@ -146,7 +146,7 @@ class AtCoderPacker(plus_commands.PackerBase):
           progress=True)
         files.CopyFile(os.path.join(testset.out_dir, difffile),
                        os.path.join(testset.atcoder_pack_dir, packed_difffile))
-      except:
+      except Exception:
         ui.errors.Exception(testset)
         yield False
 
@@ -243,7 +243,7 @@ class AtCoderUploader(plus_commands.UploaderBase):
         stdin=devnull, stdout=logfile, stderr=logfile, exclusive=True)
       try:
         proc = yield task
-      except:
+      except Exception:
         ui.errors.Exception(problem)
         yield False
       ret = proc.returncode

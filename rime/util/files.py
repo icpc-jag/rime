@@ -24,11 +24,11 @@
 
 from __future__ import with_statement
 import datetime
-import shutil
 import os
 import os.path
 import pickle
 import platform
+import shutil
 import subprocess
 
 
@@ -64,7 +64,7 @@ def RemoveTree(dir):
 def GetModified(file):
   try:
     return datetime.datetime.fromtimestamp(os.path.getmtime(file))
-  except:
+  except Exception:
     return datetime.datetime.min
 
 
@@ -88,7 +88,7 @@ def ListDir(dir, recursive=False):
         if os.path.isdir(subdir):
           files += [os.path.join(subfile, s)
                     for s in ListDir(subdir, True)]
-  except:
+  except Exception:
     pass
   return files
 
@@ -112,7 +112,7 @@ def ConvPath(path):
     newpath = p.communicate()[0].rstrip('\r\n')
     if p.returncode == 0:
       return newpath
-  except:
+  except Exception:
     pass
   return path
 
@@ -137,7 +137,7 @@ def ReadFile(name):
   try:
     with open(name, 'r') as f:
       return f.read()
-  except:
+  except Exception:
     return None
 
 
@@ -146,7 +146,7 @@ def WriteFile(content, name):
     with open(name, 'w') as f:
       f.write(content)
     return True
-  except:
+  except Exception:
     return False
 
 
@@ -155,5 +155,5 @@ def AppendFile(content, name):
     with open(name, 'a') as f:
       f.write(content)
       return True
-  except:
+  except Exception:
     return False

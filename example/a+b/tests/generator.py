@@ -12,7 +12,7 @@ def Generate(a, b):
   global seq
   filename = '50-random%02d.in' % seq
   with open(filename, 'w') as f:
-    print >>f, a, b
+    f.write('{} {}\n'.format(a, b))
   seq += 1
 
 

@@ -22,7 +22,6 @@
 # THE SOFTWARE.
 #
 
-import commands as builtin_commands
 import getpass
 import re
 import socket
@@ -31,9 +30,14 @@ import urllib
 import urllib2
 import urlparse
 
+if sys.version_info[0] == 2:
+  import commands as builtin_commands  # NOQA
+else:
+  import subprocess as builtin_commands
+
+from rime.basic import codes as basic_codes
 import rime.basic.targets.problem  # NOQA
 import rime.basic.targets.project  # NOQA
-from rime.basic import codes as basic_codes
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
@@ -159,9 +163,9 @@ class Project(targets.registry.Project):
     else:
       cell_judge = CELL_NA
     # Done.
-    yield (('|[[%(title)s>%(wiki_name)s]]|%(assignees)s|'
-            '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
-            '%(cell_validator)s|%(cell_judge)s|\n') % locals())
+    yield ('|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
+      title, wiki_name, assignees, cell_solutions, cell_input,
+      cell_output, cell_validator, cell_judge))
 
   def _UploadWiki(self, wiki, ui):
     url = self.wikify_url

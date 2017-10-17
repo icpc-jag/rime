@@ -22,7 +22,6 @@
 # THE SOFTWARE.
 #
 
-import commands as builtin_commands
 import getpass
 import hashlib
 import os
@@ -30,10 +29,15 @@ import os.path
 import socket
 import sys
 
-import rime.basic.targets.project  # NOQA
-import rime.basic.test
+if sys.version_info[0] == 2:
+  import commands as builtin_commands  # NOQA
+else:
+  import subprocess as builtin_commands
+
 from rime.basic import codes as basic_codes
 from rime.basic import consts
+import rime.basic.targets.project  # NOQA
+import rime.basic.test
 from rime.basic import test
 from rime.core import commands as rime_commands
 from rime.core import targets
@@ -280,9 +284,9 @@ class Project(targets.registry.Project):
       cell_judge = CELL_NA
 
     # Done.
-    wiki = (('|[[%(title)s>%(wiki_name)s]]|%(assignees)s|'
-             '%(cell_solutions)s|%(cell_input)s|%(cell_output)s|'
-             '%(cell_validator)s|%(cell_judge)s|\n') % locals())
+    wiki = ('|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
+      title, wiki_name, assignees, cell_solutions, cell_input,
+      cell_output, cell_validator, cell_judge))
 
     yield (wiki, wikiFull)
 

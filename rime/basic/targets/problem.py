@@ -168,7 +168,7 @@ class Problem(targets.TargetBase):
     if success:
       try:
         files.RemoveTree(self.out_dir)
-      except:
+      except Exception:
         ui.errors.Exception(self)
         success = False
     yield success
@@ -194,7 +194,7 @@ class ProblemComponentMixin(object):
     try:
       files.CreateEmptyFile(self.stamp_file)
       return True
-    except:
+    except Exception:
       ui.errors.Exception(self)
       return False
 

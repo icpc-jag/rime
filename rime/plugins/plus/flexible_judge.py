@@ -24,8 +24,8 @@
 import os.path
 
 from rime.basic import consts
-from rime.basic import test
 import rime.basic.targets.testset  # NOQA
+from rime.basic import test
 from rime.core import codes as core_codes
 from rime.core import targets
 from rime.core import taskgraph
@@ -184,9 +184,7 @@ class Testset(targets.registry.Testset):
 
   @taskgraph.task_method
   def _RunReferenceSolutionOne(self, reference_solution, testcase, ui):
-    """
-    Run the reference solution against a single input file.
-    """
+    """Run the reference solution against a single input file."""
     if os.path.isfile(testcase.difffile):
       yield True
     # reactive

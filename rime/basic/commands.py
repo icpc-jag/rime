@@ -24,14 +24,14 @@
 import os
 import os.path
 
-from rime.core import commands
-from rime.core import taskgraph
 from rime.basic import consts
 from rime.basic.targets import problem
 from rime.basic.targets import project
 from rime.basic.targets import solution
 from rime.basic.targets import testset
 from rime.basic.util import test_summary
+from rime.core import commands
+from rime.core import taskgraph
 
 
 # Register the root command and global options.

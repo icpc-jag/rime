@@ -23,7 +23,6 @@
 #
 
 import codecs
-import commands as builtin_commands
 import getpass
 import hashlib
 import os
@@ -31,9 +30,14 @@ import os.path
 import socket
 import sys
 
-import rime.basic.targets.project  # NOQA
+if sys.version_info[0] == 2:
+  import commands as builtin_commands  # NOQA
+else:
+  import subprocess as builtin_commands
+
 from rime.basic import codes as basic_codes
 from rime.basic import consts
+import rime.basic.targets.project  # NOQA
 from rime.basic import test
 from rime.core import commands as rime_commands
 from rime.core import targets
@@ -283,10 +287,10 @@ class Project(targets.registry.Project):
       cell_judge = HTMLIFY_CELL_NA
 
     # Done.
-    html = (('<tr><td>%(title)s</td><td>%(assignees)s</td><td'
-             '%(cell_solutions)s</td><td%(cell_input)s</td>'
-             '<td%(cell_output)s</td><td'
-             '%(cell_validator)s</td><td%(cell_judge)s<td></tr>\n') % locals())
+    html = ('<tr><td>{}</td><td>{}</td><td{}</td><td{}</td>'
+            '<td{}</td><td{}</td><td{}<td></tr>\n'.format(
+              title, assignees, cell_solutions, cell_input,
+              cell_output, cell_validator, cell_judge))
 
     yield (html, htmlFull)
 

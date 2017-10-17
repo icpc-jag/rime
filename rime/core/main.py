@@ -163,7 +163,7 @@ def Main(args):
   except KeyboardInterrupt:
     # Suppress stack trace when interrupted by Ctrl-C
     return 1
-  except:
+  except Exception:
     # Print stack trace for debug.
     exc = sys.exc_info()
     sys.excepthook(*exc)

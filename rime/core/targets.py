@@ -107,8 +107,7 @@ class TargetBase(object):
     pass
 
   def FindByBaseDir(self, base_dir):
-    """Search whole subtree under this object and return the object with
-    matching base_dir.
+    """Search whole subtree and return the object with matching base_dir.
 
     Subclasses may want to override this method for recursive search.
     """

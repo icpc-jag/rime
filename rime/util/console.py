@@ -66,9 +66,9 @@ class ConsoleBase(object):
     progress = bool(kwargs.get('progress'))
     msg = ''.join(args)
     if self._last_progress and self.caps.overwrite:
-      print >>self.out, self.UP + '\r' + msg + self.KILL
+      self.out.write(self.UP + '\r' + msg + self.KILL + '\n')
     else:
-      print >>self.out, msg
+      self.out.write(msg + '\n')
     self._last_progress = progress
 
   def PrintAction(self, action, obj, *args, **kwargs):
@@ -118,7 +118,7 @@ class TtyConsole(ConsoleBase):
         curses.setupterm()
         caps.overwrite = bool(curses.tigetstr('cuu1'))
         caps.color = bool(curses.tigetstr('setaf'))
-      except:
+      except Exception:
         pass
     return caps
 

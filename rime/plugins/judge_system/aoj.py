@@ -24,13 +24,13 @@
 import os
 import os.path
 
-import rime.basic.targets.testset   # NOQA
-from rime.basic import consts
 from rime.basic import codes as basic_codes
+from rime.basic import consts
+import rime.basic.targets.testset   # NOQA
 from rime.core import targets
 from rime.core import taskgraph
-from rime.util import files
 from rime.plugins.plus import commands as plus_commands
+from rime.util import files
 
 
 class Testset(targets.registry.Testset):
@@ -46,7 +46,7 @@ class AOJPacker(plus_commands.PackerBase):
     try:
       files.RemoveTree(testset.aoj_pack_dir)
       files.MakeDir(testset.aoj_pack_dir)
-    except:
+    except Exception:
       ui.errors.Exception(testset)
       yield False
     for (i, testcase) in enumerate(testcases):
@@ -69,7 +69,7 @@ class AOJPacker(plus_commands.PackerBase):
           progress=True)
         files.CopyFile(os.path.join(testset.out_dir, difffile),
                        os.path.join(testset.aoj_pack_dir, packed_difffile))
-      except:
+      except Exception:
         ui.errors.Exception(testset)
         yield False
 
@@ -77,7 +77,8 @@ class AOJPacker(plus_commands.PackerBase):
     files.WriteFile(str(len(testcases)),
                     os.path.join(testset.aoj_pack_dir, 'case.txt'))
 
-    # build.sh (TODO: reactive)
+    # build.sh
+    # TODO(mizuno): reactive
     checker = testset.judges[0]
     if (len(testset.judges) == 1 and
             not isinstance(checker, basic_codes.InternalDiffCode)):

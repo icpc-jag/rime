@@ -30,17 +30,17 @@ import subprocess
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts
+import rime.basic.targets.problem  # NOQA
+import rime.basic.targets.project  # NOQA
+import rime.basic.targets.solution  # NOQA
+import rime.basic.targets.testset  # NOQA
 from rime.basic import test
 from rime.basic.util import test_summary
-import rime.basic.targets.project  # NOQA
-import rime.basic.targets.problem  # NOQA
-import rime.basic.targets.testset  # NOQA
-import rime.basic.targets.solution  # NOQA
 from rime.core import codes
 from rime.core import targets
 from rime.core import taskgraph
-from rime.util import files
 from rime.plugins.plus import rime_plus_version
+from rime.util import files
 
 libdir = None
 
@@ -350,9 +350,7 @@ class Testset(targets.registry.Testset):
 
   @taskgraph.task_method
   def _RunValidators(self, ui):
-    """
-    Run input validators.
-    """
+    """Run input validators."""
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
@@ -377,9 +375,7 @@ class Testset(targets.registry.Testset):
 
   @taskgraph.task_method
   def _RunValidatorForInvalidCasesOne(self, validator, testcase, ui):
-    """
-    Run an input validator against a single input file.
-    """
+    """Run an input validator against a single input file."""
     validationfile = (
       os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
     res = yield validator.Run(
@@ -692,7 +688,7 @@ def _TestsetHash(result):
     for t in result.problem.testset.ListTestCases():
       md5.update(files.ReadFile(t.infile))
     return md5.hexdigest()
-  except:
+  except Exception:
     return '-'
 
 
@@ -702,7 +698,7 @@ def _TestsetInSize(result):
     for t in result.problem.testset.ListTestCases():
       size += len(files.ReadFile(t.infile))
     return _SmartFileSize(size)
-  except:
+  except Exception:
     return '-'
 
 
@@ -715,7 +711,7 @@ def _TestsetDiffSize(result):
         os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
       size += len(files.ReadFile(out_file))
     return _SmartFileSize(size)
-  except:
+  except Exception:
     return '-'
 
 
@@ -723,7 +719,7 @@ def _SolutionSize(solution):
   try:
     src = os.path.join(solution.src_dir, solution.code.src_name)
     return _SmartFileSize(len(files.ReadFile(src)))
-  except:
+  except Exception:
     return '-'
 
 
@@ -731,7 +727,7 @@ def _SolutionLine(solution):
   try:
     src = os.path.join(solution.src_dir, solution.code.src_name)
     return str(sum(1 for line in open(src))) + ' lines'
-  except:
+  except Exception:
     return '-'
 
 

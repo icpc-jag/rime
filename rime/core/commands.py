@@ -149,7 +149,7 @@ class CommandBase(Command):
     if not rows:
       ui.console.Print(' No options.')
     else:
-      offset = max([len(left_col_head) for left_col_head, _ in rows])
+      offset = max(rows, key=lambda row: len(row[0]))
       for left_col_head, right_col_lines in rows:
         for i, right_col_line in enumerate(right_col_lines):
           left_col_line = string.ljust(
@@ -254,7 +254,7 @@ def Parse(argv, commands):
 
         try:
           optvalue = option.argtype(optvalue)
-        except:
+        except Exception:
           raise ParseError('Invalid option parameter for %s' % optfull)
 
         options[option.varname] = optvalue

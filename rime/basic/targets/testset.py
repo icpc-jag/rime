@@ -27,8 +27,8 @@ import re
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts
-from rime.basic import test
 from rime.basic.targets import problem
+from rime.basic import test
 from rime.core import codes as core_codes
 from rime.core import targets
 from rime.core import taskgraph
@@ -146,7 +146,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     try:
       files.RemoveTree(self.out_dir)
       files.CopyTree(self.src_dir, self.out_dir)
-    except:
+    except Exception:
       ui.errors.Exception(self)
       yield False
     yield True
@@ -174,9 +174,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _RunGenerators(self, ui):
-    """
-    Run all input generators.
-    """
+    """Run all input generators."""
     results = yield taskgraph.TaskBranch([
         self._RunGeneratorOne(generator, ui)
         for generator in self.generators])
@@ -184,9 +182,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _RunGeneratorOne(self, generator, ui):
-    """
-    Run a single input generator.
-    """
+    """Run a single input generator."""
     ui.console.PrintAction('GENERATE', self, generator.src_name)
     res = yield generator.Run(
       args=(), cwd=self.out_dir,
@@ -199,9 +195,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _CompileValidators(self, ui):
-    """
-    Compile input validators.
-    """
+    """Compile input validators."""
     results = yield taskgraph.TaskBranch([
         self._CompileValidatorOne(validator, ui)
         for validator in self.validators])
@@ -209,9 +203,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _CompileValidatorOne(self, validator, ui):
-    """
-    Compile a single input validator.
-    """
+    """Compile a single input validator."""
     if not validator.QUIET_COMPILE:
       ui.console.PrintAction('COMPILE', self, validator.src_name)
     res = yield validator.Compile()
@@ -224,9 +216,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _RunValidators(self, ui):
-    """
-    Run input validators.
-    """
+    """Run input validators."""
     if not self.validators:
       # Ignore when this testset actually does not exist.
       if self.base_dir:
@@ -244,9 +234,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _RunValidatorOne(self, validator, testcase, ui):
-    """
-    Run an input validator against a single input file.
-    """
+    """Run an input validator against a single input file."""
     validationfile = (
       os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
     res = yield validator.Run(
@@ -303,9 +291,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _RunReferenceSolution(self, ui):
-    """
-    Run the reference solution to generate reference outputs.
-    """
+    """Run the reference solution to generate reference outputs."""
     reference_solution = self.problem.reference_solution
     if reference_solution is None:
       ui.errors.Error(self, 'Reference solution unavailable')
@@ -321,9 +307,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
 
   @taskgraph.task_method
   def _RunReferenceSolutionOne(self, reference_solution, testcase, ui):
-    """
-    Run the reference solution against a single input file.
-    """
+    """Run the reference solution against a single input file."""
     if os.path.isfile(testcase.difffile):
       yield True
     # ui.console.PrintAction('REFRUN', reference_solution,
@@ -574,7 +558,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     ui.console.PrintAction('CLEAN', self)
     try:
       files.RemoveTree(self.out_dir)
-    except:
+    except Exception:
       ui.errors.Exception(self)
     yield True
 

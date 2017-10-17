@@ -24,10 +24,10 @@
 import os
 import os.path
 
+from rime.basic import consts
 import rime.basic.targets.problem  # NOQA
 import rime.basic.targets.project  # NOQA
 import rime.basic.targets.testset  # NOQA
-from rime.basic import consts
 from rime.core import commands
 from rime.core import targets
 from rime.core import taskgraph
@@ -67,7 +67,7 @@ class Testset(targets.registry.Testset):
     try:
       files.RemoveTree(self.pack_dir)
       files.MakeDir(self.pack_dir)
-    except:
+    except Exception:
       ui.errors.Exception(self)
       yield False
     for (i, testcase) in enumerate(testcases):
@@ -90,7 +90,7 @@ class Testset(targets.registry.Testset):
           progress=True)
         files.CopyFile(os.path.join(self.out_dir, difffile),
                        os.path.join(self.pack_dir, packed_difffile))
-      except:
+      except Exception:
         ui.errors.Exception(self)
         yield False
     tarball_filename = _PACKED_TARBALL_TEMPLATE % self.name
@@ -108,7 +108,7 @@ class Testset(targets.registry.Testset):
       stdin=devnull, stdout=devnull, stderr=devnull)
     try:
       proc = yield task
-    except:
+    except Exception:
       ui.errors.Exception(self)
       yield False
     ret = proc.returncode

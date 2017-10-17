@@ -283,7 +283,7 @@ class ExternalProcessTask(Task):
     if self.proc is not None:
       try:
         os.kill(self.proc.pid, signal.SIGKILL)
-      except:
+      except Exception:
         pass
       self.proc.wait()
       self.proc = None
@@ -295,7 +295,7 @@ class ExternalProcessTask(Task):
       def TimeoutKiller():
         try:
           os.kill(self.proc.pid, signal.SIGXCPU)
-        except:
+        except Exception:
           pass
       self.timer = threading.Timer(self.timeout, TimeoutKiller)
       self.timer.start()
@@ -347,17 +347,17 @@ class SerialTaskGraph(object):
             result = task.Throw(*value[1])
         except StopIteration:
           result = TaskReturn(None)
-        except:
+        except Exception:
           result = _TaskRaise(*sys.exc_info())
         if isinstance(result, TaskBranch):
           try:
             value = (True, [self._Run(subtask) for subtask in result.tasks])
-          except:
+          except Exception:
             value = (False, sys.exc_info())
         elif isinstance(result, Task):
           try:
             value = (True, self._Run(result))
-          except:
+          except Exception:
             value = (False, sys.exc_info())
         elif isinstance(result, TaskBlock):
           value = (True, None)
@@ -377,7 +377,7 @@ class SerialTaskGraph(object):
           break
       try:
         task.Close()
-      except:
+      except Exception:
         self.cache[task] = (False, sys.exc_info())
     if self.cache[task] is None:
       raise RuntimeError('Cyclic task dependency found')
@@ -507,7 +507,7 @@ class FiberTaskGraph(object):
     self._LogDebug('_ContinueTask: %s: entering' % task)
     try:
       result = task.Continue(value)
-    except:
+    except Exception:
       self._LogDebug('_ContinueTask: %s: exception raised' % task)
       self._ProcessTaskException(task, sys.exc_info())
     else:
@@ -520,7 +520,7 @@ class FiberTaskGraph(object):
     self._LogDebug('_ThrowTask: %s: entering' % task)
     try:
       result = task.Throw(*exc_info)
-    except:
+    except Exception:
       self._LogDebug('_ThrowTask: %s: exception raised' % task)
       self._ProcessTaskException(task, sys.exc_info())
     else:
@@ -551,7 +551,7 @@ class FiberTaskGraph(object):
     assert self.task_state[task] == RUNNING
     try:
       task.Close()
-    except:
+    except Exception:
       # Ignore the exception.
       pass
     self._ExceptTask(task, exc_info)
@@ -607,7 +607,7 @@ class FiberTaskGraph(object):
     assert self.task_state[task] == RUNNING
     try:
       task.Close()
-    except:
+    except Exception:
       self._ExceptTask(task, sys.exc_info())
       return
     self.cache[task] = (True, value)
@@ -742,7 +742,7 @@ class FiberTaskGraph(object):
     self._LogDebug('_InterruptTask: %s: interrupted' % task)
     try:
       task.Close()
-    except:
+    except Exception:
       pass
     # Simulate as if the task raised an exception.
     subtasks = []

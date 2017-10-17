@@ -25,15 +25,15 @@ import os
 import os.path
 from subprocess import call
 
+from rime.basic import commands as basic_commands
+from rime.basic import consts
 import rime.basic.targets.problem   # NOQA
 import rime.basic.targets.project   # NOQA
 import rime.basic.targets.solution  # NOQA
 import rime.basic.targets.testset   # NOQA
-from rime.basic import commands as basic_commands
-from rime.basic import consts
 from rime.core import commands
-from rime.core import taskgraph
 from rime.core import targets
+from rime.core import taskgraph
 from rime.util import class_registry
 from rime.util import files
 
