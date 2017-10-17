@@ -70,21 +70,21 @@ class Project(targets.registry.Project):
   def Build(self, ui):
     """Build all problems."""
     results = yield taskgraph.TaskBranch(
-      [problem.Build(ui) for problem in self.problems])
+        [problem.Build(ui) for problem in self.problems])
     yield all(results)
 
   @taskgraph.task_method
   def Test(self, ui):
     """Run tests in the project."""
     results = yield taskgraph.TaskBranch(
-      [problem.Test(ui) for problem in self.problems])
+        [problem.Test(ui) for problem in self.problems])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method
   def Clean(self, ui):
     """Clean the project."""
     results = yield taskgraph.TaskBranch(
-      [problem.Clean(ui) for problem in self.problems])
+        [problem.Clean(ui) for problem in self.problems])
     yield all(results)
 
 

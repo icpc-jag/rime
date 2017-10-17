@@ -92,8 +92,8 @@ def CreateTaskGraph(options):
     graph = taskgraph.SerialTaskGraph()
   else:
     graph = taskgraph.FiberTaskGraph(
-      parallelism=options.parallelism,
-      debug=options.debug)
+        parallelism=options.parallelism,
+        debug=options.debug)
   return graph
 
 

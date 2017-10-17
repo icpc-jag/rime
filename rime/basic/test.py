@@ -81,10 +81,10 @@ class TestsetResult(object):
     self.solution = solution
     self.testcases = testcases
     self.results = dict(
-      [(testcase,
-        TestCaseResult(solution, testcase, TestCaseResult.NA,
-                       time=None, cached=False))
-       for testcase in testcases])
+        [(testcase,
+          TestCaseResult(solution, testcase, TestCaseResult.NA,
+                         time=None, cached=False))
+         for testcase in testcases])
     assert len(self.results) == len(testcases)
     self.finalized = False
 

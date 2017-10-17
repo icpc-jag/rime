@@ -56,17 +56,17 @@ class AOJPacker(plus_commands.PackerBase):
       packed_difffile = 'out' + str(i + 1) + '.txt'
       try:
         ui.console.PrintAction(
-          'PACK',
-          testset,
-          '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
-          progress=True)
+            'PACK',
+            testset,
+            '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
+            progress=True)
         files.CopyFile(os.path.join(testset.out_dir, testcase.infile),
                        os.path.join(testset.aoj_pack_dir, packed_infile))
         ui.console.PrintAction(
-          'PACK',
-          testset,
-          '%s -> %s' % (os.path.basename(difffile), packed_difffile),
-          progress=True)
+            'PACK',
+            testset,
+            '%s -> %s' % (os.path.basename(difffile), packed_difffile),
+            progress=True)
         files.CopyFile(os.path.join(testset.out_dir, difffile),
                        os.path.join(testset.aoj_pack_dir, packed_difffile))
       except Exception:
@@ -126,16 +126,17 @@ PUBLICATION_DATE = datetime.datetime(*, *, *, *, *)
 '''
     if not isinstance(checker, basic_codes.InternalDiffCode):
       files.WriteFile(
-        aoj_conf.format(
-          'JUDGE_TYPE = \'special-validator\'', testset.problem.title),
-        os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
+          aoj_conf.format(
+              'JUDGE_TYPE = \'special-validator\'', testset.problem.title),
+          os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
     else:
       files.WriteFile(
-        aoj_conf.format(
-          'JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
-        os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
+          aoj_conf.format(
+              'JUDGE_TYPE = \'diff-validator\'', testset.problem.title),
+          os.path.join(testset.aoj_pack_dir, 'AOJCONF'))
 
     yield True
+
 
 targets.registry.Override('Testset', Testset)
 

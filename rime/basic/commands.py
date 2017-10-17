@@ -86,7 +86,7 @@ def RunCommon(method_name, project, args, ui):
 
   if not IsBasicTarget(obj):
     ui.errors.Error(
-      None, '%s is not supported for the specified target.' % method_name)
+        None, '%s is not supported for the specified target.' % method_name)
     return None
 
   return getattr(obj, method_name)(ui)
@@ -95,11 +95,11 @@ def RunCommon(method_name, project, args, ui):
 class Build(commands.CommandBase):
   def __init__(self, parent):
     super(Build, self).__init__(
-      'build',
-      '[<target>]',
-      'Build a target and its dependencies.',
-      consts.BUILD_HELP,
-      parent)
+        'build',
+        '[<target>]',
+        'Build a target and its dependencies.',
+        consts.BUILD_HELP,
+        parent)
 
   def Run(self, project, args, ui):
     return RunCommon('Build', project, args, ui)
@@ -108,11 +108,11 @@ class Build(commands.CommandBase):
 class Test(commands.CommandBase):
   def __init__(self, parent):
     super(Test, self).__init__(
-      'test',
-      '[<target>]',
-      'Run tests in a target.',
-      consts.TEST_HELP,
-      parent)
+        'test',
+        '[<target>]',
+        'Run tests in a target.',
+        consts.TEST_HELP,
+        parent)
 
   def Run(self, project, args, ui):
     task = RunCommon('Test', project, args, ui)
@@ -130,11 +130,11 @@ class Test(commands.CommandBase):
 class Clean(commands.CommandBase):
   def __init__(self, parent):
     super(Clean, self).__init__(
-      'clean',
-      '[<target>]',
-      'Clean intermediate files.',
-      consts.CLEAN_HELP,
-      parent)
+        'clean',
+        '[<target>]',
+        'Clean intermediate files.',
+        consts.CLEAN_HELP,
+        parent)
 
   def Run(self, project, args, ui):
     return RunCommon('Clean', project, args, ui)

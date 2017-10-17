@@ -62,17 +62,17 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     self.validators = []
     self.judges = []
     self.exports.update(
-      core_codes.CreateDictionary('%s_generator', self.generators,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir))
+        core_codes.CreateDictionary('%s_generator', self.generators,
+                                    src_dir=self.src_dir,
+                                    out_dir=self.out_dir))
     self.exports.update(
-      core_codes.CreateDictionary('%s_validator', self.validators,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir))
+        core_codes.CreateDictionary('%s_validator', self.validators,
+                                    src_dir=self.src_dir,
+                                    out_dir=self.out_dir))
     self.exports.update(
-      core_codes.CreateDictionary('%s_judge', self.judges,
-                                  src_dir=self.src_dir,
-                                  out_dir=self.out_dir))
+        core_codes.CreateDictionary('%s_judge', self.judges,
+                                    src_dir=self.src_dir,
+                                    out_dir=self.out_dir))
 
   def PostLoad(self, ui):
     if not self.judges:
@@ -167,7 +167,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     res = yield generator.Compile()
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(
-        self, '%s: Compile Error (%s)' % (generator.src_name, res.status))
+          self, '%s: Compile Error (%s)' % (generator.src_name, res.status))
       ui.console.PrintLog(generator.ReadCompileLog())
       raise taskgraph.Bailout([False])
     yield True
@@ -185,8 +185,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     """Run a single input generator."""
     ui.console.PrintAction('GENERATE', self, generator.src_name)
     res = yield generator.Run(
-      args=(), cwd=self.out_dir,
-      input=os.devnull, output=os.devnull, timeout=None, precise=False)
+        args=(), cwd=self.out_dir,
+        input=os.devnull, output=os.devnull, timeout=None, precise=False)
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(self,
                       '%s: %s' % (generator.src_name, res.status))
@@ -209,7 +209,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     res = yield validator.Compile()
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(
-        self, '%s: Compile Error (%s)' % (validator.src_name, res.status))
+          self, '%s: Compile Error (%s)' % (validator.src_name, res.status))
       ui.console.PrintLog(validator.ReadCompileLog())
       raise taskgraph.Bailout([False])
     yield True
@@ -236,16 +236,16 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   def _RunValidatorOne(self, validator, testcase, ui):
     """Run an input validator against a single input file."""
     validationfile = (
-      os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
+        os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
     res = yield validator.Run(
-      args=(), cwd=self.out_dir,
-      input=testcase.infile,
-      output=validationfile,
-      timeout=None, precise=False,
-      redirect_error=True)
+        args=(), cwd=self.out_dir,
+        input=testcase.infile,
+        output=validationfile,
+        timeout=None, precise=False,
+        redirect_error=True)
     if res.status == core_codes.RunResult.NG:
       ui.errors.Error(
-        self, '%s: Validation Failed' % os.path.basename(testcase.infile))
+          self, '%s: Validation Failed' % os.path.basename(testcase.infile))
       log = files.ReadFile(validationfile)
       ui.console.PrintLog(log)
       raise taskgraph.Bailout([False])
@@ -275,7 +275,7 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     res = yield judge.Compile()
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(
-        self, '%s: Compile Error (%s)' % (judge.src_name, res.status))
+          self, '%s: Compile Error (%s)' % (judge.src_name, res.status))
       ui.console.PrintLog(judge.ReadCompileLog())
       yield False
     yield True
@@ -313,10 +313,10 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     # ui.console.PrintAction('REFRUN', reference_solution,
     #                        testcase.infile, progress=True)
     res = yield reference_solution.Run(
-      args=(), cwd=self.out_dir,
-      input=testcase.infile,
-      output=testcase.difffile,
-      timeout=None, precise=False)
+        args=(), cwd=self.out_dir,
+        input=testcase.infile,
+        output=testcase.difffile,
+        timeout=None, precise=False)
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(reference_solution, res.status)
       raise taskgraph.Bailout([False])
@@ -333,7 +333,8 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
   def Test(self, ui):
     """Run tests in the testset."""
     results = yield taskgraph.TaskBranch(
-      [self.TestSolution(solution, ui) for solution in self.problem.solutions])
+        [self.TestSolution(solution, ui) for solution in
+         self.problem.solutions])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method
@@ -481,9 +482,9 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
       if solution.IsCorrect():
         if case_result.verdict == test.TestCaseResult.WA:
           judgefile = os.path.join(
-            solution.out_dir,
-            os.path.splitext(os.path.basename(testcase.infile))[0] +
-            consts.JUDGE_EXT)
+              solution.out_dir,
+              os.path.splitext(os.path.basename(testcase.infile))[0] +
+              consts.JUDGE_EXT)
           ui.errors.Error(solution,
                           '%s\n  judge log: %s' % (result.detail, judgefile))
         else:
@@ -516,16 +517,16 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     Returns TestCaseResult.
     """
     outfile, judgefile = [
-      os.path.join(
-        solution.out_dir,
-        os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-      for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
+        os.path.join(
+            solution.out_dir,
+            os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+        for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     res = yield solution.Run(
-      args=(), cwd=solution.out_dir,
-      input=testcase.infile,
-      output=outfile,
-      timeout=testcase.timeout, precise=precise)
+        args=(), cwd=solution.out_dir,
+        input=testcase.infile,
+        output=outfile,
+        timeout=testcase.timeout, precise=precise)
     if res.status == core_codes.RunResult.TLE:
       yield test.TestCaseResult(solution, testcase, test.TestCaseResult.TLE,
                                 time=None, cached=False)
@@ -535,20 +536,20 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
     time = res.time
     for judge in self.judges:
       res = yield judge.Run(
-        args=('--infile', testcase.infile,
-              '--difffile', testcase.difffile,
-              '--outfile', outfile),
-        cwd=self.out_dir,
-        input=os.devnull,
-        output=judgefile,
-        timeout=None, precise=False)
+          args=('--infile', testcase.infile,
+                '--difffile', testcase.difffile,
+                '--outfile', outfile),
+          cwd=self.out_dir,
+          input=os.devnull,
+          output=judgefile,
+          timeout=None, precise=False)
       if res.status == core_codes.RunResult.NG:
         yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
                                   time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
         yield test.TestCaseResult(
-          solution, testcase, test.TestVerdict('Validator %s' % res.status),
-          time=None, cached=False)
+            solution, testcase, test.TestVerdict('Validator %s' % res.status),
+            time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
 

@@ -103,7 +103,7 @@ class Project(targets.registry.Project):
 
     # Get system information.
     rev = SafeUnicode(builtin_commands.getoutput(
-      'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
+        'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
@@ -187,11 +187,11 @@ class Project(targets.registry.Project):
     solutionnames = [solution.name for solution in solutions]
 
     captions = [
-      name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
+        name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
     htmlFull += ('<table class="table">\n<thead><tr><th>' +
                  '</th><th>'.join(
-                   ['testcase', 'in', 'diff', 'md5'] + captions +
-                   ['Comments']) + '</th></tr></thead>\n<tbody>\n')
+                     ['testcase', 'in', 'diff', 'md5'] + captions +
+                     ['Comments']) + '</th></tr></thead>\n<tbody>\n')
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -218,14 +218,14 @@ class Project(targets.registry.Project):
       rows.append(
           '<tr><td' +
           '</td><td'.join(
-            [
-              '>' + casename.replace('_', ' ').replace('-', ' '),
-              '>' + GetFileSize(dir, casename + consts.IN_EXT),
-              '>' + GetFileSize(dir, casename + consts.DIFF_EXT),
-              '>' + GetFileHash(dir, casename + consts.IN_EXT)
-            ] +
-            [self._GetHtmlifyMessage(*t) for t in cols] +
-            ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
+              [
+                  '>' + casename.replace('_', ' ').replace('-', ' '),
+                  '>' + GetFileSize(dir, casename + consts.IN_EXT),
+                  '>' + GetFileSize(dir, casename + consts.DIFF_EXT),
+                  '>' + GetFileHash(dir, casename + consts.IN_EXT)
+              ] +
+              [self._GetHtmlifyMessage(*t) for t in cols] +
+              ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
           ) +
           '</td></tr>\n')
     htmlFull += ''.join(rows)
@@ -289,8 +289,8 @@ class Project(targets.registry.Project):
     # Done.
     html = ('<tr><td>{}</td><td>{}</td><td{}</td><td{}</td>'
             '<td{}</td><td{}</td><td{}<td></tr>\n'.format(
-              title, assignees, cell_solutions, cell_input,
-              cell_output, cell_validator, cell_judge))
+                title, assignees, cell_solutions, cell_input,
+                cell_output, cell_validator, cell_judge))
 
     yield (html, htmlFull)
 
@@ -321,7 +321,7 @@ class HtmlifyFull(rime_commands.CommandBase):
       return obj.HtmlifyFull(ui)
 
     ui.console.PrintError(
-      'Htmlify_full is not supported for the specified target.')
+        'Htmlify_full is not supported for the specified target.')
     return None
 
 

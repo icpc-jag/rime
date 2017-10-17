@@ -45,14 +45,14 @@ class TestMerger(object):
     difffiles = [os.path.splitext(infile)[0] + consts.DIFF_EXT
                  for infile in infiles]
     ui.console.PrintAction(
-      'MERGE', merged_testcase.testset,
-      'Generating %s' % os.path.basename(merged_testcase.infile),
-      progress=True)
+        'MERGE', merged_testcase.testset,
+        'Generating %s' % os.path.basename(merged_testcase.infile),
+        progress=True)
     self._ConcatenateIn(infiles, merged_testcase.infile)
     ui.console.PrintAction(
-      'MERGE', merged_testcase.testset,
-      'Generating %s' % os.path.basename(merged_testcase.difffile),
-      progress=True)
+        'MERGE', merged_testcase.testset,
+        'Generating %s' % os.path.basename(merged_testcase.difffile),
+        progress=True)
     self._ConcatenateDiff(difffiles, merged_testcase.difffile)
 
   def _ConcatenateIn(self, srcs, dst):
@@ -77,7 +77,7 @@ class ICPCMerger(TestMerger):
     self.input_terminator = input_terminator
     if self.input_terminator and not self.input_terminator.endswith('\n'):
       raise RuntimeError(
-        'icpc_merger(): input_terminator is not ending with \\n.')
+          'icpc_merger(): input_terminator is not ending with \\n.')
 
   def _ConcatenateIn(self, srcs, dst):
     with open(dst, 'w') as f:
@@ -98,6 +98,7 @@ class GCJMerger(TestMerger):
       for i, src in enumerate(srcs):
         f.write(files.ReadFile(src))
 
+
 test_merger_registry = class_registry.ClassRegistry(TestMerger)
 test_merger_registry.Add(ICPCMerger)
 test_merger_registry.Add(GCJMerger)
@@ -106,8 +107,8 @@ test_merger_registry.Add(GCJMerger)
 class MergedTestCase(test.TestCase):
   def __init__(self, testset, name, input_pattern):
     super(MergedTestCase, self).__init__(
-      testset,
-      os.path.join(testset.out_dir, '{0}{1}'.format(name, consts.IN_EXT)))
+        testset,
+        os.path.join(testset.out_dir, '{0}{1}'.format(name, consts.IN_EXT)))
     self.input_pattern = input_pattern
 
   @property
@@ -204,7 +205,7 @@ class Testset(targets.registry.Testset):
   @taskgraph.task_method
   def _TestSolutionWithAllCases(self, solution, ui):
     original_result = (
-      yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
+        yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
     if (original_result.expected and
             solution.IsCorrect() and
             self.merged_testcases):
@@ -212,8 +213,9 @@ class Testset(targets.registry.Testset):
       original_result.results.update(merged_result.results)
       if not merged_result.expected:
         original_result.Finalize(
-          False, detail=merged_result.detail,
-          notable_testcase=merged_result.notable_testcase, allow_override=True)
+            False, detail=merged_result.detail,
+            notable_testcase=merged_result.notable_testcase,
+            allow_override=True)
       else:
         if merged_result.IsTimingValid(ui):
           detail = ('%s, %s' %

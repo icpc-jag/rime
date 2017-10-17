@@ -27,11 +27,11 @@ from rime.core import commands
 class Example(commands.CommandBase):
   def __init__(self, parent):
     super(Example, self).__init__(
-      'example',
-      '',
-      'Example command.',
-      'Example help.',
-      parent)
+        'example',
+        '',
+        'Example command.',
+        'Example help.',
+        parent)
 
   def Run(self, project, args, ui):
     ui.console.Print('Hello, world!')
@@ -46,5 +46,6 @@ class Example(commands.CommandBase):
     ui.console.Print('Options:')
     for key, value in ui.options.items():
       ui.console.Print('  options.%s = %s' % (key, value))
+
 
 commands.registry.Add(Example)

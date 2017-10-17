@@ -90,8 +90,8 @@ class ErrorRecorder(object):
     for e in self.warnings:
       self.ui.console.PrintWarning(e)
     self.ui.console.Print(
-      'Total %d errors, %d warnings' %
-      (len(self.errors), len(self.warnings)))
+        'Total %d errors, %d warnings' %
+        (len(self.errors), len(self.warnings)))
 
   def _FormatErrorMessage(self, source, reason, exc_info):
     msg, stacktrace = '', None

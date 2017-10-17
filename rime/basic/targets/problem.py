@@ -121,9 +121,9 @@ class Problem(targets.TargetBase):
           break
       if self.reference_solution is None:
         ui.errors.Error(
-          self,
-          ('Reference solution "%s" does not exist' %
-           reference_solution_name))
+            self,
+            ('Reference solution "%s" does not exist' %
+             reference_solution_name))
 
   def FindByBaseDir(self, base_dir):
     if self.base_dir == base_dir:
@@ -142,22 +142,22 @@ class Problem(targets.TargetBase):
   def Build(self, ui):
     """Build all solutions and the testset."""
     results = yield taskgraph.TaskBranch(
-      [solution.Build(ui) for solution in self.solutions] +
-      [self.testset.Build(ui)])
+        [solution.Build(ui) for solution in self.solutions] +
+        [self.testset.Build(ui)])
     yield all(results)
 
   @taskgraph.task_method
   def Test(self, ui):
     """Run tests in the problem."""
     results = yield taskgraph.TaskBranch(
-      [testset.Test(ui) for testset in self.testsets])
+        [testset.Test(ui) for testset in self.testsets])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method
   def TestSolution(self, solution, ui):
     """Run tests in the problem."""
     results = yield taskgraph.TaskBranch(
-      [testset.TestSolution(solution, ui) for testset in self.testsets])
+        [testset.TestSolution(solution, ui) for testset in self.testsets])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method

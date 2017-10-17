@@ -41,7 +41,7 @@ class Project(targets.registry.Project):
   @taskgraph.task_method
   def Pack(self, ui):
     results = yield taskgraph.TaskBranch(
-      [problem.Pack(ui) for problem in self.problems])
+        [problem.Pack(ui) for problem in self.problems])
     yield all(results)
 
 
@@ -49,7 +49,7 @@ class Problem(targets.registry.Problem):
   @taskgraph.task_method
   def Pack(self, ui):
     results = yield taskgraph.TaskBranch(
-      [testset.Pack(ui) for testset in self.testsets])
+        [testset.Pack(ui) for testset in self.testsets])
     yield all(results)
 
 
@@ -77,17 +77,17 @@ class Testset(targets.registry.Testset):
       packed_difffile = str(i + 1) + consts.DIFF_EXT
       try:
         ui.console.PrintAction(
-          'PACK',
-          self,
-          '%s -> %s' % (testcase.infile, packed_infile),
-          progress=True)
+            'PACK',
+            self,
+            '%s -> %s' % (testcase.infile, packed_infile),
+            progress=True)
         files.CopyFile(os.path.join(self.out_dir, testcase.infile),
                        os.path.join(self.pack_dir, packed_infile))
         ui.console.PrintAction(
-          'PACK',
-          self,
-          '%s -> %s' % (difffile, packed_difffile),
-          progress=True)
+            'PACK',
+            self,
+            '%s -> %s' % (difffile, packed_difffile),
+            progress=True)
         files.CopyFile(os.path.join(self.out_dir, difffile),
                        os.path.join(self.pack_dir, packed_difffile))
       except Exception:
@@ -98,14 +98,14 @@ class Testset(targets.registry.Testset):
                 os.path.join(os.pardir, os.pardir, tarball_filename),
                 os.curdir)
     ui.console.PrintAction(
-      'PACK',
-      self,
-      ' '.join(tar_args),
-      progress=True)
+        'PACK',
+        self,
+        ' '.join(tar_args),
+        progress=True)
     devnull = files.OpenNull()
     task = taskgraph.ExternalProcessTask(
-      tar_args, cwd=self.pack_dir,
-      stdin=devnull, stdout=devnull, stderr=devnull)
+        tar_args, cwd=self.pack_dir,
+        stdin=devnull, stdout=devnull, stderr=devnull)
     try:
       proc = yield task
     except Exception:
@@ -116,9 +116,9 @@ class Testset(targets.registry.Testset):
       ui.errors.Error(self, 'tar failed: ret = %d' % ret)
       yield False
     ui.console.PrintAction(
-      'PACK',
-      self,
-      tarball_filename)
+        'PACK',
+        self,
+        tarball_filename)
     yield True
 
 
@@ -130,11 +130,11 @@ targets.registry.Override('Testset', Testset)
 class Pack(commands.CommandBase):
   def __init__(self, parent):
     super(Pack, self).__init__(
-      'pack',
-      '',
-      'Pack testsets to export to M-judge. (pack_mjudge plugin)',
-      '',
-      parent)
+        'pack',
+        '',
+        'Pack testsets to export to M-judge. (pack_mjudge plugin)',
+        '',
+        parent)
 
   def Run(self, obj, args, ui):
     """Entry point for pack command."""
@@ -147,5 +147,6 @@ class Pack(commands.CommandBase):
 
     ui.console.PrintError('Pack is not supported for the specified target.')
     return None
+
 
 commands.registry.Add(Pack)

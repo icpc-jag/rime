@@ -60,9 +60,9 @@ class CodeBase(codes.Code):
     """Run the code and return RunResult."""
     try:
       result = yield self._ExecForRun(
-        args=tuple(list(self.run_args) + list(args)), cwd=cwd,
-        input=input, output=output, timeout=timeout, precise=precise,
-        redirect_error=redirect_error)
+          args=tuple(list(self.run_args) + list(args)), cwd=cwd,
+          input=input, output=output, timeout=timeout, precise=precise,
+          redirect_error=redirect_error)
     except Exception as e:
       result = codes.RunResult('On execution: %s' % e, None)
     yield result
@@ -108,16 +108,16 @@ class CodeBase(codes.Code):
   def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
                     timeout=None, precise=False):
     task = taskgraph.ExternalProcessTask(
-      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
-      timeout=timeout, exclusive=precise)
+        args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+        timeout=timeout, exclusive=precise)
     proc = yield task
     code = proc.returncode
     # Retry if TLE.
     if not precise and code == -(signal.SIGXCPU):
       self._ResetIO(stdin, stdout, stderr)
       task = taskgraph.ExternalProcessTask(
-        args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
-        timeout=timeout, exclusive=True)
+          args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+          timeout=timeout, exclusive=True)
       proc = yield task
       code = proc.returncode
     if code == 0:
@@ -149,11 +149,11 @@ class CCode(CodeBase):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     cc = os.getenv('CC', 'gcc')
     super(CCode, self).__init__(
-      src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=([cc,
-                     '-o', os.path.join(out_dir, exe_name),
-                     src_name] + list(flags)),
-      run_args=[os.path.join(out_dir, exe_name)])
+        src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+        compile_args=([cc,
+                       '-o', os.path.join(out_dir, exe_name),
+                       src_name] + list(flags)),
+        run_args=[os.path.join(out_dir, exe_name)])
 
 
 class CXXCode(CodeBase):
@@ -164,11 +164,11 @@ class CXXCode(CodeBase):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     cxx = os.getenv('CXX', 'g++')
     super(CXXCode, self).__init__(
-      src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=([cxx,
-                     '-o', os.path.join(out_dir, exe_name),
-                     src_name] + list(flags)),
-      run_args=[os.path.join(out_dir, exe_name)])
+        src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+        compile_args=([cxx,
+                       '-o', os.path.join(out_dir, exe_name),
+                       src_name] + list(flags)),
+        run_args=[os.path.join(out_dir, exe_name)])
 
 
 class JavaCode(CodeBase):
@@ -186,13 +186,13 @@ class JavaCode(CodeBase):
       java = 'java'
       javac = 'javac'
     super(JavaCode, self).__init__(
-      src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=([javac, '-encoding', encoding,
-                     '-d', files.ConvPath(out_dir)] +
-                    compile_flags + [src_name]),
-      run_args=([java, '-Dline.separator=\n',
-                 '-cp', files.ConvPath(out_dir)] +
-                run_flags + [mainclass]))
+        src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+        compile_args=([javac, '-encoding', encoding,
+                       '-d', files.ConvPath(out_dir)] +
+                      compile_flags + [src_name]),
+        run_args=([java, '-Dline.separator=\n',
+                   '-cp', files.ConvPath(out_dir)] +
+                  run_flags + [mainclass]))
 
 
 class ScriptCode(CodeBase):
@@ -202,9 +202,9 @@ class ScriptCode(CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
     super(ScriptCode, self).__init__(
-      src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=[],
-      run_args=['false', os.path.join(src_dir, src_name)] + run_flags)
+        src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+        compile_args=[],
+        run_args=['false', os.path.join(src_dir, src_name)] + run_flags)
     # Replace the executable with the shebang line
     run_args = list(self.run_args)
     try:
@@ -239,11 +239,11 @@ class InternalDiffCode(CodeBase):
 
   def __init__(self):
     super(InternalDiffCode, self).__init__(
-      src_name='diff',
-      src_dir='',
-      out_dir='',
-      compile_args=[],
-      run_args=[])
+        src_name='diff',
+        src_dir='',
+        out_dir='',
+        compile_args=[],
+        run_args=[])
 
   @taskgraph.task_method
   def Run(self, args, cwd, input, output, timeout, precise,
@@ -261,8 +261,8 @@ class InternalDiffCode(CodeBase):
         else:
           errfile = files.OpenNull()
         task = taskgraph.ExternalProcessTask(
-          run_args, cwd=cwd, stdin=infile, stdout=outfile, stderr=errfile,
-          timeout=timeout)
+            run_args, cwd=cwd, stdin=infile, stdout=outfile, stderr=errfile,
+            timeout=timeout)
         try:
           proc = yield task
         except OSError:

@@ -20,5 +20,6 @@ def main():
   for _ in six.moves.range(20):
     Generate(random.randrange(0, MAX), random.randrange(0, MAX))
 
+
 if __name__ == '__main__':
   main()

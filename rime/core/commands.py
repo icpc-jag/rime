@@ -153,7 +153,7 @@ class CommandBase(Command):
       for left_col_head, right_col_lines in rows:
         for i, right_col_line in enumerate(right_col_lines):
           left_col_line = string.ljust(
-            (i == 0 and left_col_head or ''), offset)
+              (i == 0 and left_col_head or ''), offset)
           ui.console.Print(left_col_line + right_col_line)
     ui.console.Print()
 
@@ -269,13 +269,13 @@ def Parse(argv, commands):
 class Help(CommandBase):
   def __init__(self, parent):
     super(Help, self).__init__(
-      'help',
-      '<command>',
-      'Show help.',
-      'To see a brief description and available options of a command, try:\n'
-      '\n'
-      'rime.py help <command>',
-      parent)
+        'help',
+        '<command>',
+        'Show help.',
+        'To see a brief description and available options of a command, try:\n'
+        '\n'
+        'rime.py help <command>',
+        parent)
 
   def Run(self, project, args, ui):
     commands = GetCommands()

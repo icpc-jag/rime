@@ -62,6 +62,7 @@ class TestlibJudgeRunner(JudgeRunner):
         output=judgefile,
         timeout=None, precise=False, redirect_error=True)  # !redirect_error
 
+
 judge_runner_registry = class_registry.ClassRegistry(JudgeRunner)
 judge_runner_registry.Add(RimeJudgeRunner)
 judge_runner_registry.Add(TestlibJudgeRunner)
@@ -102,6 +103,7 @@ class NEERCReactiveRunner(ReactiveRunner):
           precise):
     raise NotImplementedError()
 
+
 reactive_runner_registry = class_registry.ClassRegistry(ReactiveRunner)
 reactive_runner_registry.Add(KUPCReactiveRunner)
 # reactive_runner_registry.Add(TestlibReactiveRunner)
@@ -114,11 +116,11 @@ class Testset(targets.registry.Testset):
 
     for judge_runner in judge_runner_registry.classes.values():
       self.exports['{0}_judge_runner'.format(
-        judge_runner.PREFIX)] = judge_runner()
+          judge_runner.PREFIX)] = judge_runner()
 
     for reactive_runner in reactive_runner_registry.classes.values():
       self.exports['{0}_reactive_runner'.format(
-        reactive_runner.PREFIX)] = reactive_runner()
+          reactive_runner.PREFIX)] = reactive_runner()
 
   @taskgraph.task_method
   def _TestOneCaseNoCache(self, solution, testcase, ui):
@@ -128,10 +130,10 @@ class Testset(targets.registry.Testset):
     Returns TestCaseResult.
     """
     outfile, judgefile = [
-      os.path.join(
-        solution.out_dir,
-        os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-      for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
+        os.path.join(
+            solution.out_dir,
+            os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
+        for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
     precise = (ui.options.precise or ui.options.parallelism <= 1)
     # reactive
     if self.reactives:
@@ -142,17 +144,17 @@ class Testset(targets.registry.Testset):
       if not reactive.variant:
         reactive.variant = KUPCReactiveRunner()
       res = yield reactive.variant.Run(
-        reactive=reactive,
-        args=solution.code.run_args, cwd=solution.out_dir,
-        input=testcase.infile,
-        output=outfile,
-        timeout=testcase.timeout, precise=precise)
+          reactive=reactive,
+          args=solution.code.run_args, cwd=solution.out_dir,
+          input=testcase.infile,
+          output=outfile,
+          timeout=testcase.timeout, precise=precise)
     else:
       res = yield solution.Run(
-        args=(), cwd=solution.out_dir,
-        input=testcase.infile,
-        output=outfile,
-        timeout=testcase.timeout, precise=precise)
+          args=(), cwd=solution.out_dir,
+          input=testcase.infile,
+          output=outfile,
+          timeout=testcase.timeout, precise=precise)
     if res.status == core_codes.RunResult.TLE:
       yield test.TestCaseResult(solution, testcase, test.TestCaseResult.TLE,
                                 time=None, cached=False)
@@ -165,20 +167,20 @@ class Testset(targets.registry.Testset):
       if not judge.variant:
         judge.variant = RimeJudgeRunner()
       res = yield judge.variant.Run(
-        judge=judge,
-        infile=testcase.infile,
-        difffile=testcase.difffile,
-        outfile=outfile,
-        cwd=self.out_dir,
-        judgefile=judgefile)
+          judge=judge,
+          infile=testcase.infile,
+          difffile=testcase.difffile,
+          outfile=outfile,
+          cwd=self.out_dir,
+          judgefile=judgefile)
       if res.status == core_codes.RunResult.NG:
         yield test.TestCaseResult(solution, testcase, test.TestCaseResult.WA,
                                   time=None, cached=False)
       elif res.status != core_codes.RunResult.OK:
         yield test.TestCaseResult(
-          solution, testcase,
-          test.TestVerdict('Validator %s' % res.status),
-          time=None, cached=False)
+            solution, testcase,
+            test.TestVerdict('Validator %s' % res.status),
+            time=None, cached=False)
     yield test.TestCaseResult(solution, testcase, test.TestCaseResult.AC,
                               time=time, cached=False)
 
@@ -196,17 +198,18 @@ class Testset(targets.registry.Testset):
       if not reactive.variant:
         reactive.variant = KUPCReactiveRunner()
       res = yield reactive.variant.Run(
-        reactive=reactive,
-        args=reference_solution.code.run_args, cwd=reference_solution.out_dir,
-        input=testcase.infile,
-        output=testcase.difffile,
-        timeout=None, precise=False)
+          reactive=reactive,
+          args=reference_solution.code.run_args,
+          cwd=reference_solution.out_dir,
+          input=testcase.infile,
+          output=testcase.difffile,
+          timeout=None, precise=False)
     else:
       res = yield reference_solution.Run(
-        args=(), cwd=reference_solution.out_dir,
-        input=testcase.infile,
-        output=testcase.difffile,
-        timeout=None, precise=False)
+          args=(), cwd=reference_solution.out_dir,
+          input=testcase.infile,
+          output=testcase.difffile,
+          timeout=None, precise=False)
     if res.status != core_codes.RunResult.OK:
       ui.errors.Error(reference_solution, res.status)
       raise taskgraph.Bailout([False])
@@ -238,5 +241,6 @@ class Testset(targets.registry.Testset):
       ui.console.PrintLog(reactive.ReadCompileLog())
       yield False
     yield True
+
 
 targets.registry.Override('Testset', Testset)

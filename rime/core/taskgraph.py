@@ -209,7 +209,7 @@ class GeneratorTask(Task):
         hash(key)
       except TypeError:
         raise ValueError(
-          'Unhashable argument was passed to GeneratorTask function')
+            'Unhashable argument was passed to GeneratorTask function')
       it = func(*args, **kwargs)
       return GeneratorTask(it, key)
     return MakeTask
@@ -433,8 +433,8 @@ class FiberTaskGraph(object):
     self._UpdateCumulativeParallelism()
     if self.last_tick > self.first_tick:
       parallelism_efficiency = (
-        self.cumulative_parallelism /
-        (self.parallelism * (self.last_tick - self.first_tick)))
+          self.cumulative_parallelism /
+          (self.parallelism * (self.last_tick - self.first_tick)))
     else:
       parallelism_efficiency = 1.0
     self._Log('Parallelism efficiency: %.2f%%' %
@@ -691,12 +691,12 @@ class FiberTaskGraph(object):
   def _ResolveTask(self, task):
     if task not in self.task_counters:
       self._LogDebug(
-        '_ResolveTask: %s: resolved, but already bailed out' % task)
+          '_ResolveTask: %s: resolved, but already bailed out' % task)
       return
     assert self.task_state[task] in (WAITING, BLOCKED)
     self._LogDebug(
-      '_ResolveTask: %s: resolved, counter: %d -> %d' %
-      (task, self.task_counters[task], self.task_counters[task] - 1))
+        '_ResolveTask: %s: resolved, counter: %d -> %d' %
+        (task, self.task_counters[task], self.task_counters[task] - 1))
     self.task_counters[task] -= 1
     if self.task_counters[task] == 0:
       if task in self.task_graph and isinstance(self.task_graph[task], list):
@@ -766,7 +766,7 @@ class FiberTaskGraph(object):
   def _UpdateCumulativeParallelism(self):
     cur_tick = time.clock()
     self.cumulative_parallelism += (
-      (cur_tick - self.last_tick) * len(self.blocked_tasks))
+        (cur_tick - self.last_tick) * len(self.blocked_tasks))
     self.last_tick = cur_tick
 
   def _Sleep(self):

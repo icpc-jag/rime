@@ -164,8 +164,8 @@ class Project(targets.registry.Project):
       cell_judge = CELL_NA
     # Done.
     yield ('|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
-      title, wiki_name, assignees, cell_solutions, cell_input,
-      cell_output, cell_validator, cell_judge))
+        title, wiki_name, assignees, cell_solutions, cell_input,
+        cell_output, cell_validator, cell_judge))
 
   def _UploadWiki(self, wiki, ui):
     url = self.wikify_url
@@ -183,28 +183,28 @@ class Project(targets.registry.Project):
     if self.wikify_auth_realm:
       auth_handler = urllib2.HTTPBasicAuthHandler()
       auth_handler.add_password(
-        native_auth_realm, auth_hostname, auth_username, auth_password)
+          native_auth_realm, auth_hostname, auth_username, auth_password)
       opener = urllib2.build_opener(auth_handler)
       urllib2.install_opener(opener)
 
     ui.console.PrintAction('UPLOAD', None, url)
 
     edit_params = {
-      'cmd': 'edit',
-      'page': native_page,
+        'cmd': 'edit',
+        'page': native_page,
     }
     edit_page_content = urllib2.urlopen(
-      '%s?%s' % (url, urllib.urlencode(edit_params))).read()
+        '%s?%s' % (url, urllib.urlencode(edit_params))).read()
 
     digest = re.search(r'value="([0-9a-f]{32})"', edit_page_content).group(1)
 
     update_params = {
-      'cmd': 'edit',
-      'page': native_page,
-      'digest': digest,
-      'msg': native_wiki,
-      'write': u'ページの更新'.encode(encoding),
-      'encode_hint': u'ぷ'.encode(encoding),
+        'cmd': 'edit',
+        'page': native_page,
+        'digest': digest,
+        'msg': native_wiki,
+        'write': u'ページの更新'.encode(encoding),
+        'encode_hint': u'ぷ'.encode(encoding),
     }
     urllib2.urlopen(url, urllib.urlencode(update_params))
 
@@ -225,11 +225,11 @@ class Problem(targets.registry.Problem):
 class Wikify(rime_commands.CommandBase):
   def __init__(self, parent):
     super(Wikify, self).__init__(
-      'wikify',
-      '',
-      'Upload test results to Pukiwiki. (wikify plugin)',
-      '',
-      parent)
+        'wikify',
+        '',
+        'Upload test results to Pukiwiki. (wikify plugin)',
+        '',
+        parent)
 
   def Run(self, obj, args, ui):
     if args:

@@ -50,16 +50,16 @@ class TestMerger(object):
     difffiles = [os.path.splitext(infile)[0] + consts.DIFF_EXT
                  for infile in infiles]
     ui.console.PrintAction(
-      'MERGE', merged_testcase.testset,
-      'Generating %s' % os.path.basename(merged_testcase.infile),
-      progress=True)
+        'MERGE', merged_testcase.testset,
+        'Generating %s' % os.path.basename(merged_testcase.infile),
+        progress=True)
     self._Concatenate(infiles, merged_testcase.infile,
                       self.input_separator,
                       self.input_terminator)
     ui.console.PrintAction(
-      'MERGE', merged_testcase.testset,
-      'Generating %s' % os.path.basename(merged_testcase.difffile),
-      progress=True)
+        'MERGE', merged_testcase.testset,
+        'Generating %s' % os.path.basename(merged_testcase.difffile),
+        progress=True)
     self._Concatenate(difffiles, merged_testcase.difffile,
                       self.output_separator,
                       self.output_terminator)
@@ -77,8 +77,8 @@ class TestMerger(object):
 class MergedTestCase(test.TestCase):
   def __init__(self, testset, merger):
     super(MergedTestCase, self).__init__(
-      testset,
-      os.path.join(testset.out_dir, '%s%s' % (merger.name, consts.IN_EXT)))
+        testset,
+        os.path.join(testset.out_dir, '%s%s' % (merger.name, consts.IN_EXT)))
     self.merger = merger
 
   @property
@@ -107,7 +107,7 @@ class Testset(targets.registry.Testset):
         value = locals()[name]
         if value and not value.endswith('\n'):
           ui.errors.Warning(
-            self, 'merged_test(): %s not ending with \\n.' % name)
+              self, 'merged_test(): %s not ending with \\n.' % name)
       self.mergers.append(merger)
     self.exports['merged_test'] = merged_test
 
@@ -116,8 +116,8 @@ class Testset(targets.registry.Testset):
     if not (yield super(Testset, self)._PostBuildHook(ui)):
       yield False
     yield all((yield taskgraph.TaskBranch([
-      self._GenerateMergedTest(testcase, ui)
-      for testcase in self.GetMergedTestCases()])))
+        self._GenerateMergedTest(testcase, ui)
+        for testcase in self.GetMergedTestCases()])))
 
   @taskgraph.task_method
   def _GenerateMergedTest(self, merged_testcase, ui):
@@ -129,14 +129,15 @@ class Testset(targets.registry.Testset):
   @taskgraph.task_method
   def _TestSolutionWithAllCases(self, solution, ui):
     original_result = (
-      yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
+        yield super(Testset, self)._TestSolutionWithAllCases(solution, ui))
     if original_result.expected and solution.IsCorrect() and self.mergers:
       merged_result = (yield self._TestSolutionWithMergedTests(solution, ui))
       original_result.results.update(merged_result.results)
       if not merged_result.expected:
         original_result.Finalize(
-          False, detail=merged_result.detail,
-          notable_testcase=merged_result.notable_testcase, allow_override=True)
+            False, detail=merged_result.detail,
+            notable_testcase=merged_result.notable_testcase,
+            allow_override=True)
       else:
         if merged_result.IsTimingValid(ui):
           detail = ('%s, %s' %

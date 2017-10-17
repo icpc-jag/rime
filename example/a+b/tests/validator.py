@@ -13,5 +13,6 @@ def main():
   assert 0 <= a <= MAX, 'a out of range: %d' % a
   assert 0 <= b <= MAX, 'a out of range: %d' % b
 
+
 if __name__ == '__main__':
   main()

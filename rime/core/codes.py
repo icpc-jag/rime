@@ -88,8 +88,8 @@ def CreateDictionary(name_fmt, codeset, src_dir, out_dir, wrapper=None):
     def Closure(code_class):
       def Registerer(src, *args, **kwargs):
         codeset.append(
-          wrapper(code_class)(src_name=src, src_dir=src_dir, out_dir=out_dir,
-                              *args, **kwargs))
+            wrapper(code_class)(src_name=src, src_dir=src_dir, out_dir=out_dir,
+                                *args, **kwargs))
       exports[name_fmt % code_class.PREFIX] = Registerer
     Closure(code_class)
   return exports
@@ -114,7 +114,7 @@ class AutoCode(Code):
       code_class = None
     if not code_class:
       raise UnknownCodeExtensionException(
-        'Unknown code extension: %s' % src_ext)
+          'Unknown code extension: %s' % src_ext)
     # Swap the class in runtime.
     self.__class__ = code_class
     self.__init__(src_name, src_dir, out_dir, *args, **kwargs)

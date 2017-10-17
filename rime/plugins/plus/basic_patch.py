@@ -69,8 +69,8 @@ class Project(targets.registry.Project):
         raise RuntimeError('installed rime-plus is too old.')
       global libdir
       libdir = os.path.join(
-        self.base_dir,
-        library_dir)
+          self.base_dir,
+          library_dir)
       self.library_dir = libdir
       self.project_defined = True
     self.exports['project'] = _project
@@ -85,25 +85,25 @@ class Testset(targets.registry.Testset):
     super(Testset, self).PreLoad(ui)
     self.reactives = []
     self.exports.update(
-      codes.CreateDictionary('%s_generator', self.generators,
-                             src_dir=self.src_dir,
-                             out_dir=self.out_dir,
-                             wrapper=self._WrapDependency))
+        codes.CreateDictionary('%s_generator', self.generators,
+                               src_dir=self.src_dir,
+                               out_dir=self.out_dir,
+                               wrapper=self._WrapDependency))
     self.exports.update(
-      codes.CreateDictionary('%s_validator', self.validators,
-                             src_dir=self.src_dir,
-                             out_dir=self.out_dir,
-                             wrapper=self._WrapDependency))
+        codes.CreateDictionary('%s_validator', self.validators,
+                               src_dir=self.src_dir,
+                               out_dir=self.out_dir,
+                               wrapper=self._WrapDependency))
     self.exports.update(
-      codes.CreateDictionary('%s_judge', self.judges,
-                             src_dir=self.src_dir,
-                             out_dir=self.out_dir,
-                             wrapper=self._WrapDependency))
+        codes.CreateDictionary('%s_judge', self.judges,
+                               src_dir=self.src_dir,
+                               out_dir=self.out_dir,
+                               wrapper=self._WrapDependency))
     self.exports.update(
-      codes.CreateDictionary('%s_reactive', self.reactives,
-                             src_dir=self.src_dir,
-                             out_dir=self.out_dir,
-                             wrapper=self._WrapDependency))
+        codes.CreateDictionary('%s_reactive', self.reactives,
+                               src_dir=self.src_dir,
+                               out_dir=self.out_dir,
+                               wrapper=self._WrapDependency))
 
   def _WrapDependency(self, code_class):
     def Wrapped(src_name, src_dir, out_dir, dependency=[], variant=None,
@@ -123,8 +123,8 @@ class Testset(targets.registry.Testset):
     testcases = []
     for infile in challenge_infiles:
       matched_testcases = [
-        testcase for testcase in all_testcases
-        if fnmatch.fnmatch(os.path.basename(testcase.infile), infile)]
+          testcase for testcase in all_testcases
+          if fnmatch.fnmatch(os.path.basename(testcase.infile), infile)]
 
       if not matched_testcases:
         ui.errors.Error(solution,
@@ -135,7 +135,7 @@ class Testset(targets.registry.Testset):
         yield result
 
       testcases.extend(
-        [t for t in matched_testcases if t.infile not in testcases])
+          [t for t in matched_testcases if t.infile not in testcases])
     # Try challenge cases.
     result = test.TestsetResult(self, solution, testcases)
     yield taskgraph.TaskBranch([
@@ -250,9 +250,9 @@ class Testset(targets.registry.Testset):
       if solution.IsCorrect():
         if case_result.verdict == test.TestCaseResult.WA:
           judgefile = os.path.join(
-            solution.out_dir,
-            os.path.splitext(os.path.basename(testcase.infile))[0] +
-            consts.JUDGE_EXT)
+              solution.out_dir,
+              os.path.splitext(os.path.basename(testcase.infile))[0] +
+              consts.JUDGE_EXT)
           ui.errors.Error(solution,
                           '%s\n  judge log: %s' % (r.detail, judgefile))
         else:
@@ -260,7 +260,7 @@ class Testset(targets.registry.Testset):
       elif (solution.expected_verdicts is not None and
             case_result.verdict not in solution.expected_verdicts):
         r = test.TestsetResult(
-          result.testset, result.solution, result.testcases)
+            result.testset, result.solution, result.testcases)
         r.Finalize(False,
                    '%s: Unexpected Verdict (%s)' %
                    (os.path.basename(testcase.infile), case_result.verdict),
@@ -268,9 +268,9 @@ class Testset(targets.registry.Testset):
         ui.errors.Error(solution, r.detail)
         if case_result.verdict == test.TestCaseResult.WA:
           judgefile = os.path.join(
-            solution.out_dir,
-            os.path.splitext(os.path.basename(testcase.infile))[0] +
-            consts.JUDGE_EXT)
+              solution.out_dir,
+              os.path.splitext(os.path.basename(testcase.infile))[0] +
+              consts.JUDGE_EXT)
           ui.errors.Error(solution,
                           '%s\n  judge log: %s' % (r.detail, judgefile))
         else:
@@ -293,16 +293,17 @@ class Testset(targets.registry.Testset):
     Returns TestCaseResult.
     """
     cache_file_name = os.path.join(
-      solution.out_dir,
-      os.path.splitext(
-        os.path.basename(testcase.infile))[0] + consts.CACHE_EXT)
+        solution.out_dir,
+        os.path.splitext(
+            os.path.basename(testcase.infile))[0] + consts.CACHE_EXT)
     solution_file_name = os.path.join(solution.src_dir, solution.code.src_name)
 
     cache_flag = (
-      ui.options.cache_tests and
-      files.GetModified(solution_file_name) <
-      files.GetModified(cache_file_name) and
-      files.GetModified(testcase.infile) < files.GetModified(cache_file_name))
+        ui.options.cache_tests and
+        files.GetModified(solution_file_name) <
+        files.GetModified(cache_file_name) and
+        files.GetModified(testcase.infile) <
+        files.GetModified(cache_file_name))
 
     if cache_flag:
       case_result_cache = files.ReadFile(cache_file_name)
@@ -316,9 +317,9 @@ class Testset(targets.registry.Testset):
         case_result = test.TestCaseResult(solution, testcase, None, None, True)
         case_result.time = j['time']
         case_result.verdict = [
-          verdict for verdict in test.TestCaseResult.__dict__.values()
-          if isinstance(verdict, test.TestVerdict) and
-          verdict.msg == j['verdict']][0]
+            verdict for verdict in test.TestCaseResult.__dict__.values()
+            if isinstance(verdict, test.TestVerdict) and
+            verdict.msg == j['verdict']][0]
 
       yield case_result
 
@@ -326,8 +327,8 @@ class Testset(targets.registry.Testset):
 
     # always cache in json
     files.WriteFile(json.dumps({
-      'verdict': case_result.verdict.msg,
-      'time': case_result.time
+        'verdict': case_result.verdict.msg,
+        'time': case_result.time
     }), cache_file_name)
 
     yield case_result
@@ -377,23 +378,24 @@ class Testset(targets.registry.Testset):
   def _RunValidatorForInvalidCasesOne(self, validator, testcase, ui):
     """Run an input validator against a single input file."""
     validationfile = (
-      os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
+        os.path.splitext(testcase.infile)[0] + consts.VALIDATION_EXT)
     res = yield validator.Run(
-      args=(), cwd=self.out_dir,
-      input=testcase.infile,
-      output=validationfile,
-      timeout=None, precise=False,
-      redirect_error=True)
+        args=(), cwd=self.out_dir,
+        input=testcase.infile,
+        output=validationfile,
+        timeout=None, precise=False,
+        redirect_error=True)
     if res.status == codes.RunResult.OK:
       ui.errors.Error(self,
                       '%s: Unexpectedly Validator Accepted: %s' %
                       (os.path.basename(testcase.infile), res.status))
       raise taskgraph.Bailout([False])
     ui.console.PrintAction(
-      'VALIDATE', self,
-      '%s: Expectedly Failed' % os.path.basename(testcase.infile),
-      progress=True)
+        'VALIDATE', self,
+        '%s: Expectedly Failed' % os.path.basename(testcase.infile),
+        progress=True)
     yield True
+
 
 targets.registry.Override('Project', Project)
 targets.registry.Override('Testset', Testset)
@@ -404,16 +406,16 @@ targets.registry.Override('Testset', Testset)
 def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
                   timeout=None, precise=False):
   task = taskgraph.ExternalProcessTask(
-    args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr, timeout=timeout,
-    exclusive=precise)
+      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+      timeout=timeout, exclusive=precise)
   proc = yield task
   code = proc.returncode
   # Retry if TLE.
   if not precise and code == -(signal.SIGXCPU):
     self._ResetIO(stdin, stdout, stderr)
     task = taskgraph.ExternalProcessTask(
-      args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
-      timeout=timeout, exclusive=precise)
+        args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
+        timeout=timeout, exclusive=precise)
     proc = yield task
     code = proc.returncode
   if code == 0:
@@ -432,6 +434,7 @@ def IsTimingValid(self, ui):
   return (self.results and
           all((c.verdict == test.TestCaseResult.AC
                for c in self.results.values())))
+
 
 basic_codes.CodeBase._ExecInternal = _ExecInternal
 test.TestsetResult.IsTimingValid = IsTimingValid
@@ -457,8 +460,8 @@ def _ExecForCompile(self, args):
         if not os.path.exists(os.path.join(libdir, f)):
           raise IOError('%s is not found in %s.' % (f, libdir))
         files.CopyFile(
-          os.path.join(libdir, f),
-          self.out_dir)
+            os.path.join(libdir, f),
+            self.out_dir)
 
   with open(os.path.join(self.out_dir, self.log_name), 'w') as outfile:
     yield (yield self._ExecInternal(
@@ -473,11 +476,12 @@ def GetLastModified(self):
     stamp = max(stamp, files.GetLastModifiedUnder(self.project.library_dir))
   return stamp
 
+
 basic_codes.CodeBase._ExecForCompile = _ExecForCompile
 basic_codes.CodeBase.dependency = []
 basic_codes.CodeBase.variant = None
 rime.basic.targets.problem.ProblemComponentMixin.GetLastModified = \
-  GetLastModified
+    GetLastModified
 
 
 # -O2
@@ -491,7 +495,7 @@ class CXXCode(codes.registry.CXXCode):
 
   def __init__(self, src_name, src_dir, out_dir, flags=[]):
     super(CXXCode, self).__init__(
-      src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
+        src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
 
 
 # shebang support
@@ -526,14 +530,15 @@ class ScriptCode(basic_codes.ScriptCode):
       try:
         # if the command does not exist, "which" return 1 as the status code
         interpreter = subprocess.check_output(
-          ['which', self.run_args[1]]).strip()
+            ['which', self.run_args[1]]).strip()
       except subprocess.CalledProcessError:
         yield codes.RunResult(
-          'Interpreter not installed: %s' % self.run_args[1], None)
+            'Interpreter not installed: %s' % self.run_args[1], None)
       if not os.path.exists(interpreter):
         yield codes.RunResult('Interpreter not found: %s' % interpreter, None)
 
     yield (yield basic_codes.CodeBase.Compile(self, *args, **kwargs))
+
 
 codes.registry.Override('CCode', CCode)
 codes.registry.Override('CXXCode', CXXCode)
@@ -548,9 +553,9 @@ class JavaScriptCode(basic_codes.CodeBase):
 
   def __init__(self, src_name, src_dir, out_dir, run_flags=[]):
     super(JavaScriptCode, self).__init__(
-      src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=[],
-      run_args=['node', '--', os.path.join(src_dir, src_name)] + run_flags)
+        src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+        compile_args=[],
+        run_args=['node', '--', os.path.join(src_dir, src_name)] + run_flags)
 
   @taskgraph.task_method
   def Compile(self, *args, **kwargs):
@@ -570,11 +575,11 @@ class HaskellCode(basic_codes.CodeBase):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     exe_path = os.path.join(out_dir, exe_name)
     super(HaskellCode, self).__init__(
-      src_name=src_name, src_dir=src_dir, out_dir=out_dir,
-      compile_args=(['stack', 'ghc', '--', '-O',
-                     '-o', exe_path, '-outputdir', out_dir, src_name] +
-                    list(flags)),
-      run_args=[exe_path])
+        src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+        compile_args=(['stack', 'ghc', '--', '-O',
+                       '-o', exe_path, '-outputdir', out_dir, src_name] +
+                      list(flags)),
+        run_args=[exe_path])
 
 
 class CsCode(basic_codes.CodeBase):
@@ -585,13 +590,14 @@ class CsCode(basic_codes.CodeBase):
     exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
     exe_path = os.path.join(out_dir, exe_name)
     super(CsCode, self).__init__(
-      src_name=src_name,
-      src_dir=src_dir,
-      out_dir=out_dir,
-      compile_args=(['mcs',
-                     src_name,
-                     '-out:' + exe_path] + list(flags)),
-      run_args=['mono', exe_path])
+        src_name=src_name,
+        src_dir=src_dir,
+        out_dir=out_dir,
+        compile_args=(['mcs',
+                       src_name,
+                       '-out:' + exe_path] + list(flags)),
+        run_args=['mono', exe_path])
+
 
 codes.registry.Add(CsCode)
 codes.registry.Add(JavaScriptCode)
@@ -609,26 +615,26 @@ def PrintTestSummary(results, ui):
   ui.console.Print()
   ui.console.Print(ui.console.BOLD, 'Test Summary:', ui.console.NORMAL)
   solution_name_width = max(
-    map(lambda t: len(t.solution.name), results))
+      map(lambda t: len(t.solution.name), results))
   last_problem = None
   for result in sorted(results, key=_KeyTestResultForListing):
     if last_problem is not result.problem:
       problem_row = [
-        ui.console.BOLD,
-        ui.console.CYAN,
-        result.problem.name,
-        ui.console.NORMAL,
-        ' ... %d solutions, %d tests' %
-        (len(result.problem.solutions),
-         len(result.problem.testset.ListTestCases()))]
+          ui.console.BOLD,
+          ui.console.CYAN,
+          result.problem.name,
+          ui.console.NORMAL,
+          ' ... %d solutions, %d tests' %
+          (len(result.problem.solutions),
+           len(result.problem.testset.ListTestCases()))]
       ui.console.Print(*problem_row)
       last_problem = result.problem
     status_row = ['  ']
     status_row += [
-      result.solution.IsCorrect() and ui.console.GREEN or ui.console.YELLOW,
-      result.solution.name.ljust(solution_name_width),
-      ui.console.NORMAL,
-      ' ']
+        result.solution.IsCorrect() and ui.console.GREEN or ui.console.YELLOW,
+        result.solution.name.ljust(solution_name_width),
+        ui.console.NORMAL,
+        ' ']
     if result.expected:
       status_row += [ui.console.GREEN, ' OK ', ui.console.NORMAL]
     else:
@@ -645,40 +651,40 @@ def PrintBuildSummary(results, ui):
   ui.console.Print()
   ui.console.Print(ui.console.BOLD, 'Build Summary:', ui.console.NORMAL)
   solution_name_width = max(
-    map(lambda t: len(t.solution.name), results))
+      map(lambda t: len(t.solution.name), results))
   solution_prefix_width = max(
-    map(lambda t: len(t.solution.code.PREFIX), results))
+      map(lambda t: len(t.solution.code.PREFIX), results))
   solution_line_width = max(
-    map(lambda t: len(_SolutionLine(t.solution)), results))
+      map(lambda t: len(_SolutionLine(t.solution)), results))
   solution_size_width = max(
-    map(lambda t: len(_SolutionSize(t.solution)), results))
+      map(lambda t: len(_SolutionSize(t.solution)), results))
   last_problem = None
   for result in sorted(results, key=_KeyTestResultForListing):
     if last_problem is not result.problem:
       problem_row = [
-        ui.console.BOLD,
-        ui.console.CYAN,
-        result.problem.name,
-        ui.console.NORMAL,
-        ' ... in: %s, diff: %s, md5: %s' %
-        (_TestsetInSize(result),
-         _TestsetDiffSize(result),
-         _TestsetHash(result)
-         )]
+          ui.console.BOLD,
+          ui.console.CYAN,
+          result.problem.name,
+          ui.console.NORMAL,
+          ' ... in: %s, diff: %s, md5: %s' %
+          (_TestsetInSize(result),
+           _TestsetDiffSize(result),
+           _TestsetHash(result)
+           )]
       ui.console.Print(*problem_row)
       last_problem = result.problem
     status_row = ['  ']
     status_row += [
-      result.solution.IsCorrect() and ui.console.GREEN or ui.console.YELLOW,
-      result.solution.name.ljust(solution_name_width),
-      ' ',
-      ui.console.GREEN,
-      result.solution.code.PREFIX.upper().ljust(solution_prefix_width),
-      ' ',
-      ui.console.NORMAL,
-      _SolutionLine(result.solution).rjust(solution_line_width),
-      ', ',
-      _SolutionSize(result.solution).rjust(solution_size_width)]
+        result.solution.IsCorrect() and ui.console.GREEN or ui.console.YELLOW,
+        result.solution.name.ljust(solution_name_width),
+        ' ',
+        ui.console.GREEN,
+        result.solution.code.PREFIX.upper().ljust(solution_prefix_width),
+        ' ',
+        ui.console.NORMAL,
+        _SolutionLine(result.solution).rjust(solution_line_width),
+        ', ',
+        _SolutionSize(result.solution).rjust(solution_size_width)]
     ui.console.Print(*status_row)
 
 
@@ -707,8 +713,8 @@ def _TestsetDiffSize(result):
     size = 0
     for t in result.problem.testset.ListTestCases():
       out_file = os.path.join(
-        result.problem.testset.out_dir,
-        os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
+          result.problem.testset.out_dir,
+          os.path.splitext(os.path.basename(t.infile))[0] + consts.DIFF_EXT)
       size += len(files.ReadFile(out_file))
     return _SmartFileSize(size)
   except Exception:
@@ -745,6 +751,7 @@ def _KeyTestResultForListing(a):
   """Key function of TestResult for display-ordering."""
   return (a.problem.id, test_summary.KeyTestResultForListing(a))
 
+
 test_summary.PrintBuildSummary = PrintBuildSummary
 test_summary.PrintTestSummary = PrintTestSummary
 
@@ -766,5 +773,6 @@ class Solution(targets.registry.Solution):
     self.exports['WA'] = test.TestCaseResult.WA
     self.exports['TLE'] = test.TestCaseResult.TLE
     self.exports['RE'] = test.TestCaseResult.RE
+
 
 targets.registry.Override('Solution', Solution)

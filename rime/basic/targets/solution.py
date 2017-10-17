@@ -46,11 +46,11 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
     super(Solution, self).PreLoad(ui)
     self._codes = []
     self.exports.update(
-      codes.CreateDictionary('%s_solution',
-                             self._codes,
-                             src_dir=self.src_dir,
-                             out_dir=self.out_dir,
-                             wrapper=self._WrapSolution))
+        codes.CreateDictionary('%s_solution',
+                               self._codes,
+                               src_dir=self.src_dir,
+                               out_dir=self.out_dir,
+                               wrapper=self._WrapSolution))
 
   def _WrapSolution(self, code_class):
     def Wrapped(src_name, src_dir, out_dir, challenge_cases=None,
@@ -116,7 +116,7 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
   def Test(self, ui):
     """Run tests for the solution."""
     results = yield taskgraph.TaskBranch(
-      [testset.TestSolution(self, ui) for testset in self.problem.testsets])
+        [testset.TestSolution(self, ui) for testset in self.problem.testsets])
     yield list(itertools.chain(*results))
 
   @taskgraph.task_method

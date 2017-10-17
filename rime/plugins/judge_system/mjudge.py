@@ -55,23 +55,24 @@ class MJudgePacker(plus_commands.PackerBase):
       packed_difffile = str(i + 1) + consts.DIFF_EXT
       try:
         ui.console.PrintAction(
-          'PACK',
-          testset,
-          '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
-          progress=True)
+            'PACK',
+            testset,
+            '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
+            progress=True)
         files.CopyFile(os.path.join(testset.out_dir, testcase.infile),
                        os.path.join(testset.mjudge_pack_dir, packed_infile))
         ui.console.PrintAction(
-          'PACK',
-          testset,
-          '%s -> %s' % (os.path.basename(difffile), packed_difffile),
-          progress=True)
+            'PACK',
+            testset,
+            '%s -> %s' % (os.path.basename(difffile), packed_difffile),
+            progress=True)
         files.CopyFile(os.path.join(testset.out_dir, difffile),
                        os.path.join(testset.mjudge_pack_dir, packed_difffile))
       except Exception:
         ui.errors.Exception(testset)
         yield False
     yield True
+
 
 targets.registry.Override('Testset', Testset)
 

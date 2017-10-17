@@ -107,7 +107,7 @@ class Project(targets.registry.Project):
     yield self.Clean(ui)  # 重すぎるときはコメントアウト
     # Get system information.
     rev = SafeUnicode(builtin_commands.getoutput(
-      'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
+        'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
     username = getpass.getuser()
     hostname = socket.gethostname()
 
@@ -136,17 +136,17 @@ class Project(targets.registry.Project):
       javac = 'javac'
     environments = '** Environments\n'
     environments += (
-      ':gcc:|' + builtin_commands.getoutput('{0} --version'.format(cc)) +
-      '\n')
+        ':gcc:|' + builtin_commands.getoutput('{0} --version'.format(cc)) +
+        '\n')
     environments += (
-      ':g++:|' + builtin_commands.getoutput('{0} --version'.format(cxx)) +
-      '\n')
+        ':g++:|' + builtin_commands.getoutput('{0} --version'.format(cxx)) +
+        '\n')
     environments += (
-      ':javac:|' + builtin_commands.getoutput('{0} -version'.format(javac)) +
-      '\n')
+        ':javac:|' + builtin_commands.getoutput('{0} -version'.format(javac)) +
+        '\n')
     environments += (
-      ':java:|' + builtin_commands.getoutput('{0} -version'.format(java)) +
-      '\n')
+        ':java:|' + builtin_commands.getoutput('{0} -version'.format(java)) +
+        '\n')
 
     errors = '** Error Messages\n'
     if ui.errors.HasError():
@@ -184,12 +184,12 @@ class Project(targets.registry.Project):
     captions = [name.replace('-', ' ').replace('_', ' ')
                 for name in solutionnames]
     wikiFull += '|CENTER:~' + '|CENTER:~'.join(
-      ['testcase', 'in', 'diff', 'md5'] + captions +
-      ['Comments']) + '|h\n'
+        ['testcase', 'in', 'diff', 'md5'] + captions +
+        ['Comments']) + '|h\n'
     formats = ['RIGHT:' for solution in solutions]
     wikiFull += '|' + '|'.join(
-      ['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats +
-      ['LEFT:']) + '|c\n'
+        ['LEFT:', 'RIGHT:', 'RIGHT:', 'LEFT:'] + formats +
+        ['LEFT:']) + '|c\n'
 
     dics = {}
     for testcase in problem.testset.ListTestCases():
@@ -216,14 +216,14 @@ class Project(targets.registry.Project):
       rows.append(
           '|' +
           '|'.join(
-            [
-              casename.replace('_', ' ').replace('-', ' '),
-              GetFileSize(dir, casename + consts.IN_EXT),
-              GetFileSize(dir, casename + consts.DIFF_EXT),
-              GetFileHash(dir, casename + consts.IN_EXT)
-            ] +
-            [self._GetMessage(*t) for t in cols] +
-            [GetFileComment(dir, casename + '.comment')]
+              [
+                  casename.replace('_', ' ').replace('-', ' '),
+                  GetFileSize(dir, casename + consts.IN_EXT),
+                  GetFileSize(dir, casename + consts.DIFF_EXT),
+                  GetFileHash(dir, casename + consts.IN_EXT)
+              ] +
+              [self._GetMessage(*t) for t in cols] +
+              [GetFileComment(dir, casename + '.comment')]
           ) +
           '|\n')
     wikiFull += ''.join(rows)
@@ -285,8 +285,8 @@ class Project(targets.registry.Project):
 
     # Done.
     wiki = ('|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
-      title, wiki_name, assignees, cell_solutions, cell_input,
-      cell_output, cell_validator, cell_judge))
+        title, wiki_name, assignees, cell_solutions, cell_input,
+        cell_output, cell_validator, cell_judge))
 
     yield (wiki, wikiFull)
 
@@ -317,7 +317,7 @@ class WikifyFull(rime_commands.CommandBase):
       return obj.WikifyFull(ui)
 
     ui.console.PrintError(
-      'Wikify_full is not supported for the specified target.')
+        'Wikify_full is not supported for the specified target.')
     return None
 
 

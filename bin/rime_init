@@ -33,9 +33,11 @@ import urllib
 
 from rime.plugins.plus import rime_plus_version
 
+
 def make_file(path, content):
   with open(path, 'w') as f:
     f.write(content)
+
 
 if __name__ == '__main__':
   if os.path.exists('PROJECT'):
@@ -74,8 +76,8 @@ target
     os.makedirs('common')
   try:
     urllib.urlretrieve(
-      'https://raw.githubusercontent.com/MikeMirzayanov/testlib/master/testlib.h',
-      'common/testlib.h')
+        'https://raw.githubusercontent.com/MikeMirzayanov/testlib/master/testlib.h',
+        'common/testlib.h')
   except Exception:
     os.remove('PROJECT')
     print('Some error while downloading testlib.h.')

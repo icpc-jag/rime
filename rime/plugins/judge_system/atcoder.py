@@ -101,8 +101,8 @@ class Problem(targets.registry.Problem):
       yield False
     if self.atcoder_task_id is None:
       ui.console.PrintAction(
-        'SUBMIT', self,
-        'This problem is considered to a spare. Not submitted.')
+          'SUBMIT', self,
+          'This problem is considered to a spare. Not submitted.')
       yield True
     yield super(Problem, self).Submit(ui)
 
@@ -133,17 +133,17 @@ class AtCoderPacker(plus_commands.PackerBase):
       packed_difffile = os.path.join('out', os.path.basename(basename))
       try:
         ui.console.PrintAction(
-          'PACK',
-          testset,
-          '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
-          progress=True)
+            'PACK',
+            testset,
+            '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
+            progress=True)
         files.CopyFile(os.path.join(testset.out_dir, testcase.infile),
                        os.path.join(testset.atcoder_pack_dir, packed_infile))
         ui.console.PrintAction(
-          'PACK',
-          testset,
-          '%s -> %s' % (os.path.basename(difffile), packed_difffile),
-          progress=True)
+            'PACK',
+            testset,
+            '%s -> %s' % (os.path.basename(difffile), packed_difffile),
+            progress=True)
         files.CopyFile(os.path.join(testset.out_dir, difffile),
                        os.path.join(testset.atcoder_pack_dir, packed_difffile))
       except Exception:
@@ -155,10 +155,10 @@ class AtCoderPacker(plus_commands.PackerBase):
     if (len(testset.judges) == 1 and
             not isinstance(checker, basic_codes.InternalDiffCode)):
       ui.console.PrintAction(
-        'PACK', testset, 'output checker files', progress=True)
+          'PACK', testset, 'output checker files', progress=True)
       files.CopyFile(
-        os.path.join(testset.src_dir, checker.src_name),
-        os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
+          os.path.join(testset.src_dir, checker.src_name),
+          os.path.join(testset.atcoder_pack_dir, 'etc', 'output_checker.cpp'))
       for f in checker.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.atcoder_pack_dir, 'etc', f))
@@ -170,10 +170,10 @@ class AtCoderPacker(plus_commands.PackerBase):
     if len(testset.reactives) == 1:
       reactive = testset.reactives[0]
       ui.console.PrintAction(
-        'PACK', testset, 'reactive checker files', progress=True)
+          'PACK', testset, 'reactive checker files', progress=True)
       files.CopyFile(
-        os.path.join(testset.src_dir, reactive.src_name),
-        os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
+          os.path.join(testset.src_dir, reactive.src_name),
+          os.path.join(testset.atcoder_pack_dir, 'etc', 'reactive.cpp'))
       for f in reactive.dependency:
         files.CopyFile(os.path.join(testset.project.library_dir, f),
                        os.path.join(testset.atcoder_pack_dir, 'etc', f))
@@ -187,12 +187,12 @@ class AtCoderPacker(plus_commands.PackerBase):
     subtasks = testset.subtask_testcases
     if len(subtasks) > 0:
       score = '\n'.join([
-        s.name + '(' + str(s.score) + ')' + ': ' + ','.join(s.input_patterns)
-        for s in subtasks])
+          s.name + '(' + str(s.score) + ')' + ': ' + ','.join(s.input_patterns)
+          for s in subtasks])
     else:
       score = 'All(100): *'
     files.WriteFile(
-      score, os.path.join(testset.atcoder_pack_dir, 'etc', 'score.txt'))
+        score, os.path.join(testset.atcoder_pack_dir, 'etc', 'score.txt'))
 
     yield True
 
@@ -210,8 +210,8 @@ class AtCoderUploader(plus_commands.UploaderBase):
 
     if problem.atcoder_task_id is None:
       ui.console.PrintAction(
-        'UPLOAD', problem,
-        'This problem is considered to a spare. Not uploaded.')
+          'UPLOAD', problem,
+          'This problem is considered to a spare. Not uploaded.')
       yield True
 
     script = os.path.join(problem.project.atcoder_upload_script)
@@ -239,8 +239,8 @@ class AtCoderUploader(plus_commands.UploaderBase):
 
     with open(log, 'a+') as logfile:
       task = taskgraph.ExternalProcessTask(
-        args, cwd=problem.project.base_dir,
-        stdin=devnull, stdout=logfile, stderr=logfile, exclusive=True)
+          args, cwd=problem.project.base_dir,
+          stdin=devnull, stdout=logfile, stderr=logfile, exclusive=True)
       try:
         proc = yield task
       except Exception:
@@ -266,32 +266,32 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
     task_id = str(solution.problem.atcoder_task_id)
     lang_id = solution.project.atcoder_lang_ids[solution.code.PREFIX]
     source_code = files.ReadFile(
-      os.path.join(solution.src_dir, solution.code.src_name))
+        os.path.join(solution.src_dir, solution.code.src_name))
 
     ui.console.PrintAction(
-      'SUBMIT', solution, str({'task_id': task_id, 'lang_id': lang_id}),
-      progress=True)
+        'SUBMIT', solution, str({'task_id': task_id, 'lang_id': lang_id}),
+        progress=True)
 
     html = solution.project._Request('submit?task_id=%s' % task_id).read()
     pat = re.compile(r'name="__session" value="([^"]+)"')
     m = pat.search(html)
     session = m.group(1)
     r = solution.project._Request('submit?task_id=%s' % task_id, {
-      '__session': session,
-      'task_id': task_id,
-      'language_id_' + task_id: lang_id,
-      'source_code': source_code})
+        '__session': session,
+        'task_id': task_id,
+        'language_id_' + task_id: lang_id,
+        'source_code': source_code})
     r.read()
 
     results = solution.project._Request('submissions/me').read()
     submit_id = results.split('<td><a href="/submissions/')[1].split('"')[0]
 
     ui.console.PrintAction(
-      'SUBMIT', solution, 'submitted: ' + str(submit_id), progress=True)
+        'SUBMIT', solution, 'submitted: ' + str(submit_id), progress=True)
 
     while True:
       result, progress = solution.project._Request(
-        'submissions/' + submit_id).read().split(
+          'submissions/' + submit_id).read().split(
           'data-title="')[1].split('"', 1)
       if 'Judging' not in result:
         break
@@ -302,9 +302,10 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
     else:
       expected = '(fake solution)'
     ui.console.PrintAction(
-      'SUBMIT', solution, '{0} {1}'.format(result, expected))
+        'SUBMIT', solution, '{0} {1}'.format(result, expected))
 
     yield True
+
 
 targets.registry.Override('Project', Project)
 targets.registry.Override('Problem', Problem)
