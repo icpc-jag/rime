@@ -25,10 +25,10 @@ import setuptools
 
 
 if sys.version_info[0] != 2:
-  print('Rime supports Python 2 only at this moment.')
-  print('Please use:')
-  print('    python2 -m pip install git+https://github.com/icpc-jag/rime')
-  sys.exit(1)
+    print('Rime supports Python 2 only at this moment.')
+    print('Please use:')
+    print('    python2 -m pip install git+https://github.com/icpc-jag/rime')
+    sys.exit(1)
 
 setuptools.setup(
     name='rime',
