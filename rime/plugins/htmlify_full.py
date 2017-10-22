@@ -150,11 +150,11 @@ class Project(targets.registry.Project):
             '</dd>\n')
         environments += (
             '<dt>javac:</dt><dd>' +
-            builtin_commands.getoutput('{0} -version').format(javac) +
+            builtin_commands.getoutput('{0} -version'.format(javac)) +
             '</dd>\n')
         environments += (
             '<dt>java:</dt><dd>' +
-            builtin_commands.getoutput('{0} -version').format(java) +
+            builtin_commands.getoutput('{0} -version'.format(java)) +
             '</dd>\n')
         environments += '</dl>\n'
 
