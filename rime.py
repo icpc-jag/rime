@@ -27,4 +27,4 @@ from rime.core import main
 
 
 if __name__ == '__main__':
-  sys.exit(main.Main(sys.argv))
+    sys.exit(main.Main(sys.argv))
