@@ -288,7 +288,7 @@ class Project(targets.registry.Project):
             cell_judge = CELL_NA
 
         # Done.
-        wiki = ('|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
+        wiki = (u'|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
             title, wiki_name, assignees, cell_solutions, cell_input,
             cell_output, cell_validator, cell_judge))
 
