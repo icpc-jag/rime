@@ -164,7 +164,7 @@ class Project(targets.registry.Project):
         else:
             cell_judge = CELL_NA
         # Done.
-        yield ('|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
+        yield (u'|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
             title, wiki_name, assignees, cell_solutions, cell_input,
             cell_output, cell_validator, cell_judge))
 
