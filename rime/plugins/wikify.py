@@ -35,12 +35,12 @@ if sys.version_info[0] == 2:
 else:
     import subprocess as builtin_commands
 
-from rime.basic import codes as basic_codes
+from rime.basic import codes as basic_codes  # NOQA
 import rime.basic.targets.problem  # NOQA
 import rime.basic.targets.project  # NOQA
-from rime.core import commands as rime_commands
-from rime.core import targets
-from rime.core import taskgraph
+from rime.core import commands as rime_commands  # NOQA
+from rime.core import targets  # NOQA
+from rime.core import taskgraph  # NOQA
 
 
 BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
