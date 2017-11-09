@@ -150,7 +150,7 @@ class CommandBase(Command):
         if not rows:
             ui.console.Print(' No options.')
         else:
-            offset = max(rows, key=lambda row: len(row[0]))
+            offset = max([len(left_col) for left_col, _ in rows])
             for left_col_head, right_col_lines in rows:
                 for i, right_col_line in enumerate(right_col_lines):
                     left_col_line = string.ljust(
