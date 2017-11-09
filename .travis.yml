@@ -7,7 +7,7 @@ install:
 script:
     - flake8
     - python setup.py test
-    - cd example && rime test
+    - cd example && rime help && rime test && rime clean
 notifications:
     email:
         on_success: never
