@@ -21,8 +21,6 @@
 # THE SOFTWARE.
 #
 
-import string
-
 from rime.util import class_registry
 from rime.util import struct
 
@@ -123,9 +121,8 @@ class CommandBase(Command):
 
         if not self.name:
             rows = []
-            for cmd in sorted(ui.commands.values(), key=lambda a: a.name):
-                if not cmd.name:
-                    continue
+            values = filter(lambda a: a.name, ui.commands.values())
+            for cmd in sorted(values, key=lambda a: a.name):
                 rows.append((' %s    ' % cmd.name, cmd.oneline_summary))
 
             offset = max([len(left_col) for left_col, _ in rows])
@@ -133,7 +130,7 @@ class CommandBase(Command):
             ui.console.Print('Commands:')
             ui.console.Print()
             for left_col, right_col in rows:
-                ui.console.Print(string.ljust(left_col, offset) + right_col)
+                ui.console.Print(left_col.ljust(offset) + right_col)
             ui.console.Print()
 
     def _PrintOptionDescription(self, ui):
@@ -153,8 +150,8 @@ class CommandBase(Command):
             offset = max([len(left_col) for left_col, _ in rows])
             for left_col_head, right_col_lines in rows:
                 for i, right_col_line in enumerate(right_col_lines):
-                    left_col_line = string.ljust(
-                        (i == 0 and left_col_head or ''), offset)
+                    left_col_line = (i == 0 and left_col_head or '').ljust(
+                        offset)
                     ui.console.Print(left_col_line + right_col_line)
         ui.console.Print()
 

@@ -27,13 +27,15 @@ import re
 import socket
 import sys
 import urllib
-import urllib2
-import urlparse
 
 if sys.version_info[0] == 2:
     import commands as builtin_commands  # NOQA
+    import urllib2
+    import urlparse
 else:
     import subprocess as builtin_commands
+    import urllib.parse as urlparse
+    import urllib.request as urllib2
 
 from rime.basic import codes as basic_codes  # NOQA
 import rime.basic.targets.problem  # NOQA

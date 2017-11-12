@@ -22,13 +22,19 @@
 # THE SOFTWARE.
 #
 
-import cookielib
 import os
 import os.path
 import re
+import sys
 import time
 import urllib
-import urllib2
+
+if sys.version_info[0] == 2:
+    import cookielib
+    import urllib2
+else:
+    import http.cookiejar as cookielib
+    import urllib.request as urllib2
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts
