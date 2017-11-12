@@ -58,6 +58,9 @@ class Default(commands.CommandBase):
         self.AddOptionEntry(commands.OptionEntry(
             'k', 'keep_going', 'keep_going', bool, False, None,
             'Do not skip tests on failures.'))
+        self.AddOptionEntry(commands.OptionEntry(
+            'q', 'quiet', 'quiet', bool, False, None,
+            'Skip unimportant message.'))
 
 
 def IsBasicTarget(obj):

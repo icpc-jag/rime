@@ -113,6 +113,9 @@ def InternalMain(argv):
         console.PrintError(str(e))
         return 1
 
+    if options.quiet:
+        console.set_quiet()
+
     graph = CreateTaskGraph(options)
 
     ui = ui_mod.UiContext(options, console, commands, graph)
