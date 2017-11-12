@@ -28,6 +28,13 @@ import socket
 import sys
 import urllib
 
+from rime.basic import codes as basic_codes
+import rime.basic.targets.problem
+import rime.basic.targets.project  # NOQA
+from rime.core import commands as rime_commands
+from rime.core import targets
+from rime.core import taskgraph
+
 if sys.version_info[0] == 2:
     import commands as builtin_commands  # NOQA
     import urllib2
@@ -36,13 +43,6 @@ else:
     import subprocess as builtin_commands
     import urllib.parse as urlparse
     import urllib.request as urllib2
-
-from rime.basic import codes as basic_codes  # NOQA
-import rime.basic.targets.problem  # NOQA
-import rime.basic.targets.project  # NOQA
-from rime.core import commands as rime_commands  # NOQA
-from rime.core import targets  # NOQA
-from rime.core import taskgraph  # NOQA
 
 
 BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'

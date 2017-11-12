@@ -29,23 +29,23 @@ import sys
 import time
 import urllib
 
+from rime.basic import codes as basic_codes
+from rime.basic import consts
+import rime.basic.targets.problem
+import rime.basic.targets.project
+import rime.basic.targets.solution
+import rime.basic.targets.testset  # NOQA
+from rime.core import targets
+from rime.core import taskgraph
+from rime.plugins.plus import commands as plus_commands
+from rime.util import files
+
 if sys.version_info[0] == 2:
     import cookielib
     import urllib2
 else:
     import http.cookiejar as cookielib
     import urllib.request as urllib2
-
-from rime.basic import codes as basic_codes
-from rime.basic import consts
-import rime.basic.targets.problem   # NOQA
-import rime.basic.targets.project   # NOQA
-import rime.basic.targets.solution  # NOQA
-import rime.basic.targets.testset   # NOQA
-from rime.core import targets
-from rime.core import taskgraph
-from rime.plugins.plus import commands as plus_commands
-from rime.util import files
 
 # opener with cookiejar
 cookiejar = cookielib.CookieJar()
