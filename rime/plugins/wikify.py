@@ -26,7 +26,8 @@ import getpass
 import re
 import socket
 import sys
-import urllib
+
+from six.moves import urllib
 
 from rime.basic import codes as basic_codes
 import rime.basic.targets.problem
@@ -37,12 +38,8 @@ from rime.core import taskgraph
 
 if sys.version_info[0] == 2:
     import commands as builtin_commands  # NOQA
-    import urllib2
-    import urlparse
 else:
     import subprocess as builtin_commands
-    import urllib.parse as urlparse
-    import urllib.request as urllib2
 
 
 BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
@@ -177,18 +174,18 @@ class Project(targets.registry.Project):
         auth_realm = SafeUnicode(self.wikify_auth_realm)
         auth_username = self.wikify_auth_username
         auth_password = self.wikify_auth_password
-        auth_hostname = urlparse.urlparse(url).hostname
+        auth_hostname = urllib.parse.urlparse(url).hostname
 
         native_page = page.encode(encoding)
         native_auth_realm = auth_realm.encode(encoding)
         native_wiki = wiki.encode(encoding)
 
         if self.wikify_auth_realm:
-            auth_handler = urllib2.HTTPBasicAuthHandler()
+            auth_handler = urllib.request.HTTPBasicAuthHandler()
             auth_handler.add_password(
                 native_auth_realm, auth_hostname, auth_username, auth_password)
-            opener = urllib2.build_opener(auth_handler)
-            urllib2.install_opener(opener)
+            opener = urllib.request.build_opener(auth_handler)
+            urllib.request.install_opener(opener)
 
         ui.console.PrintAction('UPLOAD', None, url)
 
@@ -196,8 +193,8 @@ class Project(targets.registry.Project):
             'cmd': 'edit',
             'page': native_page,
         }
-        edit_page_content = urllib2.urlopen(
-            '%s?%s' % (url, urllib.urlencode(edit_params))).read()
+        edit_page_content = urllib.request.urlopen(
+            '%s?%s' % (url, urllib.parse.urlencode(edit_params))).read()
 
         digest = re.search(
             r'value="([0-9a-f]{32})"', edit_page_content).group(1)
@@ -210,7 +207,7 @@ class Project(targets.registry.Project):
             'write': u'ページの更新'.encode(encoding),
             'encode_hint': u'ぷ'.encode(encoding),
         }
-        urllib2.urlopen(url, urllib.urlencode(update_params))
+        urllib.request.urlopen(url, urllib.urlencode(update_params))
 
 
 class Problem(targets.registry.Problem):

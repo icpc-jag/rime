@@ -25,9 +25,10 @@
 import os
 import os.path
 import re
-import sys
 import time
-import urllib
+
+from six.moves import http_cookiejar
+from six.moves import urllib
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts
@@ -40,16 +41,11 @@ from rime.core import taskgraph
 from rime.plugins.plus import commands as plus_commands
 from rime.util import files
 
-if sys.version_info[0] == 2:
-    import cookielib
-    import urllib2
-else:
-    import http.cookiejar as cookielib
-    import urllib.request as urllib2
 
 # opener with cookiejar
-cookiejar = cookielib.CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+cookiejar = http_cookiejar.CookieJar()
+opener = urllib.request.build_opener(
+    urllib.request.HTTPCookieProcessor(cookiejar))
 
 
 class Project(targets.registry.Project):
@@ -79,7 +75,7 @@ class Project(targets.registry.Project):
     def _Request(self, path, data=None):
         if type(data) == dict:
             data = urllib.urlencode(data)
-        req = urllib2.Request(self.atcoder_contest_url + path, data)
+        req = urllib.request.Request(self.atcoder_contest_url + path, data)
         return opener.open(req)
 
     def _Login(self):
