@@ -51,6 +51,7 @@ class ConsoleBase(object):
     def __init__(self, out, caps):
         self.out = out
         self.caps = caps
+        self.quiet = False
         # Whether the last print is marked "progress".
         self._last_progress = False
         for name, value in _COLOR_ESCAPE_SEQUENCES.items():
@@ -58,12 +59,20 @@ class ConsoleBase(object):
         for name, value in _CONTROL_ESCAPE_SEQUENCES.items():
             setattr(self, name, (self.caps.overwrite and value or ''))
 
+    # TODO(mizuno): Move to constructor.
+    def set_quiet(self):
+        self.quiet = True
+
     def Print(self, *args, **kwargs):
         """Print one line.
 
         Each argument is either ordinal string or control code.
         """
         progress = bool(kwargs.get('progress'))
+
+        if self.quiet and progress:
+            return
+
         msg = ''.join(args)
         if self._last_progress and self.caps.overwrite:
             self.out.write(self.UP + '\r' + msg + self.KILL + '\n')
