@@ -2,3 +2,5 @@
 
 ## You can load plugins here.
 #use_plugin('pack_mjudge')
+use_plugin('wikify')
+use_plugin('htmlify_full')
