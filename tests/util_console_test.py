@@ -21,14 +21,19 @@
 # THE SOFTWARE.
 #
 
-import StringIO
+import sys
 import unittest
 
-import mox
+from six import StringIO
 
 from rime.util import console
 from rime.util import files
 from rime.util import struct
+
+if sys.version_info[0] == 2:
+    import mox
+else:
+    from mox3 import mox
 
 
 class ConsoleTest(unittest.TestCase):
@@ -39,7 +44,7 @@ class ConsoleTest(unittest.TestCase):
         self.mox.UnsetStubs()
 
     def CreateStringIOConsole(self):
-        return console.ConsoleBase(out=StringIO.StringIO(),
+        return console.ConsoleBase(out=StringIO(),
                                    caps=struct.Struct(color=True,
                                                       overwrite=True))
 
