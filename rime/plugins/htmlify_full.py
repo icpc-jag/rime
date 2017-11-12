@@ -74,7 +74,7 @@ def GetFileHash(dir, filename):
         f = open(filepath)
         r = f.read()
         f.close()
-        return hashlib.md5(SafeUnicode(r)).hexdigest()
+        return hashlib.md5(SafeUnicode(r).encode('utf-8')).hexdigest()
     else:
         return ''
 
