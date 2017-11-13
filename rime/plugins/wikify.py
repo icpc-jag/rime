@@ -183,7 +183,7 @@ class Project(targets.registry.Project):
         if self.wikify_auth_realm:
             auth_handler = urllib.request.HTTPBasicAuthHandler()
             auth_handler.add_password(
-                native_auth_realm, auth_hostname, auth_username, auth_password)
+                auth_realm, auth_hostname, auth_username, auth_password)
             opener = urllib.request.build_opener(auth_handler)
             urllib.request.install_opener(opener)
 
@@ -197,7 +197,7 @@ class Project(targets.registry.Project):
             '%s?%s' % (url, urllib.parse.urlencode(edit_params))).read()
 
         digest = re.search(
-            r'value="([0-9a-f]{32})"', edit_page_content).group(1)
+            r'value="([0-9a-f]{32})"', edit_page_content.decode(encoding)).group(1)
 
         update_params = {
             'cmd': 'edit',
@@ -207,7 +207,7 @@ class Project(targets.registry.Project):
             'write': u'ページの更新'.encode(encoding),
             'encode_hint': u'ぷ'.encode(encoding),
         }
-        urllib.request.urlopen(url, urllib.urlencode(update_params))
+        urllib.request.urlopen(url, urllib.parse.urlencode(update_params).encode(encoding))
 
 
 class Problem(targets.registry.Problem):
