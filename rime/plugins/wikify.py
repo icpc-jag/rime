@@ -177,7 +177,6 @@ class Project(targets.registry.Project):
         auth_hostname = urllib.parse.urlparse(url).hostname
 
         native_page = page.encode(encoding)
-        native_auth_realm = auth_realm.encode(encoding)
         native_wiki = wiki.encode(encoding)
 
         if self.wikify_auth_realm:
@@ -197,7 +196,8 @@ class Project(targets.registry.Project):
             '%s?%s' % (url, urllib.parse.urlencode(edit_params))).read()
 
         digest = re.search(
-            r'value="([0-9a-f]{32})"', edit_page_content.decode(encoding)).group(1)
+            r'value="([0-9a-f]{32})"',
+            edit_page_content.decode(encoding)).group(1)
 
         update_params = {
             'cmd': 'edit',
@@ -207,7 +207,8 @@ class Project(targets.registry.Project):
             'write': u'ページの更新'.encode(encoding),
             'encode_hint': u'ぷ'.encode(encoding),
         }
-        urllib.request.urlopen(url, urllib.parse.urlencode(update_params).encode(encoding))
+        urllib.request.urlopen(
+            url, urllib.parse.urlencode(update_params).encode(encoding))
 
 
 class Problem(targets.registry.Problem):
