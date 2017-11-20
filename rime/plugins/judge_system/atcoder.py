@@ -74,7 +74,7 @@ class Project(targets.registry.Project):
 
     def _Request(self, path, data=None):
         if type(data) == dict:
-            data = urllib.urlencode(data)
+            data = urllib.parse.urlencode(data).encode('utf-8')
         req = urllib.request.Request(self.atcoder_contest_url + path, data)
         return opener.open(req)
 
@@ -82,7 +82,7 @@ class Project(targets.registry.Project):
         if not self.atcoder_logined:
             self._Request('login',
                           {'name': self.atcoder_username,
-                           'password': self.atcoder_password}).info().headers
+                           'password': self.atcoder_password})
             self.atcoder_logined = True
 
 
@@ -291,7 +291,7 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
 
         html = solution.project._Request('submit?task_id=%s' % task_id).read()
         pat = re.compile(r'name="__session" value="([^"]+)"')
-        m = pat.search(html)
+        m = pat.search(str(html))
         session = m.group(1)
         r = solution.project._Request('submit?task_id=%s' % task_id, {
             '__session': session,
@@ -301,15 +301,15 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
         r.read()
 
         results = solution.project._Request('submissions/me').read()
-        submit_id = results.split(
+        submit_id = str(results).split(
             '<td><a href="/submissions/')[1].split('"')[0]
 
         ui.console.PrintAction(
             'SUBMIT', solution, 'submitted: ' + str(submit_id), progress=True)
 
         while True:
-            result, progress = solution.project._Request(
-                'submissions/' + submit_id).read().split(
+            result, progress = str(solution.project._Request(
+                'submissions/' + submit_id).read()).split(
                 'data-title="')[1].split('"', 1)
             if 'Judging' not in result:
                 break
