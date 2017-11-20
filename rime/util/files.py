@@ -69,8 +69,8 @@ def GetModified(file):
 
 
 def GetLastModifiedUnder(dir):
-    return max([GetModified(os.path.join(dir, name))
-                for name in (ListDir(dir, True) + [dir])])
+    file_list = [f for f in ListDir(dir, True)] + [dir]
+    return max([GetModified(os.path.join(dir, name)) for name in file_list])
 
 
 def CreateEmptyFile(file):

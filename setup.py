@@ -19,16 +19,10 @@
 # THE SOFTWARE.
 #
 
+import setuptools
 import sys
 
-import setuptools
-
-
-if sys.version_info[0] != 2:
-    print('Rime supports Python 2 only at this moment.')
-    print('Please use:')
-    print('    python2 -m pip install git+https://github.com/icpc-jag/rime')
-    sys.exit(1)
+mox = 'mox' if sys.version_info[0] == 2 else 'mox3'
 
 setuptools.setup(
     name='rime',
@@ -40,5 +34,5 @@ setuptools.setup(
     package_dir={'rime': 'rime'},
     install_requires=['six'],
     test_suite='nose.collector',
-    tests_require=['nose', 'mox'],
+    tests_require=['nose', mox],
 )

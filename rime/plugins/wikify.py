@@ -26,21 +26,20 @@ import getpass
 import re
 import socket
 import sys
-import urllib
-import urllib2
-import urlparse
+
+from six.moves import urllib
+
+from rime.basic import codes as basic_codes
+import rime.basic.targets.problem
+import rime.basic.targets.project  # NOQA
+from rime.core import commands as rime_commands
+from rime.core import targets
+from rime.core import taskgraph
 
 if sys.version_info[0] == 2:
     import commands as builtin_commands  # NOQA
 else:
     import subprocess as builtin_commands
-
-from rime.basic import codes as basic_codes  # NOQA
-import rime.basic.targets.problem  # NOQA
-import rime.basic.targets.project  # NOQA
-from rime.core import commands as rime_commands  # NOQA
-from rime.core import targets  # NOQA
-from rime.core import taskgraph  # NOQA
 
 
 BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
@@ -175,18 +174,17 @@ class Project(targets.registry.Project):
         auth_realm = SafeUnicode(self.wikify_auth_realm)
         auth_username = self.wikify_auth_username
         auth_password = self.wikify_auth_password
-        auth_hostname = urlparse.urlparse(url).hostname
+        auth_hostname = urllib.parse.urlparse(url).hostname
 
         native_page = page.encode(encoding)
-        native_auth_realm = auth_realm.encode(encoding)
         native_wiki = wiki.encode(encoding)
 
         if self.wikify_auth_realm:
-            auth_handler = urllib2.HTTPBasicAuthHandler()
+            auth_handler = urllib.request.HTTPBasicAuthHandler()
             auth_handler.add_password(
-                native_auth_realm, auth_hostname, auth_username, auth_password)
-            opener = urllib2.build_opener(auth_handler)
-            urllib2.install_opener(opener)
+                auth_realm, auth_hostname, auth_username, auth_password)
+            opener = urllib.request.build_opener(auth_handler)
+            urllib.request.install_opener(opener)
 
         ui.console.PrintAction('UPLOAD', None, url)
 
@@ -194,11 +192,12 @@ class Project(targets.registry.Project):
             'cmd': 'edit',
             'page': native_page,
         }
-        edit_page_content = urllib2.urlopen(
-            '%s?%s' % (url, urllib.urlencode(edit_params))).read()
+        edit_page_content = urllib.request.urlopen(
+            '%s?%s' % (url, urllib.parse.urlencode(edit_params))).read()
 
         digest = re.search(
-            r'value="([0-9a-f]{32})"', edit_page_content).group(1)
+            r'value="([0-9a-f]{32})"',
+            edit_page_content.decode(encoding)).group(1)
 
         update_params = {
             'cmd': 'edit',
@@ -208,7 +207,8 @@ class Project(targets.registry.Project):
             'write': u'ページの更新'.encode(encoding),
             'encode_hint': u'ぷ'.encode(encoding),
         }
-        urllib2.urlopen(url, urllib.urlencode(update_params))
+        urllib.request.urlopen(
+            url, urllib.parse.urlencode(update_params).encode(encoding))
 
 
 class Problem(targets.registry.Problem):

@@ -6,6 +6,9 @@
 ##   id: The problem ID (typically starts from A) used to order problems.
 ##   time_limit: The time limit of this problem in seconds.
 problem(title = "A+B Problem",
+        wiki_name = 'A+B',
+        assignees = 'assignee',
+        need_custom_judge = False,
         id = "A",
         time_limit = 1.0,
         )

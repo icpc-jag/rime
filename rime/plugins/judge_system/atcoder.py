@@ -22,28 +22,30 @@
 # THE SOFTWARE.
 #
 
-import cookielib
 import os
 import os.path
 import re
 import time
-import urllib
-import urllib2
+
+from six.moves import http_cookiejar
+from six.moves import urllib
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts
-import rime.basic.targets.problem   # NOQA
-import rime.basic.targets.project   # NOQA
-import rime.basic.targets.solution  # NOQA
-import rime.basic.targets.testset   # NOQA
+import rime.basic.targets.problem
+import rime.basic.targets.project
+import rime.basic.targets.solution
+import rime.basic.targets.testset  # NOQA
 from rime.core import targets
 from rime.core import taskgraph
 from rime.plugins.plus import commands as plus_commands
 from rime.util import files
 
+
 # opener with cookiejar
-cookiejar = cookielib.CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
+cookiejar = http_cookiejar.CookieJar()
+opener = urllib.request.build_opener(
+    urllib.request.HTTPCookieProcessor(cookiejar))
 
 
 class Project(targets.registry.Project):
@@ -72,15 +74,15 @@ class Project(targets.registry.Project):
 
     def _Request(self, path, data=None):
         if type(data) == dict:
-            data = urllib.urlencode(data)
-        req = urllib2.Request(self.atcoder_contest_url + path, data)
+            data = urllib.parse.urlencode(data).encode('utf-8')
+        req = urllib.request.Request(self.atcoder_contest_url + path, data)
         return opener.open(req)
 
     def _Login(self):
         if not self.atcoder_logined:
             self._Request('login',
                           {'name': self.atcoder_username,
-                           'password': self.atcoder_password}).info().headers
+                           'password': self.atcoder_password})
             self.atcoder_logined = True
 
 
@@ -289,7 +291,7 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
 
         html = solution.project._Request('submit?task_id=%s' % task_id).read()
         pat = re.compile(r'name="__session" value="([^"]+)"')
-        m = pat.search(html)
+        m = pat.search(str(html))
         session = m.group(1)
         r = solution.project._Request('submit?task_id=%s' % task_id, {
             '__session': session,
@@ -299,15 +301,15 @@ class AtCoderSubmitter(plus_commands.SubmitterBase):
         r.read()
 
         results = solution.project._Request('submissions/me').read()
-        submit_id = results.split(
+        submit_id = str(results).split(
             '<td><a href="/submissions/')[1].split('"')[0]
 
         ui.console.PrintAction(
             'SUBMIT', solution, 'submitted: ' + str(submit_id), progress=True)
 
         while True:
-            result, progress = solution.project._Request(
-                'submissions/' + submit_id).read().split(
+            result, progress = str(solution.project._Request(
+                'submissions/' + submit_id).read()).split(
                 'data-title="')[1].split('"', 1)
             if 'Judging' not in result:
                 break
