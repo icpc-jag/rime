@@ -26,9 +26,9 @@
 Initialize a rime project.
 """
 
-import sys
 import os
 import os.path
+import sys
 
 from six.moves import urllib
 
