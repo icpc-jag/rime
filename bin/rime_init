@@ -77,7 +77,8 @@ target
         os.makedirs('common')
     try:
         urllib.request.urlretrieve(
-            'https://raw.githubusercontent.com/MikeMirzayanov/testlib/master/testlib.h',
+            'https://raw.githubusercontent.com/'
+            'MikeMirzayanov/testlib/master/testlib.h',
             'common/testlib.h')
     except Exception:
         os.remove('PROJECT')
