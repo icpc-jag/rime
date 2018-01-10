@@ -10,6 +10,7 @@ script:
     - flake8
     - python setup.py test
     - rime
+    - mkdir tmp && cd tmp && rime_init --git && cd ..
     - cd example && rime help
     - rime test && rime clean
     - rime htmlify_full && rime clean
