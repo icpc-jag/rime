@@ -5,10 +5,10 @@ python:
     - 3.5
 install:
     - pip install .
-    - pip install flake8 hacking
+    - pip install flake8 hacking pytest mock
 script:
     - flake8
-    - python setup.py test
+    - pytest
     - rime
     - mkdir tmp && cd tmp && rime_init --git && cd ..
     - cd example && rime help

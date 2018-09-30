@@ -1,7 +1,4 @@
 import setuptools
-import sys
-
-mox = 'mox' if sys.version_info[0] == 2 else 'mox3'
 
 setuptools.setup(
     name='rime',
@@ -12,6 +9,5 @@ setuptools.setup(
               'rime.plugins.plus', 'rime.util'],
     package_dir={'rime': 'rime'},
     install_requires=['six'],
-    test_suite='nose.collector',
-    tests_require=['nose', mox],
+    tests_require=['pytest', 'mock'],
 )
