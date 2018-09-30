@@ -765,9 +765,9 @@ def _SmartFileSize(size):
     if size < 1000:
         return str(size) + 'B'
     elif size < 1000000:
-        return str(size // 100 * 0.1) + 'kB'
+        return '{:.1f}kB'.format(size / 1000.0)
     else:
-        return str(size // 100000 * 0.1) + 'MB'
+        return '{:.1f}MB'.format(size / 1000000.0)
 
 
 # sort correctly
