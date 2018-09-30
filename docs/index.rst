@@ -476,7 +476,3 @@ Rime の実行は次のように行います。
 ==========
 
 .. warning:: TODO(nya): 書く
-
-
---------
-Copyright (c) 2011-2013 Rime Project.
