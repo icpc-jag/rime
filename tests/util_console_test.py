@@ -1,27 +1,17 @@
 #!/usr/bin/python
 
-import sys
 import unittest
 
 from six import StringIO
+
+import mock
 
 from rime.util import console
 from rime.util import files
 from rime.util import struct
 
-if sys.version_info[0] == 2:
-    import mox
-else:
-    from mox3 import mox
-
 
 class ConsoleTest(unittest.TestCase):
-    def setUp(self):
-        self.mox = mox.Mox()
-
-    def tearDown(self):
-        self.mox.UnsetStubs()
-
     def CreateStringIOConsole(self):
         return console.ConsoleBase(out=StringIO(),
                                    caps=struct.Struct(color=True,
@@ -79,58 +69,54 @@ class ConsoleTest(unittest.TestCase):
 
     def testPrintActionWithoutObj(self):
         c = self.CreateStringIOConsole()
-        self.mox.StubOutWithMock(c, 'Print')
-        c.Print('\x1b[32m', '[   HOGE   ]', '\x1b[0m', ' ',
-                'hoge', 'piyo', foo='bar')
-        self.mox.ReplayAll()
+        c.Print = mock.MagicMock()
         c.PrintAction('HOGE', None, 'hoge', 'piyo', foo='bar')
-        self.mox.VerifyAll()
+        c.Print.assert_called_once_with(
+            '\x1b[32m', '[   HOGE   ]', '\x1b[0m', ' ', 'hoge', 'piyo',
+            foo='bar')
 
     def testPrintActionWithObj(self):
         c = self.CreateStringIOConsole()
-        self.mox.StubOutWithMock(c, 'Print')
-        c.Print('\x1b[32m', '[   HOGE   ]', '\x1b[0m', ' ', 'name', ':', ' ',
-                'hoge', 'piyo', foo='bar')
-        self.mox.ReplayAll()
+        c.Print = mock.MagicMock()
         c.PrintAction('HOGE', struct.Struct(fullname='name'),
                       'hoge', 'piyo', foo='bar')
-        self.mox.VerifyAll()
+        c.Print.assert_called_once_with(
+            '\x1b[32m', '[   HOGE   ]', '\x1b[0m', ' ', 'name', ':', ' ',
+            'hoge', 'piyo', foo='bar')
 
     def testPrintActionWithObjNoArg(self):
         c = self.CreateStringIOConsole()
-        self.mox.StubOutWithMock(c, 'Print')
-        c.Print('\x1b[32m', '[   HOGE   ]', '\x1b[0m', ' ', 'name', foo='bar')
-        self.mox.ReplayAll()
+        c.Print = mock.MagicMock()
         c.PrintAction('HOGE', struct.Struct(fullname='name'), foo='bar')
-        self.mox.VerifyAll()
+        c.Print.assert_called_once_with(
+            '\x1b[32m', '[   HOGE   ]', '\x1b[0m', ' ', 'name', foo='bar')
 
     def testPrintError(self):
         c = self.CreateStringIOConsole()
-        self.mox.StubOutWithMock(c, 'Print')
-        c.Print('\x1b[31m', 'ERROR:', '\x1b[0m', ' ', 'hoge')
-        self.mox.ReplayAll()
+        c.Print = mock.MagicMock()
         c.PrintError('hoge')
-        self.mox.VerifyAll()
+        c.Print.assert_called_once_with(
+            '\x1b[31m', 'ERROR:', '\x1b[0m', ' ', 'hoge')
 
     def testPrintWarning(self):
         c = self.CreateStringIOConsole()
-        self.mox.StubOutWithMock(c, 'Print')
-        c.Print('\x1b[33m', 'WARNING:', '\x1b[0m', ' ', 'hoge')
-        self.mox.ReplayAll()
+        c.Print = mock.MagicMock()
         c.PrintWarning('hoge')
-        self.mox.VerifyAll()
+        c.Print.assert_called_once_with(
+            '\x1b[33m', 'WARNING:', '\x1b[0m', ' ', 'hoge')
 
     def testPrintLog(self):
         c = self.CreateStringIOConsole()
-        self.mox.StubOutWithMock(c, 'Print')
-        c.Print('')
-        c.Print('hoge')
-        c.Print('')
-        c.Print('piyo')
-        c.Print('')
-        self.mox.ReplayAll()
+        c.Print = mock.MagicMock()
         c.PrintLog('\nhoge\n\npiyo\n\n')
-        self.mox.VerifyAll()
+        expected = [
+            mock.call(''),
+            mock.call('hoge'),
+            mock.call(''),
+            mock.call('piyo'),
+            mock.call('')
+        ]
+        self.assertEqual(c.Print.mock_calls, expected)
 
 
 if __name__ == '__main__':
