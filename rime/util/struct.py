@@ -7,9 +7,9 @@ class Struct(dict):
     def __getattribute__(self, name):
         try:
             return super(Struct, self).__getattribute__(name)
-        except AttributeError:
+        except AttributeError as e:
             try:
                 return self[name]
             except KeyError:
                 pass
-            raise
+            raise e
