@@ -24,9 +24,9 @@ class ClassRegistry(object):
     def __getattribute__(self, name):
         try:
             return super(ClassRegistry, self).__getattribute__(name)
-        except AttributeError:
+        except AttributeError as e:
             try:
                 return self.classes[name]
             except KeyError:
                 pass
-            raise
+            raise e
