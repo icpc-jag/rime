@@ -93,7 +93,7 @@ class Testset(targets.registry.Testset):
                         detail=detail, allow_override=True)
                     if min_score == max_score:
                         ui.errors.Error(self,
-                                        'expected score %s does not equal to'
+                                        'expected score %s does not equal to '
                                         '%s' %
                                         (solution.expected_score, min_score))
                     else:
