@@ -56,9 +56,8 @@ class TargetBase(object):
         self._loaded = True
 
         # Evaluate config.
-        try:
-            script = files.ReadFile(self.config_file)
-        except IOError:
+        script = files.ReadFile(self.config_file)
+        if script is None:
             raise ConfigurationError('cannot read file: %s' % self.config_file)
         try:
             code = compile(script, self.config_file, 'exec')
