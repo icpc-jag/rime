@@ -70,7 +70,7 @@ class HackerRankPacker(plus_commands.PackerBase):
                 os.path.join(testset.hackerrank_pack_dir))
             ui.console.PrintAction(
                 'PACK', testset, 'zipped to hackerrank.zip', progress=True)
-        except Exception as e:
+        except Exception:
             ui.errors.Exception(testset)
             yield False
 
