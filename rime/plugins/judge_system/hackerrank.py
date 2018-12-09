@@ -16,7 +16,8 @@ from rime.util import files
 class Testset(targets.registry.Testset):
     def __init__(self, *args, **kwargs):
         super(Testset, self).__init__(*args, **kwargs)
-        self.hackerrank_pack_dir = os.path.join(self.problem.out_dir, 'hackerrank')
+        self.hackerrank_pack_dir = os.path.join(self.problem.out_dir,
+                                                'hackerrank')
 
 
 class HackerRankPacker(plus_commands.PackerBase):
@@ -41,7 +42,7 @@ class HackerRankPacker(plus_commands.PackerBase):
                     'PACK',
                     testset,
                     '%s -> input/%s' % (os.path.basename(testcase.infile),
-                                  packed_infile),
+                                        packed_infile),
                     progress=True)
                 files.CopyFile(os.path.join(testset.out_dir, testcase.infile),
                                os.path.join(testset.hackerrank_pack_dir,
@@ -50,7 +51,8 @@ class HackerRankPacker(plus_commands.PackerBase):
                 ui.console.PrintAction(
                     'PACK',
                     testset,
-                    '%s -> output/%s' % (os.path.basename(difffile), packed_difffile),
+                    '%s -> output/%s' % (os.path.basename(difffile),
+                                         packed_difffile),
                     progress=True)
                 files.CopyFile(os.path.join(testset.out_dir, difffile),
                                os.path.join(testset.hackerrank_pack_dir,
@@ -59,7 +61,7 @@ class HackerRankPacker(plus_commands.PackerBase):
             except Exception:
                 ui.errors.Exception(testset)
                 yield False
-        
+
         # hackerrank.zip
         try:
             shutil.make_archive(
@@ -71,7 +73,6 @@ class HackerRankPacker(plus_commands.PackerBase):
         except Exception as e:
             ui.errors.Exception(testset)
             yield False
-
 
         # case.txt
         files.WriteFile(str(len(testcases)),
@@ -85,7 +86,8 @@ class HackerRankPacker(plus_commands.PackerBase):
             ui.console.PrintAction(
                 'PACK', testset, 'checker files', progress=True)
             files.CopyFile(os.path.join(testset.src_dir, checker.src_name),
-                           os.path.join(testset.hackerrank_pack_dir, 'checker.cpp'))
+                           os.path.join(testset.hackerrank_pack_dir,
+                                        'checker.cpp'))
             for f in checker.dependency:
                 files.CopyFile(os.path.join(testset.project.library_dir, f),
                                os.path.join(testset.hackerrank_pack_dir, f))
