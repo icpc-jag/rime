@@ -4,7 +4,6 @@ import os
 import os.path
 import shutil
 
-from rime.basic import codes as basic_codes
 from rime.basic import consts
 import rime.basic.targets.testset   # NOQA
 from rime.core import targets
