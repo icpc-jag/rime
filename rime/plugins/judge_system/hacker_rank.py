@@ -31,13 +31,8 @@ class HackerRankPacker(plus_commands.PackerBase):
         except Exception:
             ui.errors.Exception(testset)
             yield False
-        if len(testcases) > 100:
-            # ※100ケース以上はupload時にエラーとなる可能性が高い
-            template_packed_infile = 'input{:03d}.txt'
-            template_packed_difffile = 'output{:03d}.txt'
-        else:
-            template_packed_infile = 'input{:02d}.txt'
-            template_packed_difffile = 'output{:02d}.txt'
+        template_packed_infile = 'input{:d}.txt'
+        template_packed_difffile = 'output{:d}.txt'
         for i, testcase in enumerate(testcases):
             basename = os.path.splitext(testcase.infile)[0]
             difffile = basename + consts.DIFF_EXT
