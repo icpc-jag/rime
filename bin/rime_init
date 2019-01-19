@@ -70,6 +70,7 @@ target
 use_plugin('rime_plus')
 use_plugin('judge_system.atcoder')
 #use_plugin('judge_system.aoj')
+#use_plugin('judge_system.hacker_rank')
 #use_plugin('wikify')
 #use_plugin('wikify_full')
 
