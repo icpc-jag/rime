@@ -323,6 +323,19 @@ TESTSET
        java_generator('Generator.java')
        java_generator('Generator.java', compile_flags=['-source', '1.4'], run_flags=['-agentlib:hprof'], encoding='cp932', mainclass='Start')
 
+.. function:: rust_generator(src_name, flags=[])
+
+   Rust で書かれた入力生成器を登録します。
+
+   *src_name* にはソースコードの名前を拡張子付きで指定します。
+
+   *flags* にはコンパイラに渡すフラグを文字列のリストで指定します。
+
+   例::
+
+       rust_generator('generator.rs')
+       rust_generator('generator.rs', flags=['-O'])
+
 .. function:: script_generator(src_name, run_flags=[])
 
    スクリプト言語で書かれた入力生成器を登録します。スクリプトの冒頭は、使用するプログラミング言語を明示するために ``#!`` (shebang) で始まらなければなりません。Rime は shebang を解釈するためにスクリプトを perl インタプリタに渡すので、shebang が存在しない場合は perl スクリプトとして実行されます。
