@@ -88,20 +88,20 @@ class Project(targets.registry.Project):
         footer = u''
 
         # Generate content.
-        html = u'## Summary\n\n'
-        html += (
+        markdown = u'## Summary\n\n'
+        markdown += (
             u'問題|担当|解答|入力|出力|入検|出検\n'
             ':---|:---|:---|:---|:---|:---|:---\n'
             )
 
-        htmlFull = u'## Detail\n\n'
+        markdownFull = u'## Detail\n\n'
 
         results = yield taskgraph.TaskBranch([
             self._GenerateMarkdownFullOne(problem, ui)
             for problem in self.problems])
-        (htmlResults, htmlFullResults) = zip(*results)
-        html += ''.join(htmlResults) + '\n'
-        htmlFull += ''.join(htmlFullResults)
+        (markdownResults, markdownFullResults) = zip(*results)
+        markdown += ''.join(markdownResults) + '\n'
+        markdownFull += ''.join(markdownFullResults)
 
         cc = os.getenv('CC', 'gcc')
         cxx = os.getenv('CXX', 'g++')
@@ -144,7 +144,9 @@ class Project(targets.registry.Project):
                     errors += '\t- ' + e + '\n'
             errors += '\n'
 
-        yield header + info + html + environments + errors + htmlFull + footer
+        yield (
+            header + info + markdown + environments + errors + markdownFull
+            + footer)
 
     @taskgraph.task_method
     def _GenerateMarkdownFullOne(self, problem, ui):
@@ -158,15 +160,16 @@ class Project(targets.registry.Project):
         assignees = SafeUnicode(assignees)
 
         # Get various information about the problem.
-        htmlFull = '### ' + title + '\n\n'
+        markdownFull = '### ' + title + '\n\n'
         solutions = sorted(problem.solutions, key=lambda x: x.name)
         solutionnames = [solution.name for solution in solutions]
 
         captions = [
             name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-        htmlFull += ('|'.join(
+        markdownFull += ('|'.join(
                          ['testcase', 'in', 'diff', 'md5'] + captions +
-                         ['Comments']) + '\n' + '|:---'*(5+len(captions)) + '\n')
+                         ['Comments']) + '\n')
+        markdownFull += '|:---' * (5 + len(captions)) + '\n'
 
         dics = {}
         for testcase in problem.testset.ListTestCases():
@@ -199,13 +202,13 @@ class Project(targets.registry.Project):
                         casename.replace('_', ' ').replace('-', ' '),
                         GetFileSize(dir, casename + consts.IN_EXT),
                         GetFileSize(dir, casename + consts.DIFF_EXT),
-                        '`' + GetFileHash(dir, casename + consts.IN_EXT)[:7] + '`'
+                        '`%s`' % GetFileHash(dir, casename + consts.IN_EXT)[:7]
                     ] +
                     [self._GetMarkdownifyMessage(*t) for t in cols] +
                     [GetMarkdownifyFileComment(dir, casename + '.comment')]
                 ) +
                 '\n')
-        htmlFull += ''.join(rows) + '\n'
+        markdownFull += ''.join(rows) + '\n'
 
         # Fetch test results.
         # results = yield problem.Test(ui)
@@ -264,11 +267,11 @@ class Project(targets.registry.Project):
             cell_judge = MARKDOWNIFY_EMOJI_NA
 
         # Done.
-        html = (u'{}|{}|{}|{}|{}|{}|{}\n'.format(
+        markdown = (u'{}|{}|{}|{}|{}|{}|{}\n'.format(
                     title, assignees, cell_solutions, cell_input,
                     cell_output, cell_validator, cell_judge))
 
-        yield (html, htmlFull)
+        yield (markdown, markdownFull)
 
     def _GetMarkdownifyMessage(self, verdict, time):
         if verdict is test.TestCaseResult.NA:
