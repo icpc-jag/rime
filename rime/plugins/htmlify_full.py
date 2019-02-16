@@ -276,7 +276,7 @@ class Project(targets.registry.Project):
             cell_judge = HTMLIFY_CELL_NA
 
         # Done.
-        html = ('<tr><td>{}</td><td>{}</td><td{}</td><td{}</td>'
+        html = (u'<tr><td>{}</td><td>{}</td><td{}</td><td{}</td>'
                 '<td{}</td><td{}</td><td{}<td></tr>\n'.format(
                     title, assignees, cell_solutions, cell_input,
                     cell_output, cell_validator, cell_judge))

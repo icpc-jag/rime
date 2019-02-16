@@ -264,7 +264,7 @@ class Project(targets.registry.Project):
             cell_judge = MARKDOWNIFY_EMOJI_NA
 
         # Done.
-        html = ('{}|{}|{}|{}|{}|{}|{}\n'.format(
+        html = (u'{}|{}|{}|{}|{}|{}|{}\n'.format(
                     title, assignees, cell_solutions, cell_input,
                     cell_output, cell_validator, cell_judge))
 
