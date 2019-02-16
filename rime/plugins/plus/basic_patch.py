@@ -494,6 +494,13 @@ class CXXCode(codes.registry.CXXCode):
             src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
 
 
+# -O
+class RustCode(codes.registry.RustCode):
+    def __init__(self, src_name, src_dir, out_dir, flags=[]):
+        super(RustCode, self).__init__(
+            src_name, src_dir, out_dir, ['-O'] + flags)
+
+
 # shebang support
 # codes.registry.ScriptCode is not supported
 class ScriptCode(basic_codes.ScriptCode):
@@ -541,6 +548,7 @@ class ScriptCode(basic_codes.ScriptCode):
 
 codes.registry.Override('CCode', CCode)
 codes.registry.Override('CXXCode', CXXCode)
+codes.registry.Override('RustCode', RustCode)
 codes.registry.Override('ScriptCode', ScriptCode)
 
 
