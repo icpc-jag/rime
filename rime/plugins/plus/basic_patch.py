@@ -494,11 +494,11 @@ class CXXCode(codes.registry.CXXCode):
             src_name, src_dir, out_dir, ['-std=c++11', '-O2'] + flags)
 
 
-# -O
+# -C opt-level=2
 class RustCode(codes.registry.RustCode):
     def __init__(self, src_name, src_dir, out_dir, flags=[]):
         super(RustCode, self).__init__(
-            src_name, src_dir, out_dir, ['-O'] + flags)
+            src_name, src_dir, out_dir, ['-C', 'opt-level=2'] + flags)
 
 
 # shebang support
