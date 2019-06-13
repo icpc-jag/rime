@@ -173,6 +173,7 @@ class Problem(targets.registry.Problem):
 ## Solution
 #c_solution(src='main.c') # -lm -O2 as default
 #cxx_solution(src='main.cc', flags=[]) # -std=c++11 -O2 as default
+#kotlin_solution(src='main.kt') # kotlin
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main')
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
 #              challenge_cases=[])
