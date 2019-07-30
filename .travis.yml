@@ -5,7 +5,11 @@ python:
     - 3.5
     - 3.6
     - 3.7
+before_install:
+    - curl -sL https://get.sdkman.io | bash
+    - source "${HOME}/.sdkman/bin/sdkman-init.sh"
 install:
+    - sdk install kotlin
     - pip install .
     - pip install flake8 hacking pytest mock
 script:
