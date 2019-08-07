@@ -3,7 +3,8 @@ import unittest
 
 import mock
 
-from rime.core import commands, main
+from rime.core import commands
+from rime.core import main
 from rime.core import ui as ui_mod
 from rime.util import console as console_mod
 from rime.util.struct import Struct
