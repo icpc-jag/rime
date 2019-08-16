@@ -111,7 +111,7 @@ def InternalMain(argv):
     project = LoadProject(os.getcwd(), ui)
     if ui.errors.HasError():
         return 1
-    if not project:
+    if not project and not isinstance(cmd, commands_mod.Help):
         console.PrintError(
             'PROJECT not found. Make sure you are in Rime subtree.')
         return 1

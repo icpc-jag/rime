@@ -16,6 +16,7 @@ script:
     - flake8
     - pytest
     - rime
+    - rime help test
     - mkdir tmp && cd tmp && rime_init --git && cd ..
     - cd example && rime help
     - rime test && rime clean
