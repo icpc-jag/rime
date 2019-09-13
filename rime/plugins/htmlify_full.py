@@ -89,7 +89,7 @@ class Project(targets.registry.Project):
         header = u'<!DOCTYPE html>\n<html lang="ja"><head>'
         header += (
             u'<meta charset="utf-8"/>'
-            '<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com'
+            '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com'
             '/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>')
         info = u'このセクションは htmlfy_full plugin により自動生成されています '
         info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n'
