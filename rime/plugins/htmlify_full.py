@@ -91,7 +91,7 @@ class Project(targets.registry.Project):
             u'<meta charset="utf-8"/>'
             '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com'
             '/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>')
-        info = u'このセクションは htmlfy_full plugin により自動生成されています '
+        info = u'このセクションは htmlify_full plugin により自動生成されています '
         info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n'
                  % {'rev': rev, 'username': username, 'hostname': hostname})
         footer = u'</body></html>'
@@ -297,7 +297,7 @@ class HtmlifyFull(rime_commands.CommandBase):
         super(HtmlifyFull, self).__init__(
             'htmlify_full',
             '',
-            'Local version of htmlfy_full. (htmlify_full plugin)',
+            'Local version of htmlify_full. (htmlify_full plugin)',
             '',
             parent)
 
