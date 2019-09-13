@@ -159,7 +159,7 @@ class KotlinCode(CodeBase):
                  compile_flags=[], run_flags=[]):
         kotlinc = 'kotlinc'
         kotlin = 'kotlin'
-        mainclass = os.path.splitext(src_name)[0] + 'Kt'
+        mainclass = os.path.splitext(src_name)[0].capitalize() + 'Kt'
         super(KotlinCode, self).__init__(
             src_name=src_name, src_dir=src_dir, out_dir=out_dir,
             compile_args=([kotlinc, '-d', files.ConvPath(out_dir)] +
