@@ -1,9 +1,9 @@
 import unittest
 
 import mock
-from rime.util import struct
 
 from rime.plugins import htmlify_full
+from rime.util import struct
 
 
 class TestHtmlifyProject(unittest.TestCase):

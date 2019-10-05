@@ -66,7 +66,9 @@ class Project(targets.registry.Project):
 
     @taskgraph.task_method
     def _GenerateWiki(self, ui):
-        yield self.Clean(ui)
+        if not ui.options.skip_clean:
+            yield self.Clean(ui)
+
         # Get system information.
         rev = builtin_commands.getoutput('svnversion')
         username = getpass.getuser()
@@ -211,6 +213,10 @@ class Wikify(rime_commands.CommandBase):
             'Upload test results to Pukiwiki. (wikify plugin)',
             '',
             parent)
+        self.AddOptionEntry(rime_commands.OptionEntry(
+            's', 'skip_clean', 'skip_clean', bool, False, None,
+            'Skip cleaning generated files up.'
+        ))
 
     def Run(self, obj, args, ui):
         if args:
