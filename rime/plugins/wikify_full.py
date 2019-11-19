@@ -83,7 +83,9 @@ class Project(targets.registry.Project):
 
     @taskgraph.task_method
     def _GenerateWikiFull(self, ui):
-        yield self.Clean(ui)  # 重すぎるときはコメントアウト
+        if not ui.options.skip_clean:
+            yield self.Clean(ui)
+
         # Get system information.
         rev = SafeUnicode(builtin_commands.getoutput(
             'git show -s --oneline').replace('\n', ' ').replace('\r', ' '))
@@ -290,6 +292,10 @@ class WikifyFull(rime_commands.CommandBase):
             'Upload all test results to Pukiwiki. (wikify_full plugin)',
             '',
             parent)
+        self.AddOptionEntry(rime_commands.OptionEntry(
+            's', 'skip_clean', 'skip_clean', bool, False, None,
+            'Skip cleaning generated files up.'
+        ))
 
     def Run(self, obj, args, ui):
         if args:
