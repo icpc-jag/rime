@@ -14,7 +14,7 @@ class TestMarkdownifyProject(unittest.TestCase):
         project.problems = []
         project.Clean = mock.MagicMock()
 
-        task_graph = project._GenerateHtmlFull(ui)
+        task_graph = project._GenerateMarkdownFull(ui)
         task_graph.Continue()
 
         project.Clean.called_once_with(ui)
@@ -26,7 +26,7 @@ class TestMarkdownifyProject(unittest.TestCase):
         project.problems = []
         project.Clean = mock.MagicMock()
 
-        task_graph = project._GenerateHtmlFull(ui)
+        task_graph = project._GenerateMarkdownFull(ui)
         task_graph.Continue()
 
         project.Clean.assert_not_called()
