@@ -151,6 +151,24 @@ class CXXCode(CodeBase):
             run_args=[os.path.join(out_dir, exe_name)])
 
 
+class KotlinCode(CodeBase):
+    PREFIX = 'kotlin'
+    EXTENSIONS = ['kt']
+
+    def __init__(self, src_name, src_dir, out_dir,
+                 compile_flags=[], run_flags=[]):
+        kotlinc = 'kotlinc'
+        kotlin = 'kotlin'
+        mainclass = os.path.splitext(src_name)[0].capitalize() + 'Kt'
+        super(KotlinCode, self).__init__(
+            src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+            compile_args=([kotlinc, '-d', files.ConvPath(out_dir)] +
+                          compile_flags + [src_name]),
+            run_args=([kotlin, '-Dline.separator=\n',
+                       '-cp', files.ConvPath(out_dir)] +
+                      run_flags + [mainclass]))
+
+
 class JavaCode(CodeBase):
     PREFIX = 'java'
     EXTENSIONS = ['java']
@@ -173,6 +191,21 @@ class JavaCode(CodeBase):
             run_args=([java, '-Dline.separator=\n',
                        '-cp', files.ConvPath(out_dir)] +
                       run_flags + [mainclass]))
+
+
+class RustCode(CodeBase):
+    PREFIX = 'rust'
+    EXTENSIONS = ['rs']
+
+    def __init__(self, src_name, src_dir, out_dir, flags=[]):
+        exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+        rustc = 'rustc'
+        super(RustCode, self).__init__(
+            src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+            compile_args=([rustc,
+                           '-o', os.path.join(out_dir, exe_name),
+                           src_name] + list(flags)),
+            run_args=[os.path.join(out_dir, exe_name)])
 
 
 class ScriptCode(CodeBase):
@@ -262,5 +295,7 @@ class InternalDiffCode(CodeBase):
 
 codes.registry.Add(CCode)
 codes.registry.Add(CXXCode)
+codes.registry.Add(KotlinCode)
 codes.registry.Add(JavaCode)
+codes.registry.Add(RustCode)
 codes.registry.Add(ScriptCode)

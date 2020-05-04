@@ -78,7 +78,8 @@ class Project(targets.registry.Project):
 
     @taskgraph.task_method
     def _GenerateHtmlFull(self, ui):
-        # yield self.Clean(ui) # 重すぎるときはコメントアウト
+        if not ui.options.skip_clean:
+            yield self.Clean(ui)
 
         # Get system information.
         rev = SafeUnicode(builtin_commands.getoutput(
@@ -89,9 +90,9 @@ class Project(targets.registry.Project):
         header = u'<!DOCTYPE html>\n<html lang="ja"><head>'
         header += (
             u'<meta charset="utf-8"/>'
-            '<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com'
+            '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com'
             '/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>')
-        info = u'このセクションは htmlfy_full plugin により自動生成されています '
+        info = u'このセクションは htmlify_full plugin により自動生成されています '
         info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n'
                  % {'rev': rev, 'username': username, 'hostname': hostname})
         footer = u'</body></html>'
@@ -297,9 +298,13 @@ class HtmlifyFull(rime_commands.CommandBase):
         super(HtmlifyFull, self).__init__(
             'htmlify_full',
             '',
-            'Local version of htmlfy_full. (htmlify_full plugin)',
+            'Local version of htmlify_full. (htmlify_full plugin)',
             '',
             parent)
+        self.AddOptionEntry(rime_commands.OptionEntry(
+            's', 'skip_clean', 'skip_clean', bool, False, None,
+            'Skip cleaning generated files up.'
+        ))
 
     def Run(self, obj, args, ui):
         if args:

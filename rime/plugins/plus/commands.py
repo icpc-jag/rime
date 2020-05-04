@@ -173,11 +173,13 @@ class Problem(targets.registry.Problem):
 ## Solution
 #c_solution(src='main.c') # -lm -O2 as default
 #cxx_solution(src='main.cc', flags=[]) # -std=c++11 -O2 as default
+#kotlin_solution(src='main.kt') # kotlin
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main')
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
 #              challenge_cases=[])
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
 #              challenge_cases=['10_corner*.in'])
+#rust_solution(src='main.rs') # Rust (rustc)
 #script_solution(src='main.sh') # shebang line is required
 #script_solution(src='main.pl') # shebang line is required
 #script_solution(src='main.py') # shebang line is required
@@ -204,6 +206,7 @@ class Problem(targets.registry.Problem):
 #c_generator(src='generator.c')
 #cxx_generator(src='generator.cc', dependency=['testlib.h'])
 #java_generator(src='Generator.java', encoding='UTF-8', mainclass='Generator')
+#rust_generator(src='generator.rs')
 #script_generator(src='generator.pl')
 
 ## Input validators.
@@ -211,6 +214,7 @@ class Problem(targets.registry.Problem):
 #cxx_validator(src='validator.cc', dependency=['testlib.h'])
 #java_validator(src='Validator.java', encoding='UTF-8',
 #               mainclass='tmp/validator/Validator')
+#rust_validator(src='validator.rs')
 #script_validator(src='validator.pl')
 
 ## Output judges.
@@ -218,6 +222,7 @@ class Problem(targets.registry.Problem):
 #cxx_judge(src='judge.cc', dependency=['testlib.h'],
 #          variant=testlib_judge_runner)
 #java_judge(src='Judge.java', encoding='UTF-8', mainclass='Judge')
+#rust_judge(src='judge.rs')
 #script_judge(src='judge.py')
 
 ## Reactives.
@@ -225,6 +230,7 @@ class Problem(targets.registry.Problem):
 #cxx_reactive(src='reactive.cc', dependency=['testlib.h', 'reactive.hpp'],
 #             variant=kupc_reactive_runner)
 #java_reactive(src='Reactive.java', encoding='UTF-8', mainclass='Judge')
+#rust_reactive(src='reactive.rs')
 #script_reactive(src='reactive.py')
 
 ## Extra Testsets.

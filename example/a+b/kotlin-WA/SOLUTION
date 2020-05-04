@@ -1,0 +1,3 @@
+# -*- coding: utf-8; mode: python -*-
+
+kotlin_solution(src='main.kt', challenge_cases=[])

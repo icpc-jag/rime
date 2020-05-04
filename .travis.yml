@@ -1,15 +1,22 @@
 language: python
+dist: xenial
 python:
     - 2.7
-    - 3.4
     - 3.5
+    - 3.6
+    - 3.7
+before_install:
+    - curl -sL https://get.sdkman.io | bash
+    - source "${HOME}/.sdkman/bin/sdkman-init.sh"
 install:
+    - sdk install kotlin
     - pip install .
     - pip install flake8 hacking pytest mock
 script:
     - flake8
     - pytest
     - rime
+    - rime help test
     - mkdir tmp && cd tmp && rime_init --git && cd ..
     - cd example && rime help
     - rime test && rime clean
