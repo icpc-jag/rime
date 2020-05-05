@@ -22,15 +22,10 @@ from rime.core import commands as rime_commands  # NOQA
 from rime.core import targets  # NOQA
 from rime.core import taskgraph  # NOQA
 
-HTMLIFY_BGCOLOR_GOOD = ' class="success">'
-HTMLIFY_BGCOLOR_NOTBAD = ' class="warning">'
-HTMLIFY_BGCOLOR_BAD = ' class="danger">'
-HTMLIFY_BGCOLOR_NA = ' class="info">'
-
-HTMLIFY_CELL_GOOD = HTMLIFY_BGCOLOR_GOOD + '&#x25cb;'
-HTMLIFY_CELL_NOTBAD = HTMLIFY_BGCOLOR_NOTBAD + '&#x25b3;'
-HTMLIFY_CELL_BAD = HTMLIFY_BGCOLOR_BAD + '&#xd7;'
-HTMLIFY_CELL_NA = HTMLIFY_BGCOLOR_NA + '-'
+MARKDOWNIFY_EMOJI_GOOD = ' :white_check_mark: '
+MARKDOWNIFY_EMOJI_NOTBAD = ' :large_blue_diamond: '
+MARKDOWNIFY_EMOJI_BAD = ' :x: '
+MARKDOWNIFY_EMOJI_NA = ' :wavy_dash: '
 
 
 def SafeUnicode(s):
@@ -58,7 +53,7 @@ def GetFileHash(dir, filename):
         return ''
 
 
-def GetHtmlifyFileComment(dir, filename):
+def GetMarkdownifyFileComment(dir, filename):
     filepath = os.path.join(dir, filename)
     if os.path.exists(filepath):
         f = open(filepath)
@@ -71,13 +66,13 @@ def GetHtmlifyFileComment(dir, filename):
 
 class Project(targets.registry.Project):
     @taskgraph.task_method
-    def HtmlifyFull(self, ui):
-        htmlFull = yield self._GenerateHtmlFull(ui)
-        codecs.open("summary.html", 'w', 'utf8').write(htmlFull)
+    def MarkdownifyFull(self, ui):
+        markdownFull = yield self._GenerateMarkdownFull(ui)
+        codecs.open("summary.md", 'w', 'utf8').write(markdownFull)
         yield None
 
     @taskgraph.task_method
-    def _GenerateHtmlFull(self, ui):
+    def _GenerateMarkdownFull(self, ui):
         if not ui.options.skip_clean:
             yield self.Clean(ui)
 
@@ -87,29 +82,27 @@ class Project(targets.registry.Project):
         username = getpass.getuser()
         hostname = socket.gethostname()
 
-        header = u'<!DOCTYPE html>\n<html lang="ja"><head>'
-        header += (
-            u'<meta charset="utf-8"/>'
-            '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com'
-            '/bootstrap/3.2.0/css/bootstrap.min.css"></head>\n<body>')
-        info = u'このセクションは htmlify_full plugin により自動生成されています '
-        info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n'
+        header = u'# Project Status\n\n'
+        info = u'このファイルは markdownify_full plugin により自動生成されています '
+        info += (u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n\n'
                  % {'rev': rev, 'username': username, 'hostname': hostname})
-        footer = u'</body></html>'
+        footer = u''
 
         # Generate content.
-        html = u'<h2>Summary</h2>\n<table class="table">\n'
-        html += (u'<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th>'
-                 u'<th>出力</th><th>入検</th><th>出検</th></tr></thead>\n')
+        markdown = u'## Summary\n\n'
+        markdown += (
+            u'問題|担当|解答|入力|出力|入検|出検\n'
+            ':---|:---|:---|:---|:---|:---|:---\n'
+            )
 
-        htmlFull = u'<h2>Detail</h2>\n'
+        markdownFull = u'## Detail\n\n'
 
         results = yield taskgraph.TaskBranch([
-            self._GenerateHtmlFullOne(problem, ui)
+            self._GenerateMarkdownFullOne(problem, ui)
             for problem in self.problems])
-        (htmlResults, htmlFullResults) = zip(*results)
-        html += '<tbody>' + ''.join(htmlResults) + '</tbody></table>\n'
-        htmlFull += ''.join(htmlFullResults)
+        (markdownResults, markdownFullResults) = zip(*results)
+        markdown += ''.join(markdownResults) + '\n'
+        markdownFull += ''.join(markdownFullResults)
 
         cc = os.getenv('CC', 'gcc')
         cxx = os.getenv('CXX', 'g++')
@@ -120,44 +113,44 @@ class Project(targets.registry.Project):
         else:
             java = 'java'
             javac = 'javac'
-        environments = '<h2>Environments</h2>\n<dl class="dl-horizontal">\n'
+        environments = '## Environments\n\n'
         environments += (
-            '<dt>gcc:</dt><dd>' +
+            '- gcc\n\t- ' +
             builtin_commands.getoutput('{0} --version'.format(cc)) +
-            '</dd>\n')
+            '\n')
         environments += (
-            '<dt>g++:</dt><dd>' +
+            '- g++\n\t- ' +
             builtin_commands.getoutput('{0} --version'.format(cxx)) +
-            '</dd>\n')
+            '\n')
         environments += (
-            '<dt>javac:</dt><dd>' +
+            '- javac\n\t- ' +
             builtin_commands.getoutput('{0} -version'.format(javac)) +
-            '</dd>\n')
+            '\n')
         environments += (
-            '<dt>java:</dt><dd>' +
+            '- java\n\t- ' +
             builtin_commands.getoutput('{0} -version'.format(java)) +
-            '</dd>\n')
-        environments += '</dl>\n'
+            '\n')
+        environments += '\n'
 
         errors = ''
         if ui.errors.HasError() or ui.errors.HasWarning():
-            errors = '<h2>Error Messages</h2>\n<dl class="dl-horizontal">\n'
+            errors = '## Error Messages\n\n'
             if ui.errors.HasError():
-                errors += '<dt class="danger">ERROR:</dt><dd><ul>\n'
+                errors += '- ERROR:\n'
                 for e in ui.errors.errors:
-                    errors += '<li>' + e + '</li>\n'
-                errors += '</ul></dd>\n'
+                    errors += '\t- ' + e + '\n'
             if ui.errors.HasWarning():
-                errors += '<dt class="warning">WARNING:</dt><dd><ul>\n'
+                errors += '- WARNING:\n'
                 for e in ui.errors.warnings:
-                    errors += '<li>' + e + '</li>\n'
-                errors += '</ul></dd>\n'
-            errors += '</dl>\n'
+                    errors += '\t- ' + e + '\n'
+            errors += '\n'
 
-        yield header + info + html + environments + errors + htmlFull + footer
+        yield (
+            header + info + markdown + environments + errors + markdownFull
+            + footer)
 
     @taskgraph.task_method
-    def _GenerateHtmlFullOne(self, problem, ui):
+    def _GenerateMarkdownFullOne(self, problem, ui):
         yield problem.Build(ui)
 
         # Get status.
@@ -168,16 +161,16 @@ class Project(targets.registry.Project):
         assignees = SafeUnicode(assignees)
 
         # Get various information about the problem.
-        htmlFull = '<h3>' + title + '</h3>\n'
+        markdownFull = '### ' + title + '\n\n'
         solutions = sorted(problem.solutions, key=lambda x: x.name)
         solutionnames = [solution.name for solution in solutions]
 
         captions = [
             name.replace('-', ' ').replace('_', ' ') for name in solutionnames]
-        htmlFull += ('<table class="table">\n<thead><tr><th>' +
-                     '</th><th>'.join(
+        markdownFull += ('|'.join(
                          ['testcase', 'in', 'diff', 'md5'] + captions +
-                         ['Comments']) + '</th></tr></thead>\n<tbody>\n')
+                         ['Comments']) + '\n')
+        markdownFull += '|:---' * (5 + len(captions)) + '\n'
 
         dics = {}
         for testcase in problem.testset.ListTestCases():
@@ -205,20 +198,18 @@ class Project(targets.registry.Project):
         dir = problem.testset.out_dir
         for casename, cols in lists:
             rows.append(
-                '<tr><td' +
-                '</td><td'.join(
+                '|'.join(
                     [
-                        '>' + casename.replace('_', ' ').replace('-', ' '),
-                        '>' + GetFileSize(dir, casename + consts.IN_EXT),
-                        '>' + GetFileSize(dir, casename + consts.DIFF_EXT),
-                        '>' + GetFileHash(dir, casename + consts.IN_EXT)
+                        casename.replace('_', ' ').replace('-', ' '),
+                        GetFileSize(dir, casename + consts.IN_EXT),
+                        GetFileSize(dir, casename + consts.DIFF_EXT),
+                        '`%s`' % GetFileHash(dir, casename + consts.IN_EXT)[:7]
                     ] +
-                    [self._GetHtmlifyMessage(*t) for t in cols] +
-                    ['>' + GetHtmlifyFileComment(dir, casename + '.comment')]
+                    [self._GetMarkdownifyMessage(*t) for t in cols] +
+                    [GetMarkdownifyFileComment(dir, casename + '.comment')]
                 ) +
-                '</td></tr>\n')
-        htmlFull += ''.join(rows)
-        htmlFull += '</tbody></table>'
+                '\n')
+        markdownFull += ''.join(rows) + '\n'
 
         # Fetch test results.
         # results = yield problem.Test(ui)
@@ -236,33 +227,33 @@ class Project(targets.registry.Project):
 
         # Solutions:
         if num_corrects >= 2:
-            cell_solutions = HTMLIFY_BGCOLOR_GOOD
+            cell_solutions = MARKDOWNIFY_EMOJI_GOOD
         elif num_corrects >= 1:
-            cell_solutions = HTMLIFY_BGCOLOR_NOTBAD
+            cell_solutions = MARKDOWNIFY_EMOJI_NOTBAD
         else:
-            cell_solutions = HTMLIFY_BGCOLOR_BAD
+            cell_solutions = MARKDOWNIFY_EMOJI_BAD
         cell_solutions += '%d+%d' % (num_corrects, num_incorrects)
 
         # Input:
         if num_tests >= 20:
-            cell_input = HTMLIFY_BGCOLOR_GOOD + str(num_tests)
+            cell_input = MARKDOWNIFY_EMOJI_GOOD + str(num_tests)
         else:
-            cell_input = HTMLIFY_BGCOLOR_BAD + str(num_tests)
+            cell_input = MARKDOWNIFY_EMOJI_BAD + str(num_tests)
 
         # Output:
         if num_corrects >= 2 and num_agreed == num_corrects:
-            cell_output = HTMLIFY_BGCOLOR_GOOD
+            cell_output = MARKDOWNIFY_EMOJI_GOOD
         elif num_agreed >= 2:
-            cell_output = HTMLIFY_BGCOLOR_NOTBAD
+            cell_output = MARKDOWNIFY_EMOJI_NOTBAD
         else:
-            cell_output = HTMLIFY_BGCOLOR_BAD
+            cell_output = MARKDOWNIFY_EMOJI_BAD
         cell_output += '%d/%d' % (num_agreed, num_corrects)
 
         # Validator:
         if problem.testset.validators:
-            cell_validator = HTMLIFY_CELL_GOOD
+            cell_validator = MARKDOWNIFY_EMOJI_GOOD
         else:
-            cell_validator = HTMLIFY_CELL_BAD
+            cell_validator = MARKDOWNIFY_EMOJI_BAD
 
         # Judge:
         if need_custom_judge:
@@ -270,35 +261,34 @@ class Project(targets.registry.Project):
                 judge for judge in problem.testset.judges
                 if judge.__class__ != basic_codes.InternalDiffCode]
             if custom_judges:
-                cell_judge = HTMLIFY_CELL_GOOD
+                cell_judge = MARKDOWNIFY_EMOJI_GOOD
             else:
-                cell_judge = HTMLIFY_CELL_BAD
+                cell_judge = MARKDOWNIFY_EMOJI_BAD
         else:
-            cell_judge = HTMLIFY_CELL_NA
+            cell_judge = MARKDOWNIFY_EMOJI_NA
 
         # Done.
-        html = (u'<tr><td>{}</td><td>{}</td><td{}</td><td{}</td>'
-                '<td{}</td><td{}</td><td{}<td></tr>\n'.format(
+        markdown = (u'{}|{}|{}|{}|{}|{}|{}\n'.format(
                     title, assignees, cell_solutions, cell_input,
                     cell_output, cell_validator, cell_judge))
 
-        yield (html, htmlFull)
+        yield (markdown, markdownFull)
 
-    def _GetHtmlifyMessage(self, verdict, time):
+    def _GetMarkdownifyMessage(self, verdict, time):
         if verdict is test.TestCaseResult.NA:
-            return HTMLIFY_BGCOLOR_NA + str(verdict)
+            return MARKDOWNIFY_EMOJI_NA + str(verdict)
         elif time is None:
-            return HTMLIFY_BGCOLOR_BAD + str(verdict)
+            return MARKDOWNIFY_EMOJI_BAD + str(verdict)
         else:
-            return HTMLIFY_BGCOLOR_GOOD + '%.2fs' % (time)
+            return MARKDOWNIFY_EMOJI_GOOD + '%.2fs' % (time)
 
 
-class HtmlifyFull(rime_commands.CommandBase):
+class MarkdownifyFull(rime_commands.CommandBase):
     def __init__(self, parent):
-        super(HtmlifyFull, self).__init__(
-            'htmlify_full',
+        super(MarkdownifyFull, self).__init__(
+            'markdownify_full',
             '',
-            'Local version of htmlify_full. (htmlify_full plugin)',
+            'Markdownify full plugin',
             '',
             parent)
         self.AddOptionEntry(rime_commands.OptionEntry(
@@ -309,17 +299,17 @@ class HtmlifyFull(rime_commands.CommandBase):
     def Run(self, obj, args, ui):
         if args:
             ui.console.PrintError(
-                'Extra argument passed to htmlify_full command!')
+                'Extra argument passed to markdownify_full command!')
             return None
 
         if isinstance(obj, Project):
-            return obj.HtmlifyFull(ui)
+            return obj.MarkdownifyFull(ui)
 
         ui.console.PrintError(
-            'Htmlify_full is not supported for the specified target.')
+            'Markdownify_full is not supported for the specified target.')
         return None
 
 
 targets.registry.Override('Project', Project)
 
-rime_commands.registry.Add(HtmlifyFull)
+rime_commands.registry.Add(MarkdownifyFull)

@@ -21,6 +21,7 @@ script:
     - cd example && rime help
     - rime test && rime clean
     - rime htmlify_full && rime clean
+    - rime markdownify_full && rime clean
 notifications:
     email:
         on_success: never
