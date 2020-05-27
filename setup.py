@@ -10,4 +10,5 @@ setuptools.setup(
     package_dir={'rime': 'rime'},
     install_requires=['six', 'Jinja2'],
     tests_require=['pytest', 'mock'],
+    package_data={'rime': ['plugins/summary/*.ninja']},
 )

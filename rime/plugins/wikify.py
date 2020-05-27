@@ -49,9 +49,7 @@ class Project(targets.registry.Project):
 
         results = yield self.Test(ui)
         template_file = os.path.join(
-            self.base_dir,
-            'rime',
-            'plugins',
+            os.path.dirname(__file__),
             'summary',
             'pukiwiki.ninja')
         content = self._Summarize(results, template_file, ui)
