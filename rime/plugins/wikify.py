@@ -1,36 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import getpass
+import os.path
 import re
-import socket
 import sys
 
 from six.moves import urllib
 
-from rime.basic import codes as basic_codes
 import rime.basic.targets.problem
 import rime.basic.targets.project  # NOQA
 from rime.core import commands as rime_commands
 from rime.core import targets
 from rime.core import taskgraph
-
-if sys.version_info[0] == 2:
-    import commands as builtin_commands  # NOQA
-else:
-    import subprocess as builtin_commands
-
-
-BGCOLOR_TITLE = 'BGCOLOR(#eeeeee):'
-BGCOLOR_GOOD = 'BGCOLOR(#ccffcc):'
-BGCOLOR_NOTBAD = 'BGCOLOR(#ffffcc):'
-BGCOLOR_BAD = 'BGCOLOR(#ffcccc):'
-BGCOLOR_NA = 'BGCOLOR(#cccccc):'
-
-CELL_GOOD = BGCOLOR_GOOD + '&#x25cb;'
-CELL_NOTBAD = BGCOLOR_NOTBAD + '&#x25b3;'
-CELL_BAD = BGCOLOR_BAD + '&#xd7;'
-CELL_NA = BGCOLOR_NA + '-'
+from rime.plugins.summary import summary
 
 
 def SafeUnicode(s):
@@ -43,6 +25,7 @@ class Project(targets.registry.Project):
     def PreLoad(self, ui):
         super(Project, self).PreLoad(ui)
         self.wikify_config_defined = False
+        self._Summarize = summary.GenerateSummary
 
         def _wikify_config(url, page, encoding="utf-8", auth_realm=None,
                            auth_username=None, auth_password=None):
@@ -60,93 +43,18 @@ class Project(targets.registry.Project):
         if not self.wikify_config_defined:
             ui.errors.Error(self, 'wikify_config() is not defined.')
             yield None
-        wiki = yield self._GenerateWiki(ui)
-        self._UploadWiki(wiki, ui)
-        yield None
 
-    @taskgraph.task_method
-    def _GenerateWiki(self, ui):
         if not ui.options.skip_clean:
             yield self.Clean(ui)
 
-        # Get system information.
-        rev = builtin_commands.getoutput('svnversion')
-        username = getpass.getuser()
-        hostname = socket.gethostname()
-        # Generate content.
-        wiki = (u'このセクションは wikify plugin により自動生成されています '
-                u'(rev.%(rev)s, uploaded by %(username)s @ %(hostname)s)\n' %
-                {'rev': rev, 'username': username, 'hostname': hostname})
-        wiki += u'|||CENTER:|CENTER:|CENTER:|CENTER:|CENTER:|c\n'
-        wiki += u'|~問題|~担当|~解答|~入力|~出力|~入検|~出検|\n'
-        results = yield taskgraph.TaskBranch([
-            self._GenerateWikiOne(problem, ui)
-            for problem in self.problems])
-        wiki += ''.join(results)
-        yield wiki
-
-    @taskgraph.task_method
-    def _GenerateWikiOne(self, problem, ui):
-        # Get status.
-        title = SafeUnicode(problem.title) or 'No Title'
-        wiki_name = SafeUnicode(problem.wiki_name) or 'No Wiki Name'
-        assignees = problem.assignees
-        if isinstance(assignees, list):
-            assignees = ','.join(assignees)
-        assignees = SafeUnicode(assignees)
-        # Fetch test results.
-        results = yield problem.Test(ui)
-        # Get various information about the problem.
-        num_solutions = len(results)
-        num_tests = len(problem.testset.ListTestCases())
-        correct_solution_results = [result for result in results
-                                    if result.solution.IsCorrect()]
-        num_corrects = len(correct_solution_results)
-        num_incorrects = num_solutions - num_corrects
-        num_agreed = len([result for result in correct_solution_results
-                          if result.expected])
-        need_custom_judge = problem.need_custom_judge
-        # Solutions:
-        if num_corrects >= 2:
-            cell_solutions = BGCOLOR_GOOD
-        elif num_corrects >= 1:
-            cell_solutions = BGCOLOR_NOTBAD
-        else:
-            cell_solutions = BGCOLOR_BAD
-        cell_solutions += '%d+%d' % (num_corrects, num_incorrects)
-        # Input:
-        if num_tests >= 20:
-            cell_input = BGCOLOR_GOOD + str(num_tests)
-        else:
-            cell_input = BGCOLOR_BAD + str(num_tests)
-        # Output:
-        if num_corrects >= 2 and num_agreed == num_corrects:
-            cell_output = BGCOLOR_GOOD
-        elif num_agreed >= 2:
-            cell_output = BGCOLOR_NOTBAD
-        else:
-            cell_output = BGCOLOR_BAD
-        cell_output += '%d/%d' % (num_agreed, num_corrects)
-        # Validator:
-        if problem.testset.validators:
-            cell_validator = CELL_GOOD
-        else:
-            cell_validator = CELL_BAD
-        # Judge:
-        if need_custom_judge:
-            custom_judges = [
-                judge for judge in problem.testset.judges
-                if judge.__class__ != basic_codes.InternalDiffCode]
-            if custom_judges:
-                cell_judge = CELL_GOOD
-            else:
-                cell_judge = CELL_BAD
-        else:
-            cell_judge = CELL_NA
-        # Done.
-        yield (u'|[[{}>{}]]|{}|{}|{}|{}|{}|{}|\n'.format(
-            title, wiki_name, assignees, cell_solutions, cell_input,
-            cell_output, cell_validator, cell_judge))
+        results = yield self.Test(ui)
+        template_file = os.path.join(
+            os.path.dirname(__file__),
+            'summary',
+            'pukiwiki.ninja')
+        content = self._Summarize(results, template_file, ui)
+        self._UploadWiki(content, ui)
+        yield None
 
     def _UploadWiki(self, wiki, ui):
         url = self.wikify_url

@@ -1,0 +1,106 @@
+{%- macro bg(type) -%}
+{%- if type == ItemState.GOOD -%} class="success"
+{%- elif type == ItemState.NOTBAD -%} class="warning"
+{%- elif type == ItemState.BAD -%} class="danger"
+{%- else -%} class="info" {%- endif -%}
+{%- endmacro -%}
+
+{%- macro cell(type) -%}
+{%- if type == ItemState.GOOD -%} &#x25cb;
+{%- elif type == ItemState.NOTBAD -%} &#x25b3;
+{%- elif type == ItemState.BAD -%} &#xd7;
+{%- else -%} - {%- endif -%}
+{%- endmacro -%}
+
+
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"/><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"></head>
+<body>
+
+このファイルは htmlify_full plugin により自動生成されています (rev.{{ system.rev }}, uploaded by {{ system.username }} @ {{ system.hostname }})
+
+<h2>Summary</h2>
+
+<table class="table">
+<thead><tr><th>問題</th><th>担当</th><th>解答</th><th>入力</th><th>出力</th><th>入検</th><th>出検</th></tr></thead>
+<tbody>
+{%- for problem in problems %}
+<tr><td>{{
+    problem.title
+}} </td><td> {{
+    problem.assignees
+}} </td><td {{ bg(problem.solution_state.status) }}> {{
+    problem.solution_state.detail
+}} </td><td {{ bg(problem.input_state.status) }}> {{
+    problem.input_state.detail
+}} </td><td {{ bg(problem.output_state.status) }}> {{
+    problem.output_state.detail
+}} </td><td {{ bg(problem.validator) }}> {{
+    cell(problem.validator)
+}} </td><td {{ bg(problem.judge) }}> {{
+    cell(problem.judge)
+}}<td></tr>
+{% endfor %}
+</tbody></table>
+
+<h2>Environments</h2>
+<dl class="dl-horizontal">
+{% for env in environments %}
+<dt>{{ env.type }}:</dt>
+<dd>{{ env.detail }}</dd>
+{% endfor %}
+</dl>
+
+{% if errors|length > 0 or warnings|length > 0 %}
+<h2>Error Messages</h2>
+<dl class="dl-horizontal">
+
+{% if errors|length > 0 %}
+<dt class="danger">ERROR:</dt>
+<dd><ul>
+{%- for error in errors %}
+<li>{{ error }}</li>
+{%- endfor %}
+</ul></dd>
+{% endif %}
+
+{% if warnings|length > 0 %}
+<dt class="warning">WARNING:</dt>
+<dd><ul>
+{%- for warning in warnings %}
+<li>{{ warning }}</li>
+{%- endfor %}
+</ul></dd>
+{% endif %}
+
+</dl>
+{% endif %}
+
+
+<h2>Detail</h2>
+{% for problem in problems %}
+<h3>{{ problem.title }}</h3>
+<table class="table">
+<thead>
+<tr><th>testcase</th><th>in</th><th>diff</th><th>md5</th><th> {% for sol in problem.solutions -%} {{
+    sol.name | replace('-', ' ') | replace('_', ' ')
+}} </th><th> {% endfor -%} comments </th></tr>
+</thead>
+<tbody>
+{%- for case in problem.testcases %}
+<tr><td>{{
+    case.name | replace('-', ' ') | replace('_', ' ')
+}} </td><td> {{
+    case.insize
+}} </td><td> {{
+    case.outsize
+}} </td><td> {{
+    case.md5
+}} </td> {% for sol in problem.solutions -%} <td {{ bg(sol.verdicts[case.name].status) }}> {{
+    sol.verdicts[case.name].detail
+}} </td> {% endfor -%} <td> {{
+    case.comment | replace('\n', '<br>')
+}}</td></tr>
+{%- endfor -%}
+</tbody></table>
+{% endfor %}

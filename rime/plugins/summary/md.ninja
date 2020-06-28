@@ -1,0 +1,92 @@
+{% autoescape off %}
+
+{%- macro emoji(type) -%}
+{%- if type == ItemState.GOOD -%} :white_check_mark:
+{%- elif type == ItemState.NOTBAD -%} :large_blue_diamond:
+{%- elif type == ItemState.BAD -%} :x:
+{%- else -%} :wavy_dash: {%- endif -%}
+{%- endmacro -%}
+
+
+# Project Status
+
+このファイルは markdownify_full plugin により自動生成されています (rev.{{ system.rev }}, uploaded by {{ system.username }} @ {{ system.hostname }})
+
+
+## Summary
+
+問題|担当|解答|入力|出力|入検|出検
+:---|:---|:---|:---|:---|:---|:---
+{%- for problem in problems %}
+{{
+    problem.title
+}} | {{
+    problem.assignees
+}} | {{
+    emoji(problem.solution_state.status) }} {{ problem.solution_state.detail
+}} | {{
+    emoji(problem.input_state.status) }} {{ problem.input_state.detail
+}} | {{
+    emoji(problem.output_state.status) }} {{ problem.output_state.detailo
+}} | {{
+    emoji(problem.validator)
+}} | {{
+    emoji(problem.judge)
+}}
+{%- endfor %}
+
+
+## Environments
+
+{% for env in environments %}
+- {{ env.type }}
+    - {{ env.detail }}
+{% endfor %}
+
+
+{% if errors|length > 0 or warnings|length > 0 %}
+## Error Messages
+
+{% if errors|length > 0 %}
+- ERROR:
+{%- for error in errors %}
+    - {{ error }}
+{%- endfor %}
+{% endif %}
+
+{% if warnings|length > 0 %}
+- WARNING:
+{%- for warning in warnings %}
+    - {{ warning }}
+{%- endfor %}
+{% endif %}
+
+{% endif %}
+
+
+## Detail
+{% for problem in problems %}
+### {{ problem.title }}
+
+testcase | in | diff | md5 | {% for sol in problem.solutions -%} {{
+    sol.name | replace('-', ' ') | replace('_', ' ')
+}} | {% endfor -%} comments
+{% for _ in range(problem.solutions|length + 5) -%} |:--- {%- endfor %}
+{%- for case in problem.testcases %}
+{{
+    case.name | replace('-', ' ') | replace('_', ' ')
+}} | {{
+    case.insize
+}} | {{
+    case.outsize
+}} | `{{
+    case.md5
+}}` | {% for sol in problem.solutions -%} {{
+    emoji(sol.verdicts[case.name].status) }} {{ sol.verdicts[case.name].detail
+}} | {% endfor -%} | {{
+    case.comment | replace('\n', '<br>')
+}}
+{%- endfor -%}
+{% endfor %}
+
+{% endautoescape %}
