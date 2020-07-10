@@ -69,6 +69,7 @@ target
 ## You can load plugins here.
 use_plugin('rime_plus')
 use_plugin('judge_system.atcoder')
+use_plugin('judge_system.penguin')
 #use_plugin('judge_system.aoj')
 #use_plugin('judge_system.hacker_rank')
 #use_plugin('wikify')
