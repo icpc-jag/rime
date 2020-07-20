@@ -180,6 +180,7 @@ class Problem(targets.registry.Problem):
 #java_solution(src='Main.java', encoding='UTF-8', mainclass='Main',
 #              challenge_cases=['10_corner*.in'])
 #rust_solution(src='main.rs') # Rust (rustc)
+#go_solution(src='main.go') # Go
 #script_solution(src='main.sh') # shebang line is required
 #script_solution(src='main.pl') # shebang line is required
 #script_solution(src='main.py') # shebang line is required
@@ -207,6 +208,7 @@ class Problem(targets.registry.Problem):
 #cxx_generator(src='generator.cc', dependency=['testlib.h'])
 #java_generator(src='Generator.java', encoding='UTF-8', mainclass='Generator')
 #rust_generator(src='generator.rs')
+#go_generator(src='generator.go')
 #script_generator(src='generator.pl')
 
 ## Input validators.
@@ -215,6 +217,7 @@ class Problem(targets.registry.Problem):
 #java_validator(src='Validator.java', encoding='UTF-8',
 #               mainclass='tmp/validator/Validator')
 #rust_validator(src='validator.rs')
+#go_validator(src='validator.go')
 #script_validator(src='validator.pl')
 
 ## Output judges.
@@ -223,6 +226,7 @@ class Problem(targets.registry.Problem):
 #          variant=testlib_judge_runner)
 #java_judge(src='Judge.java', encoding='UTF-8', mainclass='Judge')
 #rust_judge(src='judge.rs')
+#go_judge(src='judge.go')
 #script_judge(src='judge.py')
 
 ## Reactives.
@@ -231,6 +235,7 @@ class Problem(targets.registry.Problem):
 #             variant=kupc_reactive_runner)
 #java_reactive(src='Reactive.java', encoding='UTF-8', mainclass='Judge')
 #rust_reactive(src='reactive.rs')
+#go_reactive(src='reactive.go')
 #script_reactive(src='reactive.py')
 
 ## Extra Testsets.
