@@ -208,6 +208,21 @@ class RustCode(CodeBase):
             run_args=[os.path.join(out_dir, exe_name)])
 
 
+class GoCode(CodeBase):
+    PREFIX = 'go'
+    EXTENSIONS = ['go']
+
+    def __init__(self, src_name, src_dir, out_dir, flags=[]):
+        exe_name = os.path.splitext(src_name)[0] + consts.EXE_EXT
+        goc = 'go'
+        super(GoCode, self).__init__(
+            src_name=src_name, src_dir=src_dir, out_dir=out_dir,
+            compile_args=([goc, 'build',
+                           '-o', os.path.join(out_dir, exe_name)] +
+                          flags + [src_name]),
+            run_args=[os.path.join(out_dir, exe_name)])
+
+
 class ScriptCode(CodeBase):
     QUIET_COMPILE = True
     PREFIX = 'script'
@@ -298,4 +313,5 @@ codes.registry.Add(CXXCode)
 codes.registry.Add(KotlinCode)
 codes.registry.Add(JavaCode)
 codes.registry.Add(RustCode)
+codes.registry.Add(GoCode)
 codes.registry.Add(ScriptCode)
