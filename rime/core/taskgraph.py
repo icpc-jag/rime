@@ -401,7 +401,7 @@ class FiberTaskGraph(object):
     def Run(self, init_task):
         assert not self.running
         self.running = True
-        self.first_tick = time.clock()
+        self.first_tick = time.perf_counter()
         self.last_tick = self.first_tick
         self.cumulative_parallelism = 0.0
         self._BranchTask(None, [init_task])
@@ -749,7 +749,7 @@ class FiberTaskGraph(object):
             self._InterruptTask(subtask)
 
     def _UpdateCumulativeParallelism(self):
-        cur_tick = time.clock()
+        cur_tick = time.perf_counter()
         self.cumulative_parallelism += (
             (cur_tick - self.last_tick) * len(self.blocked_tasks))
         self.last_tick = cur_tick
