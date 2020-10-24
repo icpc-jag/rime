@@ -18,6 +18,15 @@ NUM_STATES = 6
 RUNNING, WAITING, BLOCKED, READY, FINISHED, ABORTED = range(NUM_STATES)
 
 
+def process_time():
+    # time.process_time() was introduced in Python 3.3, and
+    # time.clock() was removed in Python 3.8
+    # See https://docs.python.org/3.7/library/time.html#time.clock
+    if sys.version_info[0:2] < (3, 3):
+        return time.clock()
+    return time.process_time()
+
+
 class TaskBranch(object):
     def __init__(self, tasks, unsafe_interrupt=False):
         self.tasks = tasks
@@ -401,7 +410,7 @@ class FiberTaskGraph(object):
     def Run(self, init_task):
         assert not self.running
         self.running = True
-        self.first_tick = time.clock()
+        self.first_tick = process_time()
         self.last_tick = self.first_tick
         self.cumulative_parallelism = 0.0
         self._BranchTask(None, [init_task])
@@ -749,7 +758,7 @@ class FiberTaskGraph(object):
             self._InterruptTask(subtask)
 
     def _UpdateCumulativeParallelism(self):
-        cur_tick = time.clock()
+        cur_tick = process_time()
         self.cumulative_parallelism += (
             (cur_tick - self.last_tick) * len(self.blocked_tasks))
         self.last_tick = cur_tick
