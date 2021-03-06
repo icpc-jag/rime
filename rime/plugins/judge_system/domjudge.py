@@ -5,16 +5,17 @@ import os.path
 import shutil
 
 from rime.basic import consts
-import rime.basic.targets.testset
 from rime.core import targets
 from rime.core import taskgraph
 from rime.plugins.plus import commands as plus_commands
 from rime.util import files
 
+
 class Testset(targets.registry.Testset):
     def __init__(self, *args, **kwargs):
         super(Testset, self).__init__(*args, **kwargs)
         self.domjudge_pack_dir = os.path.join(self.problem.out_dir, 'domjudge')
+
 
 class DOMJudgePacker(plus_commands.PackerBase):
     @taskgraph.task_method
@@ -24,8 +25,10 @@ class DOMJudgePacker(plus_commands.PackerBase):
             files.RemoveTree(testset.domjudge_pack_dir)
             files.MakeDir(testset.domjudge_pack_dir)
             files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data'))
-            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data', 'sample'))
-            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data', 'secret'))
+            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data',
+                                       'sample'))
+            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data',
+                                       'secret'))
 
             # Generate problem.yaml
             yaml_file = os.path.join(testset.domjudge_pack_dir, 'problem.yaml')
@@ -40,14 +43,16 @@ class DOMJudgePacker(plus_commands.PackerBase):
             packed_infile = basename + ".in"
             packed_difffile = basename + ".ans"
             is_sample = 'sample' in packed_infile
-            packed_files_dir = os.path.join(testset.domjudge_pack_dir, 'data',
-                                            'sample' if is_sample else 'secret')
+            packed_files_dir = os.path.join(
+                testset.domjudge_pack_dir, 'data',
+                'sample' if is_sample else 'secret')
 
             try:
                 ui.console.PrintAction(
                     'PACK',
                     testset,
-                    '%s -> %s' % (os.path.basename(testcase.infile), packed_infile),
+                    '%s -> %s' % (os.path.basename(testcase.infile),
+                                  packed_infile),
                     progress=True)
                 files.CopyFile(os.path.join(testset.out_dir, testcase.infile),
                                os.path.join(packed_files_dir, packed_infile))
@@ -56,14 +61,15 @@ class DOMJudgePacker(plus_commands.PackerBase):
                     testset,
                     '%s -> %s' % (os.path.basename(difffile), packed_difffile),
                     progress=True)
-                files.CopyFile(os.path.join(testset.out_dir, testcase.difffile),
-                               os.path.join(packed_files_dir, packed_difffile))
+                files.CopyFile(
+                    os.path.join(testset.out_dir, testcase.difffile),
+                    os.path.join(packed_files_dir, packed_difffile))
             except Exception:
                 ui.errors.Exception(testset)
                 yield False
 
         # Create a zip file
-        # TODO: Add problem.pdf
+        # TODO(chiro): Add problem.pdf
         try:
             shutil.make_archive(
                 os.path.join(testset.domjudge_pack_dir, testset.problem.id),
@@ -74,6 +80,7 @@ class DOMJudgePacker(plus_commands.PackerBase):
             yield False
 
         yield True
+
 
 targets.registry.Override('Testset', Testset)
 
