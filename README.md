@@ -17,13 +17,13 @@ Cheat sheet
 #### Install Rime
 
 ```
-$ pip install git+https://github.com/icpc-jag/rime
+$ pip install rime
 ```
 
 #### Upgrade Rime
 
 ```
-$ pip install -U git+https://github.com/icpc-jag/rime
+$ pip install -U rime
 ```
 
 #### Uninstall Rime
