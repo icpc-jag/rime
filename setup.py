@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='rime',
-    version='2.0.dev1',
+    version='3.0.0.dev',
     scripts=['bin/rime', 'bin/rime_init'],
     packages=['rime', 'rime.basic', 'rime.basic.targets', 'rime.basic.util',
               'rime.core', 'rime.plugins', 'rime.plugins.judge_system',
