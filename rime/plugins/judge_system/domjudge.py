@@ -11,6 +11,18 @@ from rime.plugins.plus import commands as plus_commands
 from rime.util import files
 
 
+class Problem(targets.registry.Problem):
+    def PreLoad(self, ui):
+        super(Problem, self).PreLoad(ui)
+        self.domjudge_config_defined = False
+
+        def _domjudge_config(problem_file=None, color=None):
+            self.domjudge_config_defined = True
+            self.domjudge_problem_file = problem_file
+            self.domjudge_color = color
+        self.exports['domjudge_config'] = _domjudge_config
+
+
 class Testset(targets.registry.Testset):
     def __init__(self, *args, **kwargs):
         super(Testset, self).__init__(*args, **kwargs)
@@ -26,10 +38,16 @@ class DOMJudgePacker(plus_commands.PackerBase):
             files.MakeDir(os.path.join(pack_files_dir, 'data', 'sample'))
             files.MakeDir(os.path.join(pack_files_dir, 'data', 'secret'))
 
-            # Generate problem.yaml
-            yaml_file = os.path.join(pack_files_dir, 'problem.yaml')
+            # Generate domjudge-problem.ini
+            yaml_file = os.path.join(pack_files_dir, 'domjudge-problem.ini')
             with open(yaml_file, 'w') as f:
-                f.write('name: {}\n'.format(testset.problem.name))
+                f.write(f'externalid = "{testset.problem.name}"\n')
+                f.write(f'short-name = "{testset.problem.id}"\n')
+                f.write(f'name = "{testset.problem.title}"\n')
+                f.write(f'timelimit = {testset.problem.timeout}\n')
+                if (testset.problem.domjudge_config_defined and
+                        testset.problem.domjudge_color):
+                    f.write(f'color = {testset.problem.domjudge_color}\n')
         except Exception:
             ui.errors.Exception(testset)
             yield False
@@ -66,8 +84,25 @@ class DOMJudgePacker(plus_commands.PackerBase):
                 ui.errors.Exception(testset)
                 yield False
 
+        if (testset.problem.domjudge_config_defined and
+                testset.problem.domjudge_problem_file):
+            dest_filename = 'problem.pdf'
+            try:
+                ui.console.PrintAction(
+                    'PACK',
+                    testset,
+                    '%s -> %s' % (testset.problem.domjudge_problem_file,
+                                  dest_filename),
+                    progress=True)
+                files.CopyFile(
+                    os.path.join(testset.problem.base_dir,
+                                 testset.problem.domjudge_problem_file),
+                    os.path.join(pack_files_dir, dest_filename))
+            except Exception:
+                ui.errors.Exception(testset)
+                yield False
+
         # Create a zip file
-        # TODO(chiro): Add problem.pdf
         try:
             shutil.make_archive(
                 os.path.join(testset.domjudge_pack_dir, testset.problem.id),
@@ -77,9 +112,13 @@ class DOMJudgePacker(plus_commands.PackerBase):
             ui.errors.Exception(testset)
             yield False
 
+        ui.console.PrintAction(
+            'PACK', testset, f'Created {testset.problem.id}.zip')
+
         yield True
 
 
+targets.registry.Override('Problem', Problem)
 targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(DOMJudgePacker)
