@@ -20,31 +20,29 @@ class Testset(targets.registry.Testset):
 class DOMJudgePacker(plus_commands.PackerBase):
     @taskgraph.task_method
     def Pack(self, ui, testset):
-        testcases = testset.ListTestCases()
+        pack_files_dir = os.path.join(testset.domjudge_pack_dir, 'files')
         try:
             files.RemoveTree(testset.domjudge_pack_dir)
-            files.MakeDir(testset.domjudge_pack_dir)
-            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data'))
-            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data',
-                                       'sample'))
-            files.MakeDir(os.path.join(testset.domjudge_pack_dir, 'data',
-                                       'secret'))
+            files.MakeDir(os.path.join(pack_files_dir, 'data', 'sample'))
+            files.MakeDir(os.path.join(pack_files_dir, 'data', 'secret'))
 
             # Generate problem.yaml
-            yaml_file = os.path.join(testset.domjudge_pack_dir, 'problem.yaml')
+            yaml_file = os.path.join(pack_files_dir, 'problem.yaml')
             with open(yaml_file, 'w') as f:
                 f.write('name: {}\n'.format(testset.problem.name))
         except Exception:
             ui.errors.Exception(testset)
             yield False
+
+        testcases = testset.ListTestCases()
         for (i, testcase) in enumerate(testcases):
             basename = os.path.splitext(os.path.basename(testcase.infile))[0]
             difffile = basename + consts.DIFF_EXT
             packed_infile = basename + ".in"
             packed_difffile = basename + ".ans"
             is_sample = 'sample' in packed_infile
-            packed_files_dir = os.path.join(
-                testset.domjudge_pack_dir, 'data',
+            target_dir = os.path.join(
+                pack_files_dir, 'data',
                 'sample' if is_sample else 'secret')
 
             try:
@@ -55,7 +53,7 @@ class DOMJudgePacker(plus_commands.PackerBase):
                                   packed_infile),
                     progress=True)
                 files.CopyFile(os.path.join(testset.out_dir, testcase.infile),
-                               os.path.join(packed_files_dir, packed_infile))
+                               os.path.join(target_dir, packed_infile))
                 ui.console.PrintAction(
                     'PACK',
                     testset,
@@ -63,7 +61,7 @@ class DOMJudgePacker(plus_commands.PackerBase):
                     progress=True)
                 files.CopyFile(
                     os.path.join(testset.out_dir, testcase.difffile),
-                    os.path.join(packed_files_dir, packed_difffile))
+                    os.path.join(target_dir, packed_difffile))
             except Exception:
                 ui.errors.Exception(testset)
                 yield False
@@ -74,7 +72,7 @@ class DOMJudgePacker(plus_commands.PackerBase):
             shutil.make_archive(
                 os.path.join(testset.domjudge_pack_dir, testset.problem.id),
                 'zip',
-                root_dir=testset.domjudge_pack_dir)
+                root_dir=pack_files_dir)
         except Exception:
             ui.errors.Exception(testset)
             yield False
