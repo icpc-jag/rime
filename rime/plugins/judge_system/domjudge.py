@@ -3,12 +3,27 @@
 import os
 import os.path
 import shutil
+import requests
 
 from rime.basic import consts
 from rime.core import targets
 from rime.core import taskgraph
 from rime.plugins.plus import commands as plus_commands
 from rime.util import files
+
+
+class Project(targets.registry.Project):
+    def PreLoad(self, ui):
+        super(Project, self).PreLoad(ui)
+        self.domjudge_config_defined = False
+
+        def _domjudge_config(url, contest_id, username, password):
+            self.domjudge_config_defined = True
+            self.domjudge_url = url
+            self.domjudge_contest_id = contest_id
+            self.domjudge_username = username
+            self.domjudge_password = password
+        self.exports['domjudge_config'] = _domjudge_config
 
 
 class Problem(targets.registry.Problem):
@@ -118,7 +133,65 @@ class DOMJudgePacker(plus_commands.PackerBase):
         yield True
 
 
+class DOMJudgeUploader(plus_commands.UploaderBase):
+    @taskgraph.task_method
+    def Upload(self, ui, problem, dryrun):
+        if not problem.project.domjudge_config_defined:
+            ui.errors.Error(
+                problem, 'domjudge_config() is not defined in PROJECT.')
+            yield False
+
+        base_api_url = problem.project.domjudge_url + 'api/v4/'
+        auth = requests.auth.HTTPBasicAuth(
+            problem.project.domjudge_username,
+            problem.project.domjudge_password)
+        contest_id = problem.project.domjudge_contest_id
+
+        res = requests.get(
+            base_api_url + 'contests/%d/problems' % contest_id,
+            auth=auth)
+        if res.status_code != 200:
+            ui.errors.Error(
+                problem, 'Getting problems failed: %s' % res.reason)
+            yield False
+
+        possible_problems = [
+            p for p in res.json() if p['externalid'] == problem.name]
+        new_problem = len(possible_problems) == 0
+
+        data = {}
+        if not new_problem:
+            data['problem'] = possible_problems[0]['id']
+            data['delete_old_data'] = True
+        packed_file = os.path.join(
+            problem.testsets[0].domjudge_pack_dir, problem.id + '.zip')
+        ui.console.PrintAction(
+            'UPLOAD', problem, packed_file, progress=True)
+        with open(packed_file, 'rb') as f:
+            request_url = base_api_url + 'contests/%d/problems' % contest_id
+            if not dryrun:
+                res = requests.post(
+                    request_url,
+                    data=data,
+                    files={'zip': f},
+                    auth=auth)
+                if res.status_code != 200:
+                    ui.errors.Error(
+                        problem, 'Getting problems failed: %s' % res.reason)
+                    yield False
+            else:
+                ui.console.PrintWarning('Dry-run mode')
+                ui.console.PrintWarning(
+                    f'POST {request_url} with data={data}, zip={packed_file}')
+
+        ui.console.PrintAction(
+            'UPLOAD', problem, str(problem.id))
+        yield True
+
+
+targets.registry.Override('Project', Project)
 targets.registry.Override('Problem', Problem)
 targets.registry.Override('Testset', Testset)
 
 plus_commands.packer_registry.Add(DOMJudgePacker)
+plus_commands.uploader_registry.Add(DOMJudgeUploader)
