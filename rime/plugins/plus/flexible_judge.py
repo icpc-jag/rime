@@ -130,6 +130,13 @@ class Testset(targets.registry.Testset):
                 input=testcase.infile,
                 output=outfile,
                 timeout=testcase.timeout, precise=precise)
+            # Normally, res is codes.RunResult.
+            # Some reactive variants returns TestCaseResult
+            if isinstance(res, test.TestVerdict):
+                # TODO time
+                yield test.TestCaseResult(solution, testcase, res,
+                                  time=1.23, cached=False)
+                return
         else:
             res = yield solution.Run(
                 args=(), cwd=solution.out_dir,
@@ -188,6 +195,10 @@ class Testset(targets.registry.Testset):
                 input=testcase.infile,
                 output=testcase.difffile,
                 timeout=None, precise=False)
+            # Some reactive variants returns TestCaseResult
+            if isinstance(res, test.TestVerdict):
+                yield True
+                return
         else:
             res = yield reference_solution.Run(
                 args=(), cwd=reference_solution.out_dir,
