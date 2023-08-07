@@ -55,8 +55,8 @@ class DOMJudgePacker(plus_commands.PackerBase):
             files.MakeDir(os.path.join(pack_files_dir, 'data', 'secret'))
 
             # Generate domjudge-problem.ini
-            yaml_file = os.path.join(pack_files_dir, 'domjudge-problem.ini')
-            with open(yaml_file, 'w') as f:
+            ini_file = os.path.join(pack_files_dir, 'domjudge-problem.ini')
+            with open(ini_file, 'w') as f:
                 f.write(f'externalid = "{testset.problem.name}"\n')
                 f.write(f'short-name = "{testset.problem.id}"\n')
                 f.write(f'name = "{testset.problem.title}"\n')
