@@ -10,6 +10,7 @@ from rime.basic import consts
 from rime.core import targets
 from rime.core import taskgraph
 from rime.plugins.plus import commands as plus_commands
+from rime.plugins.plus import flexible_judge
 from rime.util import files
 
 
@@ -43,6 +44,22 @@ class Testset(targets.registry.Testset):
     def __init__(self, *args, **kwargs):
         super(Testset, self).__init__(*args, **kwargs)
         self.domjudge_pack_dir = os.path.join(self.problem.out_dir, 'domjudge')
+
+
+class DOMJudgeJudgeRunner(flexible_judge.JudgeRunner):
+    PREFIX = 'domjudge'
+
+    def Run(self, judge, infile, difffile, outfile, cwd, judgefile):
+        domjudge_workdir = infile + '.domjudge'
+        files.MakeDir(domjudge_workdir)
+        return judge.Run(
+            args=(infile, difffile, domjudge_workdir),
+            cwd=cwd,
+            input=outfile,
+            output=judgefile,
+            timeout=None, precise=False,
+            redirect_error=True,
+            ok_returncode=42, ng_returncode=43)
 
 
 class DOMJudgePacker(plus_commands.PackerBase):
@@ -99,6 +116,42 @@ class DOMJudgePacker(plus_commands.PackerBase):
             except Exception:
                 ui.errors.Exception(testset)
                 yield False
+
+        if len(testset.judges) > 1:
+            ui.errors.Error(
+                testset, 'Multiple varidators is not supported in DOMJudge.')
+            yield False
+        elif len(testset.judges) == 1:
+            judge = testset.judges[0]
+
+            if not isinstance(judge.variant, DOMJudgeJudgeRunner):
+                ui.errors.Error(
+                    testset,
+                    'Only domjudge_judge_runner is supported.')
+                yield False
+
+            validator_dir = os.path.join(
+                pack_files_dir, 'output_validators',
+                os.path.splitext(judge.src_name)[0])
+            files.MakeDir(validator_dir)
+            ui.console.PrintAction(
+                'PACK',
+                testset,
+                'output validator files',
+                progress=True)
+            files.CopyFile(
+                os.path.join(testset.src_dir, judge.src_name),
+                validator_dir)
+            for f in judge.dependency:
+                files.CopyFile(
+                    os.path.join(testset.project.library_dir, f),
+                    validator_dir)
+
+            # Generate problem.yaml
+            # TODO: add more data to problem.yaml?
+            yaml_file = os.path.join(pack_files_dir, 'problem.yaml')
+            with open(yaml_file, 'w') as f:
+                f.write('validation: custom\n')
 
         if (testset.problem.domjudge_config_defined and
                 testset.problem.domjudge_problem_file):
@@ -274,7 +327,7 @@ class DOMJudgeSubmitter(plus_commands.SubmitterBase):
         if solution.IsCorrect() is not (verdict == 'AC'):
             ui.errors.Warning(
                 solution, 'Expected %s, but got %s' %
-                ('pass' if solution.IsCorrect() else 'fail' , verdict))
+                ('pass' if solution.IsCorrect() else 'fail', verdict))
 
         yield True
 
@@ -282,6 +335,8 @@ class DOMJudgeSubmitter(plus_commands.SubmitterBase):
 targets.registry.Override('Project', Project)
 targets.registry.Override('Problem', Problem)
 targets.registry.Override('Testset', Testset)
+
+flexible_judge.judge_runner_registry.Add(DOMJudgeJudgeRunner)
 
 plus_commands.packer_registry.Add(DOMJudgePacker)
 plus_commands.uploader_registry.Add(DOMJudgeUploader)

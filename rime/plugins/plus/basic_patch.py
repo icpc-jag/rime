@@ -398,7 +398,8 @@ targets.registry.Override('Testset', Testset)
 # fast_test
 @taskgraph.task_method
 def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
-                  timeout=None, precise=False):
+                  timeout=None, precise=False, ok_returncode=0,
+                  ng_returncode=None):
     task = taskgraph.ExternalProcessTask(
         args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
         timeout=timeout, exclusive=precise)
@@ -412,12 +413,18 @@ def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
             timeout=timeout, exclusive=precise)
         proc = yield task
         code = proc.returncode
-    if code == 0:
+
+    if code == ok_returncode:
         status = codes.RunResult.OK
     elif code == -(signal.SIGXCPU):
         status = codes.RunResult.TLE
     elif code < 0:
         status = codes.RunResult.RE
+    elif ng_returncode is not None:
+        if code == ng_returncode:
+            status = codes.RunResult.NG
+        else:
+            status = codes.RunResult.RE
     else:
         status = codes.RunResult.NG
     yield codes.RunResult(status, task.time)

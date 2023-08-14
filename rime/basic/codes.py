@@ -35,13 +35,14 @@ class CodeBase(codes.Code):
 
     @taskgraph.task_method
     def Run(self, args, cwd, input, output, timeout, precise,
-            redirect_error=False):
+            redirect_error=False, ok_returncode=0, ng_returncode=None):
         """Run the code and return RunResult."""
         try:
             result = yield self._ExecForRun(
                 args=tuple(list(self.run_args) + list(args)), cwd=cwd,
                 input=input, output=output, timeout=timeout, precise=precise,
-                redirect_error=redirect_error)
+                redirect_error=redirect_error,
+                ok_returncode=ok_returncode, ng_returncode=ng_returncode)
         except Exception as e:
             result = codes.RunResult('On execution: %s' % e, None)
         yield result
@@ -72,7 +73,7 @@ class CodeBase(codes.Code):
 
     @taskgraph.task_method
     def _ExecForRun(self, args, cwd, input, output, timeout, precise,
-                    redirect_error=False):
+                    redirect_error=False, ok_returncode=0, ng_returncode=None):
         with open(input, 'r') as infile:
             with open(output, 'w') as outfile:
                 if redirect_error:
@@ -82,11 +83,13 @@ class CodeBase(codes.Code):
                 yield (yield self._ExecInternal(
                     args=args, cwd=cwd,
                     stdin=infile, stdout=outfile, stderr=errfile,
-                    timeout=timeout, precise=precise))
+                    timeout=timeout, precise=precise,
+                    ok_returncode=ok_returncode, ng_returncode=ng_returncode))
 
     @taskgraph.task_method
     def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
-                      timeout=None, precise=False):
+                      timeout=None, precise=False, ok_returncode=0,
+                      ng_returncode=None):
         task = taskgraph.ExternalProcessTask(
             args, cwd=cwd, stdin=stdin, stdout=stdout, stderr=stderr,
             timeout=timeout, exclusive=precise)
@@ -100,12 +103,17 @@ class CodeBase(codes.Code):
                 timeout=timeout, exclusive=True)
             proc = yield task
             code = proc.returncode
-        if code == 0:
+        if code == ok_returncode:
             status = codes.RunResult.OK
         elif code == -(signal.SIGXCPU):
             status = codes.RunResult.TLE
         elif code < 0:
             status = codes.RunResult.RE
+        elif ng_returncode is not None:
+            if code == ng_returncode:
+                status = codes.RunResult.NG
+            else:
+                status = codes.RunResult.RE
         else:
             status = codes.RunResult.NG
         yield codes.RunResult(status, task.time)
