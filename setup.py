@@ -1,8 +1,19 @@
+import os
 import setuptools
+
+
+def get_long_description() -> str:
+    readme = os.path.join(os.path.dirname(__file__), "README.md")
+    with open(readme) as f:
+        return f.read()
+
 
 setuptools.setup(
     name='rime',
     version='3.0.0.dev',
+    description="An automation tool for programming contest organizers",
+    long_description=get_long_description(),
+    long_description_content_type="text/markdown",
     scripts=['bin/rime', 'bin/rime_init'],
     packages=['rime', 'rime.basic', 'rime.basic.targets', 'rime.basic.util',
               'rime.core', 'rime.plugins', 'rime.plugins.judge_system',
