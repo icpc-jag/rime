@@ -6,6 +6,7 @@ import shutil
 import time
 import requests
 
+from rime.basic import codes as basic_codes
 from rime.basic import consts
 from rime.core import targets
 from rime.core import taskgraph
@@ -121,7 +122,8 @@ class DOMJudgePacker(plus_commands.PackerBase):
             ui.errors.Error(
                 testset, 'Multiple varidators is not supported in DOMJudge.')
             yield False
-        elif len(testset.judges) == 1:
+        elif (len(testset.judges) == 1 and
+                not isinstance(testset.judges[0], basic_codes.InternalDiffCode)):
             judge = testset.judges[0]
 
             if not isinstance(judge.variant, DOMJudgeJudgeRunner):
