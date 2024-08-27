@@ -191,37 +191,27 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
 
     @taskgraph.task_method
     def Run(self, reactive, args, cwd, input, output, timeout, precise):
-        # TODO instead of tmpfile, store log somewhere.
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with tempfile.NamedTemporaryFile() as tmpfile:
-                judge_args = reactive.run_args + (input, tmpfile.name, tmpdir, )
-                solution_args = args
-                task = DOMJudgeReactiveTask(
-                    judge_args, solution_args,
-                    cwd=cwd, timeout=timeout, exclusive=precise)
-                (judge_proc, solution_proc) = yield task
+        with tempfile.NamedTemporaryFile() as tmpfile:
+            judge_args = reactive.run_args + (input, tmpfile.name, cwd, )
+            solution_args = args
+            task = DOMJudgeReactiveTask(
+                judge_args, solution_args,
+                cwd=cwd, timeout=timeout, exclusive=precise)
+            (judge_proc, solution_proc) = yield task
 
-                for filename in os.listdir(tmpdir):
-                    if os.path.isfile(os.path.join(tmpdir, filename)):
-                        with open(os.path.join(tmpdir, filename), 'r') as f:
-                            print()
-                            print('file' + filename)
-                            print(f.read())
-                            print()
-
-                judge_code = judge_proc.returncode
-                solution_code = solution_proc.returncode
-                if judge_code == 42:
-                    if solution_code != 0:
-                        yield test.TestCaseResult(verdict=test.TestCaseResult.RE)
-                    else:
-                        yield test.TestCaseResult(verdict=test.TestCaseResult.AC, time=task.time)
-                elif judge_code == 43:
-                    yield test.TestCaseResult(verdict=test.TestCaseResult.WA, time=task.time)
-                elif judge_code == -(signal.SIGXCPU):
-                    yield test.TestCaseResult(verdict=test.TestCaseResult.TLE)
+            judge_code = judge_proc.returncode
+            solution_code = solution_proc.returncode
+            if judge_code == 42:
+                if solution_code != 0:
+                    yield test.TestCaseResult(verdict=test.TestCaseResult.RE)
                 else:
-                    yield test.TestCaseResult(verdict=test.TestCaseResult.ERR)
+                    yield test.TestCaseResult(verdict=test.TestCaseResult.AC, time=task.time)
+            elif judge_code == 43:
+                yield test.TestCaseResult(verdict=test.TestCaseResult.WA, time=task.time)
+            elif judge_code == -(signal.SIGXCPU):
+                yield test.TestCaseResult(verdict=test.TestCaseResult.TLE)
+            else:
+                yield test.TestCaseResult(verdict=test.TestCaseResult.ERR)
 
 
 class DOMJudgePacker(plus_commands.PackerBase):
