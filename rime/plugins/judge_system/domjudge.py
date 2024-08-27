@@ -180,10 +180,11 @@ class DOMJudgeReactiveTask(taskgraph.Task):
             self.timer = None
         # Don't keep proc in cache.
         judge_proc = self.judge_proc
+        solution_proc = self.solution_proc
         # TODO call terminate() or something if any of them are still alive?
         self.judge_proc = None
         self.solution_proc = None
-        return judge_proc
+        return (judge_proc, solution_proc)
 
 
 class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
@@ -196,18 +197,20 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
             with tempfile.NamedTemporaryFile() as tmpfile:
                 judge_args = reactive.run_args + (input, tmpfile.name, tmpdir, )
                 solution_args = args
-                proc = yield DOMJudgeReactiveTask(
+                (judge_proc, solution_proc) = yield DOMJudgeReactiveTask(
                     judge_args, solution_args,
                     cwd=cwd, timeout=timeout, exclusive=precise)
-                code = proc.returncode
-                # TODO Report error on judge process and solution process differently:
-                if code == 42:
+                judge_code = judge_proc.returncode
+                solution_code = solution_proc.returncode
+                if solution_code != 0:
+                    yield test.TestCaseResult.RE
+                elif judge_code == 42:
                     yield test.TestCaseResult.AC
-                if code == 43:
-                    yield test.TestCaseResult.AC
-                elif code == -(signal.SIGXCPU):
+                elif judge_code == 43:
+                    yield test.TestCaseResult.WA
+                elif judge_code == -(signal.SIGXCPU):
                     yield test.TestCaseResult.TLE
-                elif code < 0:
+                elif judge_code < 0:
                     yield test.TestCaseResult.RE
                 else:
                     yield test.TestCaseResult.ERR
