@@ -12,8 +12,7 @@ import requests
 
 from rime.basic import codes as basic_codes
 from rime.basic import consts, test
-from rime.core import targets
-from rime.core import taskgraph
+from rime.core import targets, taskgraph
 from rime.plugins.plus import commands as plus_commands
 from rime.plugins.plus import flexible_judge
 from rime.util import files
@@ -197,30 +196,32 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
             with tempfile.NamedTemporaryFile() as tmpfile:
                 judge_args = reactive.run_args + (input, tmpfile.name, tmpdir, )
                 solution_args = args
-                (judge_proc, solution_proc) = yield DOMJudgeReactiveTask(
+                task = DOMJudgeReactiveTask(
                     judge_args, solution_args,
                     cwd=cwd, timeout=timeout, exclusive=precise)
+                (judge_proc, solution_proc) = yield task
+
+                for filename in os.listdir(tmpdir):
+                    if os.path.isfile(os.path.join(tmpdir, filename)):
+                        with open(os.path.join(tmpdir, filename), 'r') as f:
+                            print()
+                            print('file' + filename)
+                            print(f.read())
+                            print()
+
                 judge_code = judge_proc.returncode
                 solution_code = solution_proc.returncode
-                if solution_code != 0:
-                    yield test.TestCaseResult.RE
-                elif judge_code == 42:
-                    yield test.TestCaseResult.AC
+                if judge_code == 42:
+                    if solution_code != 0:
+                        yield test.TestCaseResult(verdict=test.TestCaseResult.RE)
+                    else:
+                        yield test.TestCaseResult(verdict=test.TestCaseResult.AC, time=task.time)
                 elif judge_code == 43:
-                    yield test.TestCaseResult.WA
+                    yield test.TestCaseResult(verdict=test.TestCaseResult.WA, time=task.time)
                 elif judge_code == -(signal.SIGXCPU):
-                    yield test.TestCaseResult.TLE
-                elif judge_code < 0:
-                    yield test.TestCaseResult.RE
+                    yield test.TestCaseResult(verdict=test.TestCaseResult.TLE)
                 else:
-                    yield test.TestCaseResult.ERR
-
-            for filename in os.listdir(tmpdir):
-                if os.path.isfile(os.path.join(tmpdir, filename)):
-                    with open(os.path.join(tmpdir, filename), 'r') as f:
-                        print('file' + filename)
-                        print(f.read())
-                        print()
+                    yield test.TestCaseResult(verdict=test.TestCaseResult.ERR)
 
 
 class DOMJudgePacker(plus_commands.PackerBase):

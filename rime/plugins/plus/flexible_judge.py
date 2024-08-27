@@ -132,10 +132,11 @@ class Testset(targets.registry.Testset):
                 timeout=testcase.timeout, precise=precise)
             # Normally, res is codes.RunResult.
             # Some reactive variants returns TestCaseResult
-            if isinstance(res, test.TestVerdict):
-                # TODO time
-                yield test.TestCaseResult(solution, testcase, res,
-                                  time=1.23, cached=False)
+            if isinstance(res, test.TestCaseResult):
+                res.solution = solution
+                res.testcase = testcase
+                res.cached = False
+                yield res
                 return
         else:
             res = yield solution.Run(
@@ -196,7 +197,10 @@ class Testset(targets.registry.Testset):
                 output=testcase.difffile,
                 timeout=None, precise=False)
             # Some reactive variants returns TestCaseResult
-            if isinstance(res, test.TestVerdict):
+            if isinstance(res, test.TestCaseResult):
+                if res.verdict != test.TestCaseResult.AC:
+                    ui.errors.Error(reference_solution, res.verdict)
+                    raise taskgraph.Bailout([False])
                 yield True
                 return
         else:
