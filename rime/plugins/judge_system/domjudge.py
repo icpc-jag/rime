@@ -146,23 +146,26 @@ class DOMJudgeReactiveTask(taskgraph.Task):
         self.start_time = time.time()
         self.judge_proc = subprocess.Popen(self.judge_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, **self.kwargs)
         self.solution_proc = subprocess.Popen(self.solution_args, stdin=self.judge_proc.stdout, stdout=self.judge_proc.stdin, **self.kwargs)
-        # finishing judge_proc will make pipes closed, but solution_proc doesn't.
-        # Let's watch solution_proc in a separate thread and close pipes.
-        def run_in_thread():
-            self.solution_proc.wait()
-            if self.judge_proc is None:
-                return
-            if self.judge_proc.stdin is not None:
-                self.judge_proc.stdin.close()
-            if self.judge_proc.stdout is not None:
-                self.judge_proc.stdout.close()
-        thread = threading.Thread(target=run_in_thread)
-        thread.start()
+        # Makes writing side responsible to close the pipe.
+        def pipe_closer(write_side, read_side):
+            def task(wp, rp):
+                wp.wait()
+                if wp.stdout is not None:
+                    wp.stdout.close()
+                if rp.stdin is not None:
+                    rp.stdin.close()
+            thread = threading.Thread(target=task, args=[write_side, read_side])
+            thread.start()
+        pipe_closer(self.judge_proc, self.solution_proc)
+        pipe_closer(self.solution_proc, self.judge_proc)
 
         if self.timeout is not None:
             def TimeoutKiller():
                 try:
                     os.kill(self.solution_proc.pid, signal.SIGXCPU)
+                except Exception:
+                    pass
+                try:
                     os.kill(self.judge_proc.pid, signal.SIGXCPU)
                 except Exception:
                     pass
