@@ -191,27 +191,35 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
 
     @taskgraph.task_method
     def Run(self, reactive, args, cwd, input, output, timeout, precise):
+        feedback_dir_name = os.path.join(
+            cwd,
+            os.path.splitext(os.path.basename(input))[0] + '.feedback')
+        if os.path.exists(feedback_dir_name):
+            shutil.rmtree(feedback_dir_name)
+        os.makedirs(feedback_dir_name, exist_ok=True)
+        # 2nd argument is "expected output" file, which is not supported in rime interactive for now.
+        # As a placeholder, using a temporary file.
         with tempfile.NamedTemporaryFile() as tmpfile:
-            judge_args = reactive.run_args + (input, tmpfile.name, cwd, )
+            judge_args = reactive.run_args + (input, tmpfile.name, feedback_dir_name, )
             solution_args = args
             task = DOMJudgeReactiveTask(
                 judge_args, solution_args,
                 cwd=cwd, timeout=timeout, exclusive=precise)
             (judge_proc, solution_proc) = yield task
 
-            judge_code = judge_proc.returncode
-            solution_code = solution_proc.returncode
-            if judge_code == 42:
-                if solution_code != 0:
-                    yield test.TestCaseResult(verdict=test.TestCaseResult.RE)
-                else:
-                    yield test.TestCaseResult(verdict=test.TestCaseResult.AC, time=task.time)
-            elif judge_code == 43:
-                yield test.TestCaseResult(verdict=test.TestCaseResult.WA, time=task.time)
-            elif judge_code == -(signal.SIGXCPU):
-                yield test.TestCaseResult(verdict=test.TestCaseResult.TLE)
+        judge_code = judge_proc.returncode
+        solution_code = solution_proc.returncode
+        if judge_code == 42:
+            if solution_code != 0:
+                yield test.TestCaseResult(verdict=test.TestCaseResult.RE)
             else:
-                yield test.TestCaseResult(verdict=test.TestCaseResult.ERR)
+                yield test.TestCaseResult(verdict=test.TestCaseResult.AC, time=task.time)
+        elif judge_code == 43:
+            yield test.TestCaseResult(verdict=test.TestCaseResult.WA, time=task.time)
+        elif judge_code == -(signal.SIGXCPU):
+            yield test.TestCaseResult(verdict=test.TestCaseResult.TLE)
+        else:
+            yield test.TestCaseResult(verdict=test.TestCaseResult.ERR)
 
 
 class DOMJudgePacker(plus_commands.PackerBase):
