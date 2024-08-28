@@ -183,7 +183,6 @@ class DOMJudgeReactiveTask(taskgraph.Task):
         # Don't keep proc in cache.
         judge_proc = self.judge_proc
         solution_proc = self.solution_proc
-        # TODO call terminate() or something if any of them are still alive?
         self.judge_proc = None
         self.solution_proc = None
         return (judge_proc, solution_proc)
@@ -288,6 +287,7 @@ class DOMJudgePacker(plus_commands.PackerBase):
                 not isinstance(testset.judges[0], basic_codes.InternalDiffCode)):
             judge = testset.judges[0]
 
+            # TODO support DOMJudgeReactiveRunner
             if not isinstance(judge.variant, DOMJudgeJudgeRunner):
                 ui.errors.Error(
                     testset,
