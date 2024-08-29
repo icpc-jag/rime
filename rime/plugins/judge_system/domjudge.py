@@ -2,20 +2,26 @@
 
 import os
 import os.path
+import requests
 import shutil
 import signal
 import subprocess
 import tempfile
 import threading
 import time
-import requests
 
 from rime.basic import codes as basic_codes
-from rime.basic import consts, test
-from rime.core import targets, taskgraph
+from rime.basic import consts
+from rime.basic import test
+from rime.core import targets
+from rime.core import taskgraph
 from rime.plugins.plus import commands as plus_commands
 from rime.plugins.plus import flexible_judge
 from rime.util import files
+
+
+DOMJUDGE_RETURNCODE_AC = 42
+DOMJUDGE_RETURNCODE_WA = 43
 
 
 class Project(targets.registry.Project):
@@ -63,7 +69,8 @@ class DOMJudgeJudgeRunner(flexible_judge.JudgeRunner):
             output=judgefile,
             timeout=None, precise=False,
             redirect_error=True,
-            ok_returncode=42, ng_returncode=43)
+            ok_returncode=DOMJUDGE_RETURNCODE_AC,
+            ng_returncode=DOMJUDGE_RETURNCODE_WA)
 
 
 class DOMJudgeReactiveTask(taskgraph.Task):
@@ -144,31 +151,35 @@ class DOMJudgeReactiveTask(taskgraph.Task):
 
     def _StartProcess(self):
         self.start_time = time.time()
-        self.judge_proc = subprocess.Popen(self.judge_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, **self.kwargs)
-        self.solution_proc = subprocess.Popen(self.solution_args, stdin=self.judge_proc.stdout, stdout=self.judge_proc.stdin, **self.kwargs)
+        self.judge_proc = subprocess.Popen(
+            self.judge_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            **self.kwargs)
+        self.solution_proc = subprocess.Popen(
+            self.solution_args, stdin=self.judge_proc.stdout,
+            stdout=self.judge_proc.stdin, **self.kwargs)
         # Makes writing side responsible to close the pipe.
-        def pipe_closer(write_side, read_side):
+
+        def pipe_closer(write_proc, read_proc):
             def task(wp, rp):
                 wp.wait()
                 if wp.stdout is not None:
                     wp.stdout.close()
                 if rp.stdin is not None:
                     rp.stdin.close()
-            thread = threading.Thread(target=task, args=[write_side, read_side])
+            thread = threading.Thread(
+                target=task, args=[write_proc, read_proc])
             thread.start()
         pipe_closer(self.judge_proc, self.solution_proc)
         pipe_closer(self.solution_proc, self.judge_proc)
 
         if self.timeout is not None:
             def TimeoutKiller():
-                try:
-                    os.kill(self.solution_proc.pid, signal.SIGXCPU)
-                except Exception:
-                    pass
-                try:
-                    os.kill(self.judge_proc.pid, signal.SIGXCPU)
-                except Exception:
-                    pass
+                # Kill judge first so that TLE signal is correctly sent.
+                for pid in [self.judge_proc.pid, self.solution_proc.pid]:
+                    try:
+                        os.kill(pid, signal.SIGXCPU)
+                    except Exception:
+                        pass
             self.timer = threading.Timer(self.timeout, TimeoutKiller)
             self.timer.start()
         else:
@@ -199,10 +210,12 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
         if os.path.exists(feedback_dir_name):
             shutil.rmtree(feedback_dir_name)
         os.makedirs(feedback_dir_name, exist_ok=True)
-        # 2nd argument is "expected output" file, which is not supported in rime interactive for now.
+        # 2nd argument is an "expected output" file, which is not supported
+        # in rime interactive for now.
         # As a placeholder, using a temporary file.
         with tempfile.NamedTemporaryFile() as tmpfile:
-            judge_args = reactive.run_args + (input, tmpfile.name, feedback_dir_name, )
+            judge_args = reactive.run_args + \
+                (input, tmpfile.name, feedback_dir_name, )
             solution_args = args
             task = DOMJudgeReactiveTask(
                 judge_args, solution_args,
@@ -211,13 +224,15 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
 
         judge_code = judge_proc.returncode
         solution_code = solution_proc.returncode
-        if judge_code == 42:
+        if judge_code == DOMJUDGE_RETURNCODE_AC:
             if solution_code != 0:
                 yield test.TestCaseResult(verdict=test.TestCaseResult.RE)
             else:
-                yield test.TestCaseResult(verdict=test.TestCaseResult.AC, time=task.time)
-        elif judge_code == 43:
-            yield test.TestCaseResult(verdict=test.TestCaseResult.WA, time=task.time)
+                yield test.TestCaseResult(verdict=test.TestCaseResult.AC,
+                                          time=task.time)
+        elif judge_code == DOMJUDGE_RETURNCODE_WA:
+            yield test.TestCaseResult(verdict=test.TestCaseResult.WA,
+                                      time=task.time)
         elif judge_code == -(signal.SIGXCPU):
             yield test.TestCaseResult(verdict=test.TestCaseResult.TLE)
         else:
@@ -287,7 +302,7 @@ class DOMJudgePacker(plus_commands.PackerBase):
                 not isinstance(testset.judges[0], basic_codes.InternalDiffCode)):
             judge = testset.judges[0]
 
-            # TODO support DOMJudgeReactiveRunner
+            # TODO(tossy310): support DOMJudgeReactiveRunner
             if not isinstance(judge.variant, DOMJudgeJudgeRunner):
                 ui.errors.Error(
                     testset,
