@@ -28,8 +28,8 @@ class TestHtmlifyProject(unittest.TestCase):
         while task.Continue():
             pass
 
-        self.project.Test.called_once_with(ui)
-        self.project.Clean.called_once_with(ui)
+        self.project.Test.assert_called_once_with(ui)
+        self.project.Clean.assert_called_once_with(ui)
 
     def test_skip_clean(self):
         ui = mock.MagicMock()
