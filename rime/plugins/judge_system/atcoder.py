@@ -52,7 +52,7 @@ class Project(targets.registry.Project):
         yield super(Project, self).Upload(ui)
 
     def _Request(self, path, data=None):
-        if type(data) == dict:
+        if type(data) is dict:
             data = urllib.parse.urlencode(data).encode('utf-8')
         req = urllib.request.Request(self.atcoder_contest_url + path, data)
         return opener.open(req)

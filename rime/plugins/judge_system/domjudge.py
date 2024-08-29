@@ -123,7 +123,8 @@ class DOMJudgePacker(plus_commands.PackerBase):
                 testset, 'Multiple varidators is not supported in DOMJudge.')
             yield False
         elif (len(testset.judges) == 1 and
-                not isinstance(testset.judges[0], basic_codes.InternalDiffCode)):
+                not isinstance(testset.judges[0], basic_codes.InternalDiffCode
+                               )):
             judge = testset.judges[0]
 
             if not isinstance(judge.variant, DOMJudgeJudgeRunner):

@@ -93,7 +93,7 @@ atcoder_config(
 '''.format(rime_plus_version)
     make_file('PROJECT', content)
 
-    if(isgit):
+    if (isgit):
         os.system('git init')
         os.system('git add PROJECT .gitignore common/testlib.h')
         os.system('git commit -m "Initial commit"')
