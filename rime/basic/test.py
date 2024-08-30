@@ -39,7 +39,7 @@ class TestCaseResult(object):
     RE = TestVerdict('Runtime Error')
     ERR = TestVerdict('System Error')
 
-    def __init__(self, solution, testcase, verdict, time, cached):
+    def __init__(self, solution=None, testcase=None, verdict=NA, time=None, cached=False):
         self.solution = solution
         self.testcase = testcase
         self.verdict = verdict
