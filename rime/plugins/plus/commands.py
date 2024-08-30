@@ -110,7 +110,7 @@ atcoder_config(
 )
 '''
             newdir = os.path.join(self.base_dir, name)
-            if(os.path.exists(newdir)):
+            if os.path.exists(newdir):
                 ui.errors.Error(self, "{0} already exists.".format(newdir))
                 yield None
             os.makedirs(newdir)
@@ -193,7 +193,7 @@ class Problem(targets.registry.Problem):
 #expected_score(100)
 '''
             newdir = os.path.join(self.base_dir, name)
-            if(os.path.exists(newdir)):
+            if os.path.exists(newdir):
                 ui.errors.Error(self, "{0} already exists.".format(newdir))
                 yield None
             os.makedirs(newdir)
@@ -252,7 +252,7 @@ id='{0}'
 #scoring_judge()
 '''
             newdir = os.path.join(self.base_dir, name)
-            if(os.path.exists(newdir)):
+            if os.path.exists(newdir):
                 ui.errors.Error(self, "{0} already exists.".format(newdir))
                 yield None
             os.makedirs(newdir)
