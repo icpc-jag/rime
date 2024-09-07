@@ -300,9 +300,11 @@ class DOMJudgePacker(plus_commands.PackerBase):
         if testset.reactives:
             if len(testset.reactives) != 1:
                 ui.errors.Error(
-                    testset, 'Multiple reactive runners is not supported in DOMJudge.')
+                    testset,
+                    'Multiple reactive runners is not supported in DOMJudge.')
                 yield False
-            if not isinstance(testset.reactives[0].variant, DOMJudgeReactiveRunner):
+            if not isinstance(testset.reactives[0].variant,
+                              DOMJudgeReactiveRunner):
                 ui.errors.Error(
                     testset, 'Only domjudge_reactive_runner is supported.')
                 yield False
@@ -322,11 +324,15 @@ class DOMJudgePacker(plus_commands.PackerBase):
             has_custom_judge = True
 
         if has_reactive or has_custom_judge:
-            judge = testset.judges[0] if has_custom_judge else testset.reactives[0]
+            if has_reactive:
+                judge = testset.reactives[0]
+            elif has_custom_judge:
+                judge = testset.judges[0]
 
             validator_dir = os.path.join(
                 pack_files_dir, 'output_validators',
-                testset.problem.name + '_' + os.path.splitext(judge.src_name)[0])
+                testset.problem.name + '_' +
+                os.path.splitext(judge.src_name)[0])
             files.MakeDir(validator_dir)
             ui.console.PrintAction(
                 'PACK',
