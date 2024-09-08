@@ -297,24 +297,44 @@ class DOMJudgePacker(plus_commands.PackerBase):
                 ui.errors.Exception(testset)
                 yield False
 
-        if len(testset.judges) > 1:
+        has_reactive = False
+        has_custom_judge = False
+
+        if testset.reactives:
+            if len(testset.reactives) != 1:
+                ui.errors.Error(
+                    testset,
+                    'Multiple reactive runners is not supported in DOMJudge.')
+                yield False
+            if not isinstance(testset.reactives[0].variant,
+                              DOMJudgeReactiveRunner):
+                ui.errors.Error(
+                    testset, 'Only domjudge_reactive_runner is supported.')
+                yield False
+            has_reactive = True
+        elif len(testset.judges) > 1:
             ui.errors.Error(
                 testset, 'Multiple varidators is not supported in DOMJudge.')
             yield False
         elif (len(testset.judges) == 1 and
                 not isinstance(testset.judges[0], basic_codes.InternalDiffCode
                                )):
-            judge = testset.judges[0]
-
-            # TODO(tossy310): support DOMJudgeReactiveRunner
-            if not isinstance(judge.variant, DOMJudgeJudgeRunner):
+            if not isinstance(testset.judges[0].variant, DOMJudgeJudgeRunner):
                 ui.errors.Error(
                     testset,
                     'Only domjudge_judge_runner is supported.')
                 yield False
+            has_custom_judge = True
+
+        if has_reactive or has_custom_judge:
+            if has_reactive:
+                judge = testset.reactives[0]
+            elif has_custom_judge:
+                judge = testset.judges[0]
 
             validator_dir = os.path.join(
                 pack_files_dir, 'output_validators',
+                testset.problem.name + '_' +
                 os.path.splitext(judge.src_name)[0])
             files.MakeDir(validator_dir)
             ui.console.PrintAction(
@@ -334,7 +354,10 @@ class DOMJudgePacker(plus_commands.PackerBase):
             # TODO: add more data to problem.yaml?
             yaml_file = os.path.join(pack_files_dir, 'problem.yaml')
             with open(yaml_file, 'w') as f:
-                f.write('validation: custom\n')
+                if has_custom_judge:
+                    f.write('validation: custom\n')
+                elif has_reactive:
+                    f.write('validation: custom interactive\n')
 
         if (testset.problem.domjudge_config_defined and
                 testset.problem.domjudge_problem_file):
