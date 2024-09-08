@@ -191,6 +191,9 @@ class DOMJudgeReactiveTask(taskgraph.Task):
         if self.timer is not None:
             self.timer.cancel()
             self.timer = None
+        # Here, it's ensured that judge process is finished.
+        # Let's also make sure solution process is also finished.
+        self.solution_proc.wait()
         # Don't keep proc in cache.
         judge_proc = self.judge_proc
         solution_proc = self.solution_proc
