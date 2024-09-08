@@ -10,7 +10,7 @@ def get_long_description() -> str:
 
 setuptools.setup(
     name='rime',
-    version='3.0.0.dev',
+    version='2.2.1',
     description="An automation tool for programming contest organizers",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
