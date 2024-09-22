@@ -6,7 +6,6 @@ import requests
 import shutil
 import signal
 import subprocess
-import tempfile
 import threading
 import time
 
@@ -213,17 +212,17 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
         if os.path.exists(feedback_dir_name):
             shutil.rmtree(feedback_dir_name)
         os.makedirs(feedback_dir_name, exist_ok=True)
-        # 2nd argument is an "expected output" file, which is not supported
-        # in rime interactive for now.
-        # As a placeholder, using a temporary file.
-        with tempfile.NamedTemporaryFile() as tmpfile:
-            judge_args = reactive.run_args + \
-                (input, tmpfile.name, feedback_dir_name, )
-            solution_args = args
-            task = DOMJudgeReactiveTask(
-                judge_args, solution_args,
-                cwd=cwd, timeout=timeout, exclusive=precise)
-            (judge_proc, solution_proc) = yield task
+
+        # Makes sure output file exists.
+        open(output, 'w').close()
+
+        judge_args = reactive.run_args + \
+            (input, output, feedback_dir_name, )
+        solution_args = args
+        task = DOMJudgeReactiveTask(
+            judge_args, solution_args,
+            cwd=cwd, timeout=timeout, exclusive=precise)
+        (judge_proc, solution_proc) = yield task
 
         judge_code = judge_proc.returncode
         solution_code = solution_proc.returncode
