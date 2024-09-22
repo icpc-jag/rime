@@ -50,15 +50,17 @@ judge_runner_registry.Add(TestlibJudgeRunner)
 
 
 class ReactiveRunner(object):
-    def Run(self, reactive, solution, args, cwd, input, output, timeout,
-            precise):
+    def Run(self, reactive, args, cwd, input, output, timeout, precise,
+            stderr_file):
         raise NotImplementedError()
 
 
 class KUPCReactiveRunner(ReactiveRunner):
     PREFIX = 'kupc'
 
-    def Run(self, reactive, args, cwd, input, output, timeout, precise):
+    def Run(self, reactive, args, cwd, input, output, timeout, precise,
+            stderr_file):
+        # Not sure how solution's stderr should be handled.
         return reactive.Run(
             args=("'%s'" % ' '.join(args),),
             cwd=cwd,
@@ -72,16 +74,16 @@ class KUPCReactiveRunner(ReactiveRunner):
 class TestlibReactiveRunner(ReactiveRunner):
     PREFIX = 'testlib'
 
-    def Run(self, reactive, solution, args, cwd, input, output, timeout,
-            precise):
+    def Run(self, reactive, args, cwd, input, output, timeout, precise,
+            stderr_file):
         raise NotImplementedError()
 
 
 class NEERCReactiveRunner(ReactiveRunner):
     PREFIX = 'neerc'
 
-    def Run(self, reactive, solution, args, cwd, input, output, timeout,
-            precise):
+    def Run(self, reactive, args, cwd, input, output, timeout, precise,
+            stderr_file):
         raise NotImplementedError()
 
 
@@ -110,11 +112,11 @@ class Testset(targets.registry.Testset):
         Never cache results.
         Returns TestCaseResult.
         """
-        outfile, judgefile = [
+        outfile, judgefile, stderrfile = [
             os.path.join(
                 solution.out_dir,
                 os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-            for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
+            for ext in (consts.OUT_EXT, consts.JUDGE_EXT, consts.STDERR_EXT)]
         precise = (ui.options.precise or ui.options.parallelism <= 1)
         # reactive
         if self.reactives:
@@ -129,7 +131,8 @@ class Testset(targets.registry.Testset):
                 args=solution.code.run_args, cwd=solution.out_dir,
                 input=testcase.infile,
                 output=outfile,
-                timeout=testcase.timeout, precise=precise)
+                timeout=testcase.timeout, precise=precise,
+                stderr_file=stderrfile)
             # Normally, res is codes.RunResult.
             # Some reactive variants returns TestCaseResult
             if isinstance(res, test.TestCaseResult):
@@ -143,7 +146,8 @@ class Testset(targets.registry.Testset):
                 args=(), cwd=solution.out_dir,
                 input=testcase.infile,
                 output=outfile,
-                timeout=testcase.timeout, precise=precise)
+                timeout=testcase.timeout, precise=precise,
+                stderr_file=stderrfile)
         if res.status == core_codes.RunResult.TLE:
             yield test.TestCaseResult(solution, testcase,
                                       test.TestCaseResult.TLE,
@@ -195,7 +199,8 @@ class Testset(targets.registry.Testset):
                 cwd=reference_solution.out_dir,
                 input=testcase.infile,
                 output=testcase.difffile,
-                timeout=None, precise=False)
+                timeout=None, precise=False,
+                stderr_file=os.devnull)
             # Some reactive variants returns TestCaseResult
             if isinstance(res, test.TestCaseResult):
                 if res.verdict != test.TestCaseResult.AC:

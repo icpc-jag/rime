@@ -6,7 +6,6 @@ import requests
 import shutil
 import signal
 import subprocess
-import tempfile
 import threading
 import time
 
@@ -74,9 +73,10 @@ class DOMJudgeJudgeRunner(flexible_judge.JudgeRunner):
 
 
 class DOMJudgeReactiveTask(taskgraph.Task):
-    def __init__(self, judge_args, solution_args, **kwargs):
+    def __init__(self, judge_args, solution_args, solution_stderr, **kwargs):
         self.judge_args = judge_args
         self.solution_args = solution_args
+        self.solution_stderr = solution_stderr
         self.judge_proc = None
         self.solution_proc = None
         if 'timeout' in kwargs:
@@ -156,7 +156,8 @@ class DOMJudgeReactiveTask(taskgraph.Task):
             **self.kwargs)
         self.solution_proc = subprocess.Popen(
             self.solution_args, stdin=self.judge_proc.stdout,
-            stdout=self.judge_proc.stdin, **self.kwargs)
+            stdout=self.judge_proc.stdin, stderr=self.solution_stderr,
+            **self.kwargs)
         # Makes writing side responsible to close the pipe.
 
         def pipe_closer(write_proc, read_proc):
@@ -206,22 +207,24 @@ class DOMJudgeReactiveRunner(flexible_judge.ReactiveRunner):
     PREFIX = 'domjudge'
 
     @taskgraph.task_method
-    def Run(self, reactive, args, cwd, input, output, timeout, precise):
+    def Run(self, reactive, args, cwd, input, output, timeout, precise,
+            stderr_file):
         feedback_dir_name = os.path.join(
             cwd,
             os.path.splitext(os.path.basename(input))[0] + '.feedback')
         if os.path.exists(feedback_dir_name):
             shutil.rmtree(feedback_dir_name)
         os.makedirs(feedback_dir_name, exist_ok=True)
-        # 2nd argument is an "expected output" file, which is not supported
-        # in rime interactive for now.
-        # As a placeholder, using a temporary file.
-        with tempfile.NamedTemporaryFile() as tmpfile:
+
+        # Makes sure output file exists.
+        open(output, 'w').close()
+
+        with open(stderr_file, 'w') as solution_stderr:
             judge_args = reactive.run_args + \
-                (input, tmpfile.name, feedback_dir_name, )
+                (input, output, feedback_dir_name, )
             solution_args = args
             task = DOMJudgeReactiveTask(
-                judge_args, solution_args,
+                judge_args, solution_args, solution_stderr,
                 cwd=cwd, timeout=timeout, exclusive=precise)
             (judge_proc, solution_proc) = yield task
 

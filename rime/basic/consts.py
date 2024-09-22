@@ -15,6 +15,7 @@ JUDGE_EXT = '.judge'
 CACHE_EXT = '.cache'
 LOG_EXT = '.log'
 VALIDATION_EXT = '.validation'
+STDERR_EXT = '.stderr'
 
 RIME_OUT_DIR = 'rime-out'
 

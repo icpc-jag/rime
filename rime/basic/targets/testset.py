@@ -507,17 +507,18 @@ class Testset(targets.TargetBase, problem.ProblemComponentMixin):
         Never cache results.
         Returns TestCaseResult.
         """
-        outfile, judgefile = [
+        outfile, judgefile, stderrfile = [
             os.path.join(
                 solution.out_dir,
                 os.path.splitext(os.path.basename(testcase.infile))[0] + ext)
-            for ext in (consts.OUT_EXT, consts.JUDGE_EXT)]
+            for ext in (consts.OUT_EXT, consts.JUDGE_EXT, consts.STDERR_EXT)]
         precise = (ui.options.precise or ui.options.parallelism <= 1)
         res = yield solution.Run(
             args=(), cwd=solution.out_dir,
             input=testcase.infile,
             output=outfile,
-            timeout=testcase.timeout, precise=precise)
+            timeout=testcase.timeout, precise=precise,
+            stderr_file=stderrfile)
         if res.status == core_codes.RunResult.TLE:
             yield test.TestCaseResult(solution, testcase,
                                       test.TestCaseResult.TLE,
