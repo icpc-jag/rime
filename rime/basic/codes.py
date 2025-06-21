@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import contextlib
 import optparse
 import os
 import os.path
@@ -35,13 +36,14 @@ class CodeBase(codes.Code):
 
     @taskgraph.task_method
     def Run(self, args, cwd, input, output, timeout, precise,
-            redirect_error=False, ok_returncode=0, ng_returncode=None):
+            redirect_error=False, stderr_file=None,
+            ok_returncode=0, ng_returncode=None):
         """Run the code and return RunResult."""
         try:
             result = yield self._ExecForRun(
                 args=tuple(list(self.run_args) + list(args)), cwd=cwd,
                 input=input, output=output, timeout=timeout, precise=precise,
-                redirect_error=redirect_error,
+                redirect_error=redirect_error, stderr_file=stderr_file,
                 ok_returncode=ok_returncode, ng_returncode=ng_returncode)
         except Exception as e:
             result = codes.RunResult('On execution: %s' % e, None)
@@ -73,18 +75,27 @@ class CodeBase(codes.Code):
 
     @taskgraph.task_method
     def _ExecForRun(self, args, cwd, input, output, timeout, precise,
-                    redirect_error=False, ok_returncode=0, ng_returncode=None):
-        with open(input, 'r') as infile:
-            with open(output, 'w') as outfile:
-                if redirect_error:
-                    errfile = subprocess.STDOUT
-                else:
-                    errfile = files.OpenNull()
-                yield (yield self._ExecInternal(
-                    args=args, cwd=cwd,
-                    stdin=infile, stdout=outfile, stderr=errfile,
-                    timeout=timeout, precise=precise,
-                    ok_returncode=ok_returncode, ng_returncode=ng_returncode))
+                    redirect_error=False, stderr_file=None,
+                    ok_returncode=0, ng_returncode=None):
+        with contextlib.ExitStack() as exitStack:
+            infile = exitStack.enter_context(open(input, 'r'))
+            outfile = exitStack.enter_context(open(output, 'w'))
+
+            if redirect_error and stderr_file:
+                # Internal inconsistency, this should not happen.
+                raise taskgraph.Bailout([False])
+            elif redirect_error:
+                errfile = subprocess.STDOUT
+            elif stderr_file:
+                errfile = exitStack.enter_context(open(stderr_file, 'w'))
+            else:
+                errfile = files.OpenNull()
+
+            yield (yield self._ExecInternal(
+                args=args, cwd=cwd,
+                stdin=infile, stdout=outfile, stderr=errfile,
+                timeout=timeout, precise=precise,
+                ok_returncode=ok_returncode, ng_returncode=ng_returncode))
 
     @taskgraph.task_method
     def _ExecInternal(self, args, cwd, stdin, stdout, stderr,
