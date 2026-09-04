@@ -86,11 +86,12 @@ class Solution(targets.TargetBase, problem.ProblemComponentMixin):
         yield True
 
     @taskgraph.task_method
-    def Run(self, args, cwd, input, output, timeout, precise):
+    def Run(self, args, cwd, input, output, timeout, precise,
+            stderr_file=None):
         """Run this solution."""
         yield (yield self.code.Run(
             args=args, cwd=cwd, input=input, output=output,
-            timeout=timeout, precise=precise))
+            timeout=timeout, precise=precise, stderr_file=stderr_file))
 
     @taskgraph.task_method
     def Test(self, ui):
